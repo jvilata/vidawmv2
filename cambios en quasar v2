@@ -1,0 +1,133 @@
+- actualizo yarn de 1.22.4 a 1.22.19, tengo que instalar: https://yarnpkg.com/latest.msi desde windows
+- Upgrade Node to at least v12.22.1, npm to at least v6.14.12 and yarn to at least v1.17.3.
+	+ primero instalo nvm desde https://github.com/coreybutler/nvm-windows/releases
+	+ nvm list -> node 16.14.0
+
+JV ==> AL FINAL HE OPTADO POR CREAR UN PROYECTO DESDE 0 Y COPIAR LOS COMPONENTES Y ARCHIVOS DE LA APP
+=====================================================================================================
+- Remove folders .quasar, node_modules and package-lock.json or yarn.lock file. This generally isn’t needed, but in some cases it will avoid trouble with yarn/npm upgrading the packages for the purpose of this guide.
+
+- Uninstall: @quasar/app
+	yarn remove @quasar/app ( en mi caso me dio error de no tener yarn.lock e hice primero un "yarn install" y despupués el remove)
+	
+- Install: @quasar/app-webpack v3, quasar v2, vue v3 and vue-router v4 packages (the last two are no longer supplied by @quasar/app):
+	yarn add --dev @quasar/app-webpack@3
+	yarn add quasar@2 vue@3 vue-router@4
+
+- Remove .quasar and node_modules folders, and package-lock.json/yarn.lock file, then run npm install/yarn install to regenerate the lock file. This forces the upgrade of the whole dependency graph (deep dependencies included) and avoids troubles with mismatching packages, especially webpack 5 related ones.
+
+- If you are using ESLint, then edit /.eslintrc.js:
+	// old way
+	parserOptions: {
+	  parser: 'babel-eslint'
+	},
+	extends: [
+	  'plugin:vue/essential' // or equivalent
+	]
+
+	// NEW way
+	parserOptions: {
+	  parser: '@babel/eslint-parser'
+	},
+	extends: [
+	  'plugin:vue/vue3-essential' // or equivalent
+	]
+	
+- Also upgrade ESLint deps in "package.json". Example:
+
+	"@babel/eslint-parser": "^7.0.0", // replaces babel-eslint !
+	"eslint": "^7.14.0",
+	"eslint-config-standard": "^16.0.2",
+	"eslint-plugin-import": "^2.19.1",
+	"eslint-plugin-node": "^11.0.0",
+	"eslint-plugin-promise": "^5.1.0",
+	"eslint-plugin-quasar": "^1.0.0",
+	"eslint-plugin-vue": "^7.0.0",
+	"eslint-webpack-plugin": "^2.4.0" // replaces eslint-loader !
+
+- In quasar.config.js, before the module.exports = function (ctx) add:
+
+	const ESLintPlugin = require('eslint-webpack-plugin')
+
+- In quasar.config.js -> build add:
+
+chainWebpack (chain) {
+  chain
+    .plugin('eslint-webpack-plugin')
+    .use(ESLintPlugin, [{ extensions: ['js', 'vue'] }])
+}
+
+- If you are using Vuex, you will need to manually install it:
+	$ yarn add vuex@4
+	
+- Edit quasar.config.js > framework > lang. It will be explained in the “Quasar language packs” section on this page.
+	// old way
+	framework: {
+	  lang: 'en-us'
+	}
+
+	// NEW way
+	framework: {
+	  lang: 'en-US'
+	}
+	
+- You’ll need to edit src/App.vue and remove the wrapper <div id="q-app">. You don’t (and should NOT) need it anymore.
+
+	<!-- old way -->
+	<template>
+	  <div id="q-app">
+		<router-view />
+	  </div>
+	</template>
+
+	<!-- NEW way -->
+	<template>
+	  <router-view />
+	</template>
+	
+	
+JV ==> AL FINAL HE OPTADO POR CREAR UN PROYECTO DESDE 0 Y COPIAR LOS COMPONENTES Y ARCHIVOS DE LA APP	
+	
+====================================================================	
+- CAMBIOS EN LA APP ESPECÍFICA:
+======================================================================
+en props: --> cambia :value por :model-value o por v-model	y en componente props: [modelValue]
+en q-inputs -> cambia @input  por @update:model-value
+en q-select con multiples values -> hay que poner:
+	:model-value="scope.value.split(',')"
+                  @update:model-value="(value) => scope.value=value.join()"
+y en el metodo "update" llamar 2 veces al axios para que el proxy de el valor correcto:
+	updateRecord (record) {
+      return this.$axios.put(`acciones/bd_acciones.php/findAccionesFilter/${record.id}`, JSON.stringify(record))
+        .then(response => {
+          return this.$axios.put(`acciones/bd_acciones.php/findAccionesFilter/${record.id}`, JSON.stringify(record))
+            .then() // lo hago 2 veces porque hay problemas de sincronismo
+        })
+
+CAMBIOS:
+-en MAIN:
+	- cambiar value por modelValue y reemplazar
+	- en componente Filter y Grid cambiar :value por :model-value o v-model
+	- si el getRecords hace uso de axios pasarlo al Grid (copiar de accionesMain y grid)
+- en FILTER:
+	- cambiar en props-> modelValue y reemplazar
+	- cambiar :values y @inputs
+- en GRID:
+ + como solo se puede pasar el parámetro de id, lo demás lo tengo que poner en Store-tabs y declaro una vble: value: {} 
+	...mapState('tabs', ['tabs'])
+	mounted() { this.value = this.tabs[this.id].meta.value
+	
+	-> poner anchuras en todos los campos de fecha
+	- en this.$emit -> sólo llega al siguiente nivel, para que llegue más arriba hay que propagar
+
+	- cambiar q-table , :data por :rows, añadir "wrap-cells"
+	- el q-popup-edit -> añadir: v-slot="scope" y en cada componente (input, select, etc.): v-model="scope.value"
+	- en el metodo "update" llamar 2 veces al axios para que el proxy de el valor correcto:
+	updateRecord (record) {
+      delete record.nomObjeto // campo calculado
+      return this.$axios.put(`acciones/bd_acciones.php/findAccionesFilter/${record.id}`, JSON.stringify(record))
+        .then(response => {
+          return this.$axios.put(`acciones/bd_acciones.php/findAccionesFilter/${record.id}`, JSON.stringify(record))
+            .then() // lo hago 2 veces porque hay problemas de sincronismo
+        })
+	- en el metodo "delete", borrar el parámetro, solo url
