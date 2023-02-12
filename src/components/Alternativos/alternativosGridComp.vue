@@ -28,7 +28,6 @@
         <!-- formulario con campos de filtro -->
         <alternativosCompFilter
           :value="filterRecord"
-          @input="(value) => Object.assign(filterRecord, value)"
           @getRecords="v => getRecords(v)"
           @hide="expanded = !expanded"
         />
@@ -52,7 +51,7 @@
             </q-item>
             <q-item >
               <q-item-section align="center">
-                <dashboardResumenPatrimonio v-model="registrosAnalisisFondos1" :key="refreshRec"/>
+                <dashboardResumenPatrimonio :value="registrosAnalisisFondos1" :key="refreshRec"/>
               </q-item-section>
             </q-item>
           </div>
@@ -64,7 +63,7 @@
             </q-item>
             <q-item >
               <q-item-section align="center">
-                <dashboardResumenPatrimonio v-model="registrosAnalisisFondos2" :key="refreshRec1"/>
+                <dashboardResumenPatrimonio :value="registrosAnalisisFondos2" :key="refreshRec1"/>
               </q-item-section>
             </q-item>
           </div>
@@ -76,7 +75,7 @@
             </q-item>
             <q-item >
               <q-item-section align="center">
-                <alternativosPieChartFiltros v-model="registrosSeleccionados"/>
+                <alternativosPieChartFiltros :value="registrosSeleccionados"/>
               </q-item-section>
             </q-item>
           </div>
@@ -93,9 +92,10 @@
           :rows-per-page-options="[0]"
           :virtual-scroll-sticky-size-start="48"
           row-key="id"
-          :data="registrosSeleccionados"
+          :rows="registrosSeleccionados"
           :columns="columns"
           table-style="max-height: 50vh; max-width: 93vw"
+          wrap-cells
         >
 
           <template v-slot:header="props">
@@ -129,11 +129,12 @@
                     v-model="props.row[col.name]"
                     max-height="600px"
                     buttons
+                    v-slot="scope"
                     @save="updateRecord(props.row)">
                     <!-- aqui definimos las ediciones especificas para cada columna -->
                   <q-select v-if="col.name === 'seleccionado'"
                       class="col-xs-12 col-sm-6"
-                      v-model="props.row[col.name]"
+                      v-model="scope.value"
                       :options="listaSINO"
                       option-value="id"
                       option-label="desc"
@@ -193,13 +194,13 @@ export default {
       },
       columns: [
         { name: 'seleccionado', align: 'left', label: 'Selec.', field: 'seleccionado', sortable: true, style: 'width: 50px; whiteSpace: normal', format: val => (val === '1' ? 'SI' : '') },
-        { name: 'nombre', align: 'left', label: 'Fund Name', field: 'nombre', sortable: true, style: 'width: 200px; whiteSpace: normal' },
+        { name: 'nombre', align: 'left', label: 'Fund Name', field: 'nombre', sortable: true, style: 'width: 300px; whiteSpace: normal' },
         { name: 'nombreEntidad', align: 'left', label: 'Entity', field: 'nombreEntidad', sortable: true, style: 'width: 200px; whiteSpace: normal' },
-        { name: 'descEstadoActivo', align: 'left', label: 'State', field: 'descEstadoActivo', sortable: true },
+        { name: 'descEstadoActivo', align: 'left', label: 'State', field: 'descEstadoActivo', sortable: true, style: 'width: 100px;' },
         { name: 'launch', align: 'left', label: 'Launch', field: 'launch', sortable: true },
         { name: 'targetSize', align: 'left', label: 'Size', field: 'targetSize', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0') },
         { name: 'minimumTicket', align: 'left', label: 'Min.Tick', field: 'minimumTicket', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0') },
-        { name: 'duration', align: 'left', label: 'Duration', field: 'duration', sortable: true },
+        { name: 'duration', align: 'left', label: 'Duration', field: 'duration', sortable: true, style: 'width: 100px;' },
         { name: 'investmentPeriod', align: 'left', label: 'Inv.Per.', field: 'investmentPeriod', sortable: true },
         { name: 'gpCommitment', align: 'left', label: 'GPCom.', field: 'gpCommitment', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0') },
         { name: 'decisionDeadline', align: 'left', label: 'Dec.Deadline', field: 'decisionDeadline', sortable: true, format: val => date.formatDate(new Date(val), 'DD-MM-YYYY') },

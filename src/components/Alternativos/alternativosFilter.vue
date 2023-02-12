@@ -150,10 +150,6 @@ export default {
     this.filterR = Object.assign({}, this.value) // asignamos valor del parametro por si viene de otro tab
     this.loadEntidades()
     if (this.listaActivos.length <= 0) this.loadActivos(this.user.codEmpresa) // carga store listaActivos
-  },
-  unmounted () {
-    // guardamos valor en tabs por si despus queremos recuperarlo
-    this.$emit('input', this.filterR)
   }
 }
 </script>

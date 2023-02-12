@@ -77,14 +77,14 @@ export default {
         {
           title: 'Planif.Inversión',
           icon: 'list',
-          link: { name: 'gridPlanif' }
+          link: { name: 'gridPlanifComp' }
         },
-        {
+      /*  {
           title: 'Planif.Comprom',
           icon: 'list',
           link: { name: 'gridPlanifComp' }
         },
-        {
+      */  {
           title: 'Resumen Tipos',
           icon: 'pie_chart',
           link: { name: 'resumenTipos' }

@@ -18,7 +18,7 @@
       <div class="col" >
         <q-item >
           <q-item-section align="center">
-            <dashboardResumenPatrimonio v-model="registrosResumenPatrimonio" :key="refreshRec"/>
+            <dashboardResumenPatrimonio :value="registrosResumenPatrimonio" :key="refreshRec"/>
           </q-item-section>
         </q-item>
       </div>
@@ -68,9 +68,7 @@ export default {
           this.$q.dialog({ title: 'Error', message: error })
         })
     }
-  },
-  mounted () {
-  },
+  },  
   components: {
     dashboardResumenPatrimonio: dashboardResumenPatrimonio
   }
