@@ -266,7 +266,7 @@ export default {
                           // patrimonioY0 se calcula al final de Y0
 
                           this.registrosSeleccionados.forEach(element => {
-                            element.cajaExtraY0 = (element.distribuidoY0 === undefined ? 0 : parseFloat(element.distribuidoY0) * 0.50) // conservador, solo 50% de distribuido esperado
+                            element.cajaExtraY0 = (element.distribuidoY0 === undefined ? 0 : parseFloat(element.distribuidoY0) * 0) // conservador, solo 0% de distribuido esperado
                             element.pprevistoY0 = element.realcomprometidoY0 * 100 / this.totRealCompY0
                             element.pajusteY0 = (parseFloat(element.pTeorico) - element.pprevistoY0)
                             element.importeAjusteY0 = this.totRealCompY0 * element.pajusteY0 / 100
@@ -330,7 +330,7 @@ export default {
                           altFija = 0
                           altCapRiesgo = 0
                           this.registrosSeleccionados.forEach(element => {
-                            element.cajaExtraY1 = (element.distribuidoY1 === undefined ? 0 : parseFloat(element.distribuidoY1) * 0.50) // conservador, solo 50% de distribuido esperado
+                            element.cajaExtraY1 = (element.distribuidoY1 === undefined ? 0 : parseFloat(element.distribuidoY1) * 0) // conservador, solo 0% de distribuido esperado
                             element.pprevistoY1 = element.realcomprometidoY1 * 100 / this.totRealCompY1
                             element.pajusteY1 = parseFloat(element.pTeorico) - element.pprevistoY1
                             element.importeAjusteY1 = this.totRealCompY1 * element.pajusteY1 / 100
