@@ -276,6 +276,12 @@ export default {
         }
         return this.$axios.get('activos/bd_act_rentabEspAnual.php/duplicarRentabAnual', { params: record })
           .then(response => {
+            if (response.data.result !== 'OK') {
+              this.$q.dialog({ title: 'Error', message: 'Ya hay rentabilidades cargadas en este ejercicio en los activos:' + 
+                response.data.result.substring(3) })
+            } else {
+              this.$q.dialog({ title: 'Ok', message: 'Se han generado las rentabilidades del ejercicio ' + record.ejercicio })
+            }
           })
           .catch(error => {
             this.$q.dialog({ title: 'Error', message: error })

@@ -79,12 +79,12 @@ export default {
           icon: 'list',
           link: { name: 'gridPlanifComp' }
         },
-      /*  {
-          title: 'Planif.Comprom',
+        {
+          title: 'Compr.RVble',
           icon: 'list',
-          link: { name: 'gridPlanifComp' }
+          link: { name: 'gridPlanif' }
         },
-      */  {
+       {
           title: 'Resumen Tipos',
           icon: 'pie_chart',
           link: { name: 'resumenTipos' }

@@ -69,8 +69,9 @@
           >
             <div v-if="['pRentTeorica'].includes(col.name)">{{ numeralFormat(registrosSeleccionados.reduce((a, b) => a + (parseFloat(b.pRentTeorica) * parseFloat(b.pTeorico)/10000 || 0), 0), '0.00%') }}</div>
             <div v-if="['pRentEsperada'].includes(col.name)">{{ numeralFormat(registrosSeleccionados.reduce((a, b) => a + (parseFloat(b.pRentEsperada) * parseFloat(b.prealInicial)/10000 || 0), 0), '0.00%') }}</div>
+            <div v-if="['rentabAcum'].includes(col.name)">{{ numeralFormat(parseFloat(registrosPanelDatos.rentabilidadReal)/100, '0.00%') }}</div>
               <div v-if="['aInvertirY0Mes'].includes(col.name)">{{ numeralFormat(registrosSeleccionados.reduce((a, b) => a + (parseFloat(b.aInvertirY0) / 12), 0), '0,00') }}</div>
-            <div v-if="!['pRentTeorica','pRentEsperada','tipoActivo', 'aInvertirY0Mes'].includes(col.name) && (!ocultar || ocultar && !['comprometido7_2', 'distribuido', 'comprometido', 'comprometidotot', 'realcomprometido', 'pprevisto', 'pajuste', 'importeAjuste', 'cajaExtra'].includes(col.name.substring(0,col.name.length-2)))">
+            <div v-if="!['pRentTeorica','pRentEsperada','tipoActivo', 'aInvertirY0Mes', 'rentabAcum'].includes(col.name) && (!ocultar || ocultar && !['comprometido7_2', 'distribuido', 'comprometido', 'comprometidotot', 'realcomprometido', 'pprevisto', 'pajuste', 'importeAjuste', 'cajaExtra'].includes(col.name.substring(0,col.name.length-2)))">
               {{ numeralFormat(Math.round(registrosSeleccionados.reduce((a, b) => a + (b[col.name]===undefined?0:parseFloat(b[col.name])), 0) * 100) / 100) }}
             </div>
           </q-th>
@@ -112,6 +113,21 @@ export default {
         { name: 'tipoActivo', required: true, label: 'Tipo Activo', align: 'right', field: 'tipoActivo' },
         { name: 'pRentTeorica', required: true, label: 'Rent.Libros', align: 'right', field: 'pRentTeorica' },
         { name: 'pRentEsperada', required: true, label: 'Rent.Esper', align: 'right', field: 'pRentEsperada', format: val => parseFloat(val).toFixed(2) },
+        {
+          name: 'rentabAcum',
+          required: true,
+          label: '%Rent.Real',
+          align: 'right',
+          field: b => {
+            var res = 0
+            var newValue = parseFloat(b.patrimonio) + parseFloat(b.facturado) + parseFloat(b.impcobropago) - (parseFloat(b.patrimonioInicial) + parseFloat(b.impcompvent))
+            if (newValue !== 0 && (parseFloat(b.patrimonioInicial) + parseFloat(b.impcompras)) !== 0) {
+              res = newValue * 100 / (parseFloat(b.patrimonioInicial) + parseFloat(b.impcompras))
+            }
+            return res
+          },
+          format: val => parseFloat(val).toFixed(2)
+        },
         { name: 'pTeorico', required: true, label: '%Part.Ideal', align: 'right', field: 'pTeorico' },
         { name: 'dividendos', required: true, label: 'Dividendos', align: 'right', field: 'dividendos', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
         { name: 'patrimonio', required: true, label: 'patrimonioY-1', align: 'right', field: 'patrimonio', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
@@ -388,7 +404,7 @@ export default {
     getPanelDatos (objFilter) { // lo duplico de dashboardPanelDatos, me hace falta para los totales del grid
       var obj1 = {}
       Object.assign(obj1, objFilter)
-      obj1.mes = '01' + objFilter.mes.substring(2)
+      // obj1.mes = '01' + objFilter.mes.substring(2)
       // cards resumen de rentabilidad y patrimonio actual
       this.$axios.get('movimientos/bd_movimientos.php/findcpanelDatos/', { params: obj1 })
         .then(response => {
