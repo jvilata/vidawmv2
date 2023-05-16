@@ -5,7 +5,7 @@
         <q-btn flat @click="leftDrawerOpen = !leftDrawerOpen" round dense icon="menu" />
         <div class="items-center no-wrap absolute-center">
           <div class="text-subtitle1">{{ nomAplicacion }}</div>
-          <div class="text-caption">{{ user.nomEmpresa }}</div>
+          <div class="text-caption">{{ tmpUser.nomEmpresa }}</div>
         </div>
         <div class="q-gutter-sm q-pr-md row items-center no-wrap absolute-right">
           <q-btn round dense flat color="grey-8" icon="notifications" @click="openForm({ name: 'Acciones', label: 'Acciones' })">
@@ -16,7 +16,7 @@
           </q-btn>
           <q-btn round flat class="bg-red-9 text-weight-light">
             <q-avatar size="40px">
-              {{ user.user.email.substr(0,2) }}
+              {{ tmpUser.user.email.substr(0,2) }}
             </q-avatar>
             <q-tooltip>Account</q-tooltip>
             <q-menu auto-close :offset="[110, 0]">
@@ -25,12 +25,12 @@
                   <div class="row">
                     <div class="col-4">
                       <q-avatar round flat size="80px" class="bg-red-9 text-white text-weight-light">
-                        {{ user.user.email.substr(0,2).toUpperCase() }}
+                        {{ tmpUser.user.email.substr(0,2).toUpperCase() }}
                       </q-avatar>
                     </div>
                     <div class="col">
-                      <div class="text-weight-bold">{{ user.pers.nombre }}</div>
-                      <div>{{ user.user.email }}</div>
+                      <div class="text-weight-bold">{{ tmpUser.pers.nombre }}</div>
+                      <div>{{ tmpUser.user.email }}</div>
                       <q-btn flat class="text-weight-light" color="primary" @click="desconectar">Desconectar</q-btn>
                     </div>
                   </div>
@@ -116,6 +116,7 @@ export default {
   data () {
     return {
       nomAplicacion: 'Wealth Management',
+      tmpUser: { user: { email: '' }, pers: { userRol: -1 } },
       accionesPendientes: 0,
       leftDrawerOpen: false,
       miniState: false,
@@ -272,13 +273,15 @@ export default {
     ...mapState('login', ['user']),
     menuItemsFilter () {
       var arr = []
+      //console.log(this.tmpUser, this,this.menuItems)
       this.menuItems.forEach(element => {
-        if ((this.user.pers.userRol === '2' && element.title === 'Fichajes') || // solo fichaje
-          (this.user.pers.userRol === '1') || // admin
-          (this.user.pers.userRol === '0' && element.rol === '0')) {
+        if ((this.tmpUser.pers.userRol === '2' && element.title === 'Fichajes') || // solo fichaje
+          (this.tmpUser.pers.userRol === '1') || // admin
+          (this.tmpUser.pers.userRol === '0' && element.rol === '0')) {
           arr.push(element)
         }
       })
+      //console.log('arr', arr)
       return arr
     }
   },
@@ -302,9 +305,14 @@ export default {
     }
   },
   mounted () {
-    // llamo a la action->addTab del store->tabs y param: ['acciones','acciones',{},1]
-    if (this.user.pers.userRol !== '2') this.addTab(['Acciones', 'Acciones', {}, 1])
-    else this.addTab(['fichajesMain', 'Fichajes', {}, 1])
+    if (Object.keys(this.user).length === 0) { // por si no ha pasado la validacion doblefactor
+      this.desconectar()
+    } else {
+      Object.assign(this.tmpUser, this.user)
+      // llamo a la action->addTab del store->tabs y param: ['acciones','acciones',{},1]
+      if (this.user.pers.userRol !== '2') this.addTab(['Acciones', 'Acciones', {}, 1])
+      else this.addTab(['fichajesMain', 'Fichajes', {}, 1])
+    }
   }
 }
 </script>

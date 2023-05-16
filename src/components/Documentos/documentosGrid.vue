@@ -244,7 +244,7 @@ export default {
     }
   },
   mounted () {
-    this.value = this.tabs[this.id].meta.value
+    Object.assign(this.value, this.tabs[this.id].meta.value)
     this.getRecords()
   }
 }

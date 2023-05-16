@@ -232,7 +232,7 @@ export default {
       // se reutiliza el grid de movimientos para el form de activos y de facturas
       var record = {
         codEmpresa: this.user.codEmpresa,
-        vigente: 1,
+        // vigente: 1, // esto ha aparecido aquí y no deberia estar
         idObjeto: id,
         tipoObjeto: (this.value.tipoFactura !== undefined ? 'F' : (this.value.tipoActivo !== undefined ? 'A' : 'N')),
         tipoOperacion: (this.value.tipoFactura !== undefined ? 'PAGO' : (this.value.tipoActivo !== undefined ? 'VALORACION' : 'NOMINA')),
@@ -337,7 +337,7 @@ export default {
     }
   },
   mounted () {
-    this.value = this.tabs[this.id].meta.value
+    Object.assign(this.value, this.tabs[this.id].meta.value)
     this.getRecords()
   },
   components: {

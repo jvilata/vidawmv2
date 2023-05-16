@@ -144,7 +144,21 @@
             </template>
           </q-input>
         </div>
-        <q-input class="row q-mb-sm" outlined clearable v-model="recordToSubmit.horasJornada" label="Horas Jornada"/>
+        <div class="row q-mb-sm">
+          <q-input class="col-xs-6 col-sm-8" outlined clearable v-model="recordToSubmit.horasJornada" label="Horas Jornada"/>
+          <q-select class="col-xs-6 col-sm-4"
+            label="Doble Factor"
+            stack-label
+            outlined
+            clearable
+            v-model="recordToSubmit.dobleFactor"
+            :options="listaSINO"
+            option-value="id"
+            option-label="desc"
+            emit-value
+            map-options
+          />
+        </div>
         </q-card-section>
     </q-card>
     </q-scroll-area>
@@ -179,7 +193,8 @@ export default {
         horaFin1: '',
         horaInicio2: '',
         horaFin2: '',
-        horasJornada: ''
+        horasJornada: '',
+        dobleFactor: 0
       }, // inicializamos los campos, sino no funciona bien
       hourOptions: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
       minuteOptions: [0, 30],
@@ -222,9 +237,10 @@ export default {
           this.colorBotonSave = 'primary'
           this.hasChanges = false
           this.$q.notify('Se ha actualizado registro')
+          this.$emit('updated', this.recordToSubmit)
         })
         .catch(error => {
-          this.$q.dialog({ title: 'Error', message: error })
+          this.$q.dialog({ title: 'Error2', message: error })
         })
     },
     formatDate (pdate) {
@@ -245,7 +261,7 @@ export default {
     }
   },
   mounted () {
-    this.value = this.tabs[this.id].meta.value
+    Object.assign(this.value, this.tabs[this.id].meta.value)
     var objFilter = {
       id: this.value.id
     }
@@ -263,8 +279,8 @@ export default {
       this.$q.dialog({ title: 'Aviso', message: '¿ Desea guardar cambios ?', ok: true, cancel: true, persistent: true })
         .onOk(() => { this.updateRecord() })
     }
-    this.$emit('input', this.recordToSubmit) // v-model: para devolver el valor a atributo 'value', evento input
-    this.$emit('changeTab', { idTab: this.value.idTab, filterRecord: {}, registrosSeleccionados: Object.assign({}, this.recordToSubmit) }) // para conservar valores cuando vuelva a selec tab
+    // bthis.$emit('input', this.recordToSubmit) // v-model: para devolver el valor a atributo 'value', evento input
+    // this.$emit('changeTab', { idTab: this.value.idTab, filterRecord: {}, registrosSeleccionados: Object.assign({}, this.recordToSubmit) }) // para conservar valores cuando vuelva a selec tab
   }
 }
 </script>

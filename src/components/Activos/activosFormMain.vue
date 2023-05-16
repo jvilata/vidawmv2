@@ -173,7 +173,7 @@ export default {
     }
   },
   mounted () {
-    this.value = this.tabs[this.id].meta.value
+    Object.assign(this.value, this.tabs[this.id].meta.value)
     this.getCounters()
     this.$router.replace({ name: this.menuItems[0].link.name, params: { id: this.id } }).catch(() => {})
   }

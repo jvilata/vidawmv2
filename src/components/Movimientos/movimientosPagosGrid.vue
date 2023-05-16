@@ -98,7 +98,7 @@
                 v-slot="scope"
                 @save="updateRecord(props.row)">
                 <!-- aqui definimos las ediciones especificas para cada columna -->
-                <q-input v-model="props.row[col.name]" v-if="!['generar', 'tipoOperacion','fecha','descripcion'].includes(col.name)"/>
+                <q-input v-model="scope.value" v-if="!['generar', 'tipoOperacion','fecha','descripcion'].includes(col.name)"/>
                 <q-select v-if="['generar'].includes(col.name)"
                   v-model="scope.value"
                   :options="listaSINO"
@@ -228,7 +228,7 @@ export default {
       }
       return this.$axios.put(`movimientos/bd_movimientos.php/movimientos/${updated.id}`, JSON.stringify(updated))
         .then(response => {
-          updated = {
+          updated = { // para que refresque el valor de record
             id: record.id,
             generar: record.generar,
             importe: record.importe,
@@ -339,7 +339,7 @@ export default {
       if (this.value[0].tipoOperacion === 'NOMINA') strobjeto = 'nómina'
       var tmpAsunto = this.user.nomEmpresa + ' ha ordenado el pago de su ' + strobjeto + ' de importe ' + this.$numeral(parseFloat(record.importe)).format('0,0.00') + '€'
       var str = 'Hola,<br>En esta fecha, ' + tmpAsunto + ' y referencia ' + record.descripcion + ' en su cuenta ' + record.cuentaCorriente + '<br>Atentamente<br>' + this.entidadSelf.nombre + '<br>' +
-          (this.entidadSelf.logo !== '' ? '<img src="http://vidawm.com/img/' + this.entidadSelf.logo + '"  width="100">' : '')
+          (this.entidadSelf.logo !== '' ? '<img src="http://vidawm.com/privado/img/' + this.entidadSelf.logo + '"  width="100">' : '')
 
       this.recordSendMail = {
         destino: email,

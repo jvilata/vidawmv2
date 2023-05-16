@@ -243,7 +243,7 @@ export default {
         asunto: 'Factura de ' + this.user.nomEmpresa + ' número: ' + selected.nroFactura,
         texto: 'Hola,<br>Le adjuntamos factura ' + selected.nroFactura + ' por los servicios prestados de la empresa:' +
           this.user.nomEmpresa + '<br>Atentamente,<br>' + this.entidadSelf.nombre + '<br>' +
-          (this.entidadSelf.logo !== '' ? '<img src="http://vidawm.com/img/' + this.entidadSelf.logo + '"  width="100">' : ''),
+          (this.entidadSelf.logo !== '' ? '<img src="http://vidawm.com/privado/img/' + this.entidadSelf.logo + '"  width="100">' : ''),
         url: 'onedrive/downloadFactura.php?empresa=' + this.user.nomEmpresa + '&nombrePDF=' + selected.archivoDrive + '&carpeta=' + selected.carpeta
       }
       this.visibleSendMail = true
@@ -260,7 +260,7 @@ export default {
     }
   },
   mounted () {
-    this.value = this.tabs[this.id].meta.value
+    Object.assign(this.value, this.tabs[this.id].meta.value)
     this.getRecord()
   },
   unmounted () {

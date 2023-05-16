@@ -110,6 +110,11 @@ export default {
           link: { name: 'patrimonioEntidad' }
         },
         {
+          title: 'Rentab Activos',
+          icon: 'bar_chart',
+          link: { name: 'rentabActivos' }
+        },
+        {
           title: 'Comprometido',
           icon: 'insert_chart_outlined',
           link: { name: 'patrimonioComprometido' }

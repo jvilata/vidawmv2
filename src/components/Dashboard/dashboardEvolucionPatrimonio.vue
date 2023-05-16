@@ -5,6 +5,16 @@
         <q-item-section align="center">
           <div class="text-h6">Evolución de Patrimonio</div>
         </q-item-section>
+        <q-item-section  class="col-sm-4" align="center">
+          <q-select 
+            outlined
+            label="Periodo"
+            stack-label
+            v-model="filterR.periodo"
+            :options="listaPeriodo"
+            @update:model-value="cargarDatosGraficos"
+          />
+        </q-item-section>
       </q-item>
       <q-item >
         <q-item-section align="center">
@@ -21,7 +31,10 @@ export default {
   props: ['value'],
   data: function () {
     return {
+      filterR: { periodo: 'Años' },
+      listaPeriodo: ['Años', 'Meses'],
       registrosEvolucionPatrimonio: [],
+      registrosEvolucionPatrimonioTmp: [],
       chartOptions: {
         labels: [],
         stacked: false,
@@ -66,7 +79,7 @@ export default {
       // donut resumen patrimonio
       this.$axios.get('movimientos/bd_movimientos.php/findcevolucionPatrimonio/', { params: objFilter })
         .then(response => {
-          this.registrosEvolucionPatrimonio = response.data
+          this.registrosEvolucionPatrimonioTmp = [...response.data]
           this.cargarDatosGraficos()
         })
         .catch(error => {
@@ -74,7 +87,9 @@ export default {
         })
     },
     cargarDatosGraficos () {
-      // this.registrosEvolucionPatrimonio // [{serie: "ALTERN.R FIJA", etiquetavalor: "03/2020", valor: "733464.0000"},...]
+      this.series = []
+      this.registrosEvolucionPatrimonio = [...this.registrosEvolucionPatrimonioTmp]
+
       this.registrosEvolucionPatrimonio.sort(function (a, b) { // ordeno el array por etiquetavalor
         return a.etiquetavalor.localeCompare(b.etiquetavalor)
       })
@@ -82,30 +97,59 @@ export default {
       var arr = []
       this.registrosEvolucionPatrimonio.forEach(row => {
         if (row.etiquetavalor !== etiqAnt) {
-          arr.push(row.etiquetavalor) // la cambiar de etiqueta guardo la anterior
+          if (this.filterR.periodo==='Meses' || row.etiquetavalor.substring(4,7)==='/01') { // solo mes enero
+            arr.push(row.etiquetavalor) // la cambiar de etiqueta guardo la anterior
+          }
           etiqAnt = row.etiquetavalor
         }
       })
       this.chartOptions = {
+        ...this.chartOptions,
         labels: arr // es un array de strings
       }
 
-      this.registrosEvolucionPatrimonio.sort(function (a, b) { // ordeno el array por serie
-        return a.serie.localeCompare(b.serie)
-      })
-      var serieAnt = ''
-      var obj = {}
+      //this.registrosEvolucionPatrimonio.sort(function (a, b) { // ordeno el array por serie
+      //  return a.serie.localeCompare(b.serie)
+      //})
+      var objSerieBruto = {
+        name: 'Patrimonio Bruto',
+        type: 'line',
+        data: []
+      }
+      var objSerieApor = {
+        name: 'Aportaciones',
+        type: 'line',
+        data: []
+      }
+      var objSerieDiv = {
+        name: 'Dividendos',
+        type: 'line',
+        data: []
+      }
+      var objSerieBenef = {
+        name: 'Beneficio',
+        type: 'line',
+        data: []
+      }
+      this.series.push(objSerieBruto) 
+      this.series.push(objSerieApor) 
+      this.series.push(objSerieBenef)
+      this.series.push(objSerieDiv)
+      var divacum = 0
       this.registrosEvolucionPatrimonio.forEach(row => {
-        if (row.serie !== serieAnt) { // this.serie es un array de objetos {name:'serie', type:'line', data:[1,3,4,..]}
-          obj = {
-            name: row.serie,
-            type: 'line',
-            data: []
+        if (row.etiquetavalor.substring(4,7)==='/01') divacum += parseFloat(row.dividendos)
+        if (this.filterR.periodo==='Meses' || row.etiquetavalor.substring(4,7)==='/01') { // solo mes enero
+          objSerieBruto.data.push(row.bruto)
+          if (row.etiquetavalor.substring(0,4)<='2018') {
+            objSerieApor.data.push(row.bruto)
+            divacum = parseFloat(row.bruto)
+          } else {
+            if (row.etiquetavalor.substring(4,7)==='/01') objSerieApor.data.push(divacum)
+            else objSerieApor.data.push(divacum + parseFloat(row.dividendos))
           }
-          this.series.push(obj) // la cambiar de serie guardo la anterior
-          serieAnt = row.serie
+          objSerieBenef.data.push(row.beneficio)
+          objSerieDiv.data.push(row.dividendos)
         }
-        obj.data.push(row.valor)
       })
     }
   },

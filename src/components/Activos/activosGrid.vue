@@ -208,7 +208,7 @@ export default {
         cancel: true,
         persistent: true
       }).onOk(() => {
-        return this.$axios.delete(`activos/bd_activos.php/findActivosFilter/${id}`, JSON.stringify({ id: id }))
+        return this.$axios.delete(`activos/bd_activos.php/findActivosFilter/${id}`)
           .then(response => {
             var index = this.registrosSeleccionados.findIndex(function (record) { // busco elemento del array con este id
               if (record.id === id) return true

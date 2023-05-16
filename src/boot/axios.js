@@ -13,7 +13,7 @@ const headerFormData = {
   }
 }
 const axiosInstance = axios.create({
-  baseURL: 'https://vidawm.com/privado/php/',
+  baseURL: 'https://vidawm.com/privado/php/', //  'http://localhost/vidawm/php/', // 
   withCredentials: true,
   headers: {
     Accept: ['application/json', 'text/html', 'application/xhtml+xml', 'application/xml'],

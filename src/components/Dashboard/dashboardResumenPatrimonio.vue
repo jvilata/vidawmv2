@@ -1,5 +1,5 @@
 <template>
-  <apexchart ref="donut" height="300px" type="donut" :options="chartOptionsdonut" :series="seriesdonut"></apexchart>
+  <apexchart height="300px" type="donut" :options="chartOptionsdonut" :series="seriesdonut" :key="refresh"></apexchart>
 </template>
 <script>
 // doc in: https://github.com/apexcharts/vue-apexcharts , https://apexcharts.com/
@@ -8,15 +8,39 @@ export default {
   props: ['value'],
   data: function () {
     return {
+      refresh: 0,
       chartOptionsdonut: {
         labels: [],
         legend: {
           show: false
         },
+        theme: {
+          palette: 'palette3'
+        },
         plotOptions: {
           pie: {
             donut: {
-              size: '40%'
+              size: '40%',
+              labels: {
+                show: true,
+                value: {
+                  show: true,
+                  fontSize: '12px',
+                  formatter: function (val) {
+                    return numeralInstance(parseFloat(val)).format('0,0')
+                  }
+                },
+                total: {
+                  show: true,
+                  fontSize: '12px',
+                  formatter: function (val) {
+                    var tot = val.globals.seriesTotals.reduce((a, b) => {
+                      return a + b
+                    }, 0)
+                    return numeralInstance(parseFloat(tot)).format('0,0')
+                  }
+                }
+              }
             },
             dataLabels: {
               offset: 20,
@@ -27,7 +51,7 @@ export default {
         tooltip: {
           y: {
             formatter: function (val) {
-              return numeralInstance(parseFloat(val)).format('0,0.00')
+              return numeralInstance(parseFloat(val)).format('0,0')
             }
           }
         },
@@ -52,9 +76,9 @@ export default {
             return opt.w.globals.labels[opt.seriesIndex] + ':  ' + numeralInstance(parseFloat(val)).format('0.00') + '%'
           },
           style: {
-            fontSize: '9px',
+            fontSize: '8px',
             fontFamily: 'Helvetica, Arial, sans-serif',
-            fontWeight: 'normal',
+            fontWeight: 'bold',
             colors: ['dark']
           }
         }
@@ -68,9 +92,11 @@ export default {
     // this.value // [{serie: "ALTERN.R FIJA", etiquetavalor: "03/2020", valor: "733464.0000"},...]
     if (this.value === undefined) return
     this.chartOptionsdonut = {
+      ...this.chartOptionsdonut,
       labels: Array.from(this.value, row => row.serie)
     }
     this.seriesdonut = Array.from(this.value, row => parseFloat(row.valor))
+    this.refresh++
   } 
 }
 </script>

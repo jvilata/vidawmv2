@@ -21,7 +21,8 @@ const mutations = {
     state.loginSuccessful = !errorMessage
   },
   setUser: (state, updated) => {
-    Object.assign(state.user, updated)
+    if (updated === null) state.user = {}
+    else Object.assign(state.user, updated)
   },
   desconectar: (state) => {
     state.user = {}
@@ -57,7 +58,11 @@ const actions = {
                 this.dispatch('tablasAux/loadTablasAux', formData.get('codEmpresa')) // cargar tablas auxiliares
                 this.dispatch('entidades/loadEntidadSelf', formData.get('codEmpresa')) // cargar entidadSelf
                 this.dispatch('entidades/loadEntidadAsesor', formData.get('codEmpresa')) // cargar entidadAsesor
-                this.$router.push('/sinTabs')
+                if (response.data[0].dobleFactor === '1') { // doble factor
+                  this.$router.push('/dobleFactor')
+                } else {
+                  this.$router.push('/sinTabs')
+                }
               }
             })
             .catch(error => {
@@ -68,6 +73,9 @@ const actions = {
       .catch(error => {
         commit('loginStop', error) // .response.data.error
       })
+  },
+  setUser({ commit }, record) {
+    commit('setUser', record)
   },
   desconectarLogin ({ commit }) {
     // cerramos todos los tabs y redirigimos al login

@@ -319,6 +319,7 @@ export default {
       this.$axios.get('activos/bd_activos.php/findAnalisisFondos2/', { params: objFilter })
         .then(response => {
           this.registrosAnalisisFondos2 = response.data
+          this.registrosAnalisisFondos2.forEach(r => r.serie === null ? r.serie = '.' : '')
           this.refreshRec1++ // para que refresque el componente
         })
         .catch(error => {

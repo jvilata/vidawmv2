@@ -101,7 +101,7 @@ export default {
     activosAlterLineas: activosAlterLineas
   },
   mounted () {
-    this.value = this.tabs[this.id].meta.value
+    Object.assign(this.value, this.tabs[this.id].meta.value)
     Object.assign(this.recordToSubmit, this.value)
     var objFilter = {
       id: this.value.id

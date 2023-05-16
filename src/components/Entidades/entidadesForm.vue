@@ -226,7 +226,7 @@ export default {
   mounted () {
     // Object.assign(this.recordToSubmit, this.value) // v-model: en 'value' podemos leer el valor del v-model
     // no voy a usar el anterior, prefiero buscar de nuevo en la BD
-    this.value = this.tabs[this.id].meta.value
+    Object.assign(this.value, this.tabs[this.id].meta.value)
     var objFilter = {
       id: this.value.id
     }

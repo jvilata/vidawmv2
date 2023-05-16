@@ -302,7 +302,7 @@ export default {
     }
   },
   mounted () {
-    this.value = this.modelValue
+    Object.assign(this.value, this.modelValue)
     this.getRecords()
   }
 }

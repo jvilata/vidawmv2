@@ -4,7 +4,8 @@ const routes = [
     path: '/',
     component: () => import('layouts/LayoutLogin.vue'),
     children: [
-      { path: '', component: () => import('pages/PageLogin.vue') }
+      { path: '', component: () => import('pages/PageLogin.vue') },
+      { path: 'dobleFactor', component: () => import('components/dobleFactor/dobleFactor.vue') }
     ]
   },
   {
@@ -88,6 +89,7 @@ const routes = [
               { path: 'evolucionPatrimonio', name: 'evolucionPatrimonio', component: () => import('components/Dashboard/dashboardEvolucionPatrimonio.vue'), props: true },
               { path: 'evolucionClases', name: 'evolucionClases', component: () => import('components/Dashboard/dashboardEvolucionClasesPatrimonio.vue'), props: true },
               { path: 'patrimonioEntidad', name: 'patrimonioEntidad', component: () => import('components/Dashboard/dashboardPatrimonioEntidad.vue'), props: true },
+              { path: 'rentabActivos', name: 'rentabActivos', component: () => import('components/Dashboard/dashboardrentabActivos.vue'), props: true },
               { path: 'patrimonioComprometido', name: 'patrimonioComprometido', component: () => import('components/Dashboard/dashboardPatrimonioComprometido.vue'), props: true }
             ]
           },
@@ -103,7 +105,8 @@ const routes = [
             props: true,
             children: [
               { path: 'personalForm', name: 'personalForm', component: () => import('components/Personal/personalForm.vue'), props: true },
-              { path: 'personalGridMovimientos', name: 'personalGridMovimientos', component: () => import('components/Movimientos/movimientosGrid.vue'), props: true }
+              { path: 'personalGridMovimientos', name: 'personalGridMovimientos', component: () => import('components/Movimientos/movimientosGrid.vue'), props: true },
+              { path: 'personal2Factor', name: 'personal2Factor', component: () => import('components/Personal/personal2Factor.vue'), props: true }
             ]
           }
         ]
@@ -111,6 +114,10 @@ const routes = [
       {
         path: 'sinTabs',
         component: () => import('components/MainTabs/sinTabs.vue')
+      },
+      {
+        path: 'fichajesM',
+        component: () => import('components/Fichajes/fichajesMain.vue')
       }
     ]
   }

@@ -78,7 +78,7 @@
               max-height="600px"
               buttons
               v-slot="scope"
-              @save="updateRecord(props.row)">
+              @save="v => updateRecord(props.row, v)">
               <!-- aqui definimos las ediciones especificas para cada columna -->
               <q-input v-model="scope.value" />
             </q-popup-edit>
@@ -192,19 +192,19 @@ export default {
   methods: {
     ...mapActions('tabs', ['addTab']),
     ...mapActions('tablasAux', ['loadListaMeses']),
-    updateRecord (record) {
+    updateRecord (record, value) {
       record.user = this.user.user.email
       record.ts = date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
       var updated = {
         id: record.id,
-        importe: record.importe,
+        importe: value,
         user: record.user,
         ts: record.ts
       }
       return this.$axios.put(`movimientos/bd_movimientos.php/findcMovimientosComparado/${updated.id}`, JSON.stringify(updated))
         .then(response => {
           return this.$axios.put(`movimientos/bd_movimientos.php/findcMovimientosComparado/${updated.id}`, JSON.stringify(updated))
-            .then()
+          .then()
         })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })

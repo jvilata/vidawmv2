@@ -318,7 +318,7 @@ export default {
         asunto: 'Te adjunto notas de gasto de ' + this.user.nomEmpresa,
         texto: 'Hola,<br>Le adjuntamos notas de gasto de la empresa:' + this.user.nomEmpresa + ' en este enlace de OnDrive:%enlace%' +
           '<br>Atentamente,<br>' + this.entidadSelf.nombre + '<br>' +
-          (this.entidadSelf.logo !== '' ? '<img src="http://vidawm.com/img/' + this.entidadSelf.logo + '"  width="100">' : ''),
+          (this.entidadSelf.logo !== '' ? '<img src="http://vidawm.com/privado/img/' + this.entidadSelf.logo + '"  width="100">' : ''),
         url: 'onedrive/moverElementosCarpeta.php?codEmpresa=' + this.user.codEmpresa + '&empresa=' + this.user.nomEmpresa +
           '&tipo=NOTAS&carpeta=NOTAS&estado='
       }

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="q-ml-md q-mr-md row">
-      <q-select class="col"
+    <div class="q-ml-sm q-mr-sm row">
+      <q-select dense class="col"
         outlined
         clearable
         label="Tipo Activo"
@@ -14,13 +14,13 @@
         use-chips
         emit-value
       />
-      <q-btn class="col-1" label="Mostrar" color="primary" @click="getPatrimonioEntidad(filterR)"/>
+      <q-btn class="col-1" label="Mostrar" color="primary" @click="getRentabActivos(filterR)"/>
     </div>
   <div class="row">
     <div class="col" >
       <q-item class="q-ma-md q-pa-xs bg-indigo-1 text-grey-8">
         <q-item-section align="center">
-          <div class="text-h6">Patrimonio por Entidad</div>
+          <div class="text-h6">Rentabilidad por Activo</div>
         </q-item-section>
       </q-item>
       <q-item >
@@ -43,8 +43,8 @@ export default {
   props: ['value'],
   data: function () {
     return {
-      registrosPatrimonioEntidad: [],
-      filterR: {},
+      registrosRentabActivos: [],
+      filterR: { tipoActivo1: ['RENTA VBLE'] },
       chartOptions: {
         labels: [],
         chart: {
@@ -54,7 +54,7 @@ export default {
               Loading.hide()
             },
             dataPointSelection: function(event, chartContext, config) {
-              este.addTab(['entidadesFormMain', 'Entidad-' + regtmp[config.dataPointIndex].id, regtmp[config.dataPointIndex], regtmp[config.dataPointIndex].id])
+              este.addTab(['activosFormMain', 'Activo-' + regtmp[config.dataPointIndex].idActivo, regtmp[config.dataPointIndex], regtmp[config.dataPointIndex].idActivo])
             }
           }
         },
@@ -64,7 +64,7 @@ export default {
         },
         xaxis: {
           labels: {
-            rotate: -90,
+            rotate: -65,
             style: {
               fontSize: '8px',
               fontFamily: 'Helvetica, Arial, sans-serif',
@@ -76,7 +76,7 @@ export default {
         dataLabels: {
           enabled: true,
           formatter: function (val, opt) {
-            return numeralInstance(parseFloat(val) / 1000).format('0,0') + 'k'
+            return Math.round((parseFloat(regtmp[opt.dataPointIndex].importe) - parseFloat(regtmp[opt.dataPointIndex].impcompventastotales))/1000) + 'k'
           },
           style: {
             fontSize: '8px',
@@ -88,7 +88,7 @@ export default {
         tooltip: {
           y: {
             formatter: function (val) {
-              return numeralInstance(parseFloat(val)).format('0,0')
+              return numeralInstance(parseFloat(val)).format('0,0.0') 
             }
           }
         }
@@ -102,14 +102,19 @@ export default {
   methods: {
     ...mapActions('activos', ['loadActivos']),
     ...mapActions('tabs', ['addTab']),
-    getPatrimonioEntidad (objFilter) {
+    getRentabActivos (objFilter) {
       objFilter.tipoActivo = (objFilter.tipoActivo1 && objFilter.tipoActivo1 !== null ? objFilter.tipoActivo1.join() : null) // paso de array a concatenacion de strings (join)
-
+      Object.assign(objFilter, {
+        tipoOperacion: 'VALORACION',
+        estadoActivo: '1,4',
+        importem0: '1',
+        computa: '1'
+      })
       Loading.show()
       // donut resumen patrimonio
-      this.$axios.get('movimientos/bd_movimientos.php/findcevolucionPatrimonioEntidad/', { params: objFilter })
+      this.$axios.get('movimientos/bd_movimientos.php/findcMovimientosComparado/', { params: objFilter })
         .then(response => {
-          this.registrosPatrimonioEntidad = response.data
+          this.registrosRentabActivos = response.data
           this.cargarDatosGrafico()
           Loading.hide()
         })
@@ -127,32 +132,37 @@ export default {
       var etiqAnt = ''
       var arr = []
       este = this
-      regtmp = this.registrosPatrimonioEntidad
-      this.registrosPatrimonioEntidad.forEach(row => {
-        if (row.etiquetavalor !== etiqAnt) {
-          arr.push((row.etiquetavalor === null ? '' : row.etiquetavalor)) // la cambiar de etiqueta guardo la anterior
-          etiqAnt = row.etiquetavalor
+      regtmp = this.registrosRentabActivos
+      this.registrosRentabActivos.forEach(row => {
+        row.valor = Math.round((parseFloat(row.importe) - parseFloat(row.impcompventastotales))*100.0 / parseFloat(row.impcompventastotales)*10)/10
+      })
+      this.registrosRentabActivos.sort(function (a, b) { // ordeno el array por serie
+        if (a.valor < b.valor) return 1
+        else if (a.valor > b.valor) return -1
+        else return 0
+      })
+      this.registrosRentabActivos.forEach(row => {
+        if (row.nombre !== etiqAnt) {
+          arr.push((row.nombre === null ? '' : row.nombre)) // la cambiar de etiqueta guardo la anterior
+          etiqAnt = row.nombre
         }
       })
-      this.chartOptions = {
+      this.chartOptions= {
         ...this.chartOptions,
         labels: arr // es un array de strings
       }
-
-      this.registrosPatrimonioEntidad.sort(function (a, b) { // ordeno el array por serie
-        return a.serie.localeCompare(b.serie)
-      })
+      
       var serieAnt = ''
       var obj = {}
-      this.registrosPatrimonioEntidad.forEach(row => {
-        if (row.serie !== serieAnt) { // this.serie es un array de objetos {name:'serie', type:'line', data:[1,3,4,..]}
+      this.registrosRentabActivos.forEach(row => {
+        if (row.tipoOperacion !== serieAnt) { // row.serie!== serieAnt ** this.serie es un array de objetos {name:'serie', type:'line', data:[1,3,4,..]}
           obj = {
-            name: row.serie,
+            name: 'Rentab',// row.serie,
             type: 'column',
             data: []
           }
           this.series.push(obj) // la cambiar de serie guardo la anterior
-          serieAnt = row.serie
+          serieAnt = row.tipoOperacion // row.serie
         }
         obj.data.push(row.valor)
       })
@@ -160,7 +170,7 @@ export default {
   },
   mounted () {
     Object.assign(this.filterR, this.value)
-    this.getPatrimonioEntidad(this.filterR) // carga datos  patrim entidad
+    this.getRentabActivos(this.filterR) // carga datos  patrim entidad
   }
 }
 </script>

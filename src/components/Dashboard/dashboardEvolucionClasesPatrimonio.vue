@@ -86,6 +86,7 @@ export default {
         }
       })
       this.chartOptions = {
+        ...this.chartOptions,
         labels: arr // es un array de strings
       }
 

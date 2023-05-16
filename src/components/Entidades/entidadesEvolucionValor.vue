@@ -58,7 +58,7 @@ export default {
         },
         dataLabels: {
           enabled: true,
-          enabledOnSeries: [],
+          //enabledOnSeries: [],
           formatter: function (val, opt) {
             return numeralInstance(parseFloat(val) / 1000).format('0,0') + 'k'
           },
@@ -135,7 +135,7 @@ export default {
     }
   },
   mounted () {
-    this.value = this.tabs[this.id].meta.value
+    Object.assign(this.value, this.tabs[this.id].meta.value)
     this.getEvolucionPatrimonio() // carga datos  evoluc patrim
   }
 }
