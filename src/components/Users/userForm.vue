@@ -57,7 +57,7 @@
         <q-input class="row q-mb-sm" outlined clearable v-model="recordToSubmit.email" label="Email"/>
         <q-input class="row q-mb-sm" outlined clearable v-model="recordToSubmit.telefono" label="Telefono"/>
         <div class="row q-mb-sm">
-          <q-input class="col-xs-6 col-sm-6" outlined clearable label="Fecha Alta" stack-label :value="formatDate(recordToSubmit.fechaAlta)" @input="val => recordToSubmit.fechaAlta=val" >
+          <q-input class="col-xs-6 col-sm-6" outlined clearable label="Fecha Alta" stack-label :model-value="formatDate(recordToSubmit.fechaAlta)" @update:model-value="val => recordToSubmit.fechaAlta=val" >
             <template v-slot:append>
                 <q-icon name="event" class="cursos-pointer">
                   <q-popup-proxy ref="fechaAlta">
@@ -66,7 +66,7 @@
                 </q-icon>
             </template>
           </q-input>
-          <q-input class="col-xs-6 col-sm-6" outlined clearable label="Fecha Baja" stack-label :value="formatDate(recordToSubmit.fechaBaja)" @input="val => recordToSubmit.fechaBaja=val" >
+          <q-input class="col-xs-6 col-sm-6" outlined clearable label="Fecha Baja" stack-label :model-value="formatDate(recordToSubmit.fechaBaja)" @update:model-value="val => recordToSubmit.fechaBaja=val" >
             <template v-slot:append>
                 <q-icon name="event" class="cursos-pointer">
                   <q-popup-proxy ref="fechaBaja">

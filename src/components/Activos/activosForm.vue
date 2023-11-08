@@ -107,22 +107,6 @@
             counter
             @keyup.enter.stop />
         <div class="row q-mb-sm">
-          <!-- tipoProducto viene como string separador pr , -->
-          <!-- q-select
-            class="col-xs-6 col-sm-3"
-            outlined
-            multiple
-            use-chips
-            clearable
-            label="Tipo Producto"
-            stack-label
-            :value="recordToSubmit.tipoProducto ? recordToSubmit.tipoProducto.split(',') : null"
-            @input="value => recordToSubmit.tipoProducto = value.join()"
-            :options="listaTiposProducto"
-            option-value="codElemento"
-            option-label="codElemento"
-            emit-value
-          / -->
           <q-select
               class="col-xs-12 col-sm-6"
               label="Moneda"

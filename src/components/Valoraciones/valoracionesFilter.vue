@@ -48,7 +48,7 @@
         input-debounce="0"
       />
       <q-input outlined clearable label="Nombre" stack-label v-model="filterR.nombre" />
-      <q-input outlined clearable label="Fecha Desde" stack-label :value="formatDate(filterR.fechaDesde)" @input="val => filterR.fechaDesde=val" >
+      <q-input outlined clearable label="Fecha Desde" stack-label :model-value="formatDate(filterR.fechaDesde)" @update:model-value="val => filterR.fechaDesde=val" >
         <template v-slot:append>
             <q-icon name="event" class="cursos-pointer">
               <q-popup-proxy>
@@ -57,7 +57,7 @@
             </q-icon>
         </template>
       </q-input>
-      <q-input outlined clearable label="Fecha Hasta" stack-label :value="formatDate(filterR.fechaHasta)" @input="val => filterR.fechaHasta=val" >
+      <q-input outlined clearable label="Fecha Hasta" stack-label :model-value="formatDate(filterR.fechaHasta)" @update:model-value="val => filterR.fechaHasta=val" >
         <template v-slot:append>
             <q-icon name="event" class="cursos-pointer">
               <q-popup-proxy>

@@ -18,15 +18,18 @@
         emit-value
       />
       <q-input outlined clearable label="Descripción" stack-label v-model="filterR.descripcion" />
-      <q-input outlined clearable label="Fecha" stack-label :model-value="formatDate(filterR.fecha)" @update:model-value="val => filterR.fecha=val" >
+      <!-- q-input outlined clearable label="Fecha" stack-label :model-value="formatDate(filterR.fecha)" @update:model-value="val => filterR.fecha=val" >
         <template v-slot:append>
             <q-icon name="event" class="cursos-pointer">
               <q-popup-proxy>
                 <wgDate v-model="filterR.fecha" />
+                <q-btn label="Cancel" color="primary" flat v-close-popup />
+                <q-btn label="OK" color="primary" flat @click="save" v-close-popup />
               </q-popup-proxy>
             </q-icon>
         </template>
-      </q-input>
+      </q-input -->
+      <q-input outlined clearable label="Fecha" stack-label v-model="filterR.fecha" type="date" />
       <q-input outlined clearable label="Fecha Próx Desde" stack-label :model-value="formatDate(filterR.fechaProxDesde)" @update:model-value="val => filterR.fechaProxDesde=val" >
         <template v-slot:append>
             <q-icon name="event" class="cursos-pointer">
