@@ -118,6 +118,7 @@ export default {
         // { name: 'tipoActivo', label: 'tipoActivo', align: 'left', field: 'tipoActivo', sortable: true },
         { name: 'nombre', align: 'left', label: 'Activo', field: 'nombre', sortable: true, style: 'width: 200px; whiteSpace: normal' },
         { name: 'nombreEntidad', align: 'left', label: 'Gestor/Arrend', field: 'nombreEntidad', sortable: true, style: 'width: 130px; whiteSpace: normal' },
+        { name: 'nomOtraEmpresa', align: 'left', label: 'Empresa', field: 'nomOtraEmpresa', sortable: true, style: 'width: 130px; whiteSpace: normal' },
         { name: 'tipoOperacion', align: 'left', label: 'Tipo', field: 'tipoOperacion' },
         { name: 'fecha', align: 'left', label: 'Fecha', field: 'fecha', format: val => (val !== undefined ? date.formatDate(date.extractDate(val, 'YYYY-MM-DD'), 'DD-MM-YYYY') : ''), style: 'width: 70px;' },
         { name: 'importe', align: 'right', label: 'Importe Neto', field: 'importe', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },

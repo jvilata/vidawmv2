@@ -31,7 +31,7 @@
           fill-input
           input-debounce="0"
         />
-        <q-input class="col-xs-5 col-sm-2" outlined label="Fecha" stack-label :value="formatDate(recordToSubmit.fecha)" @input="val => recordToSubmit.fecha=val" >
+        <q-input class="col-xs-5 col-sm-2" outlined label="Fecha" stack-label :model-value="formatDate(recordToSubmit.fecha)" @update:model-value="val => recordToSubmit.fecha=val" >
           <template v-slot:append>
               <q-icon name="event" class="cursos-pointer">
                 <q-popup-proxy>

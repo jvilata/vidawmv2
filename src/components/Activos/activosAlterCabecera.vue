@@ -29,7 +29,7 @@
         <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined suffix="m" label="Target Size" stack-label v-model="recordToSubmit.targetSize" />
         <q-input class="col-xs-4 col-sm-1" @blur="updateRec" outlined suffix="m" label="GP Commitment" stack-label v-model="recordToSubmit.gpCommitment" />
         <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined label="Launch" stack-label v-model="recordToSubmit.launch" />
-        <q-input class="col-xs-5 col-sm-2" @blur="updateRec" outlined label="Deadline decision" stack-label :value="formatDate(recordToSubmit.decisionDeadline)" @input="val => recordToSubmit.fecha=val" >
+        <q-input class="col-xs-5 col-sm-2" @blur="updateRec" outlined label="Deadline decision" stack-label :model-value="formatDate(recordToSubmit.decisionDeadline)" @update:model-value="val => recordToSubmit.fecha=val" >
           <template v-slot:append>
               <q-icon name="event" class="cursos-pointer">
                 <q-popup-proxy>

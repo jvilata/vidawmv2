@@ -19,7 +19,7 @@
         emit-value
         map-options
       />
-      <q-input outlined clearable label="Fecha" stack-label :value="formatDate(filterR.fecha)" @input="val => filterR.fecha=val" >
+      <q-input outlined clearable label="Fecha" stack-label :model-value="formatDate(filterR.fecha)" @update:model-value="val => filterR.fecha=val" >
         <template v-slot:append>
             <q-icon name="event" class="cursos-pointer">
               <q-popup-proxy ref="fecha">
@@ -28,7 +28,7 @@
             </q-icon>
         </template>
       </q-input>
-      <q-input outlined clearable label="Fecha Desde" stack-label :value="formatDate(filterR.fechaGeneracionGT)" @input="val => filterR.fechaGeneracionGT=val" >
+      <q-input outlined clearable label="Fecha Desde" stack-label :model-value="formatDate(filterR.fechaGeneracionGT)" @update:model-value="val => filterR.fechaGeneracionGT=val" >
         <template v-slot:append>
             <q-icon name="event" class="cursos-pointer">
               <q-popup-proxy ref="fechaGeneracionGT">
@@ -37,7 +37,7 @@
             </q-icon>
         </template>
       </q-input>
-      <q-input outlined clearable label="Fecha Hasta" stack-label :value="formatDate(filterR.fechaGeneracionLT)" @input="val => filterR.fechaGeneracionLT=val" >
+      <q-input outlined clearable label="Fecha Hasta" stack-label :model-value="formatDate(filterR.fechaGeneracionLT)" @update:model-value="val => filterR.fechaGeneracionLT=val" >
         <template v-slot:append>
             <q-icon name="event" class="cursos-pointer">
               <q-popup-proxy ref="fechaGeneracionLT">
