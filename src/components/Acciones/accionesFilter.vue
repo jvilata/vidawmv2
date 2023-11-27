@@ -30,24 +30,8 @@
         </template>
       </q-input -->
       <q-input outlined clearable label="Fecha" stack-label v-model="filterR.fecha" type="date" />
-      <q-input outlined clearable label="Fecha Próx Desde" stack-label :model-value="formatDate(filterR.fechaProxDesde)" @update:model-value="val => filterR.fechaProxDesde=val" >
-        <template v-slot:append>
-            <q-icon name="event" class="cursos-pointer">
-              <q-popup-proxy>
-                <wgDate v-model="filterR.fechaProxDesde" />
-              </q-popup-proxy>
-            </q-icon>
-        </template>
-      </q-input>
-      <q-input outlined clearable label="Fecha Próx Hasta" stack-label :model-value="formatDate(filterR.fechaProxHasta)"  @update:model-value="val => filterR.fechaProxHasta=val" >
-        <template v-slot:append>
-            <q-icon name="event" class="cursos-pointer">
-              <q-popup-proxy>
-                <wgDate v-model="filterR.fechaProxHasta" />
-              </q-popup-proxy>
-            </q-icon>
-        </template>
-      </q-input>
+      <q-input outlined clearable label="Fecha Próx Desde" stack-label v-model="filterR.fechaProxDesde" type="date" />
+      <q-input outlined clearable label="Fecha Próx Hasta" stack-label v-model="filterR.fechaProxHasta" type="date" />
       <!-- en q-select multiple los valores estan en un array, como en nuestro caso estan en un string separados por comas
           hay que crear un array con los valores en el columns format (split) y aqui volver a convertir el array a string (join) -->
       <q-select
@@ -98,7 +82,7 @@
 <script>
 import { mapState } from 'vuex'
 import { date } from 'quasar'
-import wgDate from 'components/General/wgDate.vue'
+//import wgDate from 'components/General/wgDate.vue'
 export default {
   props: ['modelValue'], // value es el objeto con los campos de filtro que le pasa accionesMain con v-model
   data () {
@@ -124,8 +108,8 @@ export default {
     // guardamos valor en tabs por si despus queremos recuperarlo
     this.$emit('saveChanges', this.filterR)
   },
-  components: {
+  /*components: {
     wgDate: wgDate
-  }
+  }*/
 }
 </script>

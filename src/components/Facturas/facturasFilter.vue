@@ -24,16 +24,9 @@
         fill-input
         input-debounce="0"
       />
-      <q-input outlined clearable label="Fecha Desde" stack-label :model-value="formatDate(filterR.fechainicial)" @update:model-value="val => filterR.fechainicial=val" >
-        <template v-slot:append>
-            <q-icon name="event" class="cursos-pointer">
-              <q-popup-proxy ref="fechainicial">
-                <wgDate v-model="filterR.fechainicial" @input="$refs.fechainicial.hide()" />
-              </q-popup-proxy>
-            </q-icon>
-        </template>
-      </q-input>
-      <q-input outlined clearable label="Fecha Hasta" stack-label :model-value="formatDate(filterR.fechafinal)" @update:model-value="val => filterR.fechafinal=val" >
+      <q-input outlined clearable label="Fecha Desde" stack-label v-model="filterR.fechainicial" type="date" />
+      <q-input outlined clearable label="Fecha Hasta" stack-label v-model="filterR.fechafinal" type="date" />
+      <!--q-input outlined clearable label="Fecha Hasta" stack-label :model-value="formatDate(filterR.fechafinal)" @update:model-value="val => filterR.fechafinal=val" >
         <template v-slot:append>
             <q-icon name="event" class="cursos-pointer">
               <q-popup-proxy ref="fechafinal" >
@@ -41,7 +34,7 @@
               </q-popup-proxy>
             </q-icon>
         </template>
-      </q-input>
+      </q-input-->
       <q-select
         outlined
         clearable
@@ -92,7 +85,7 @@
 <script>
 import { mapState } from 'vuex'
 import { date } from 'quasar'
-import wgDate from 'components/General/wgDate.vue'
+//import wgDate from 'components/General/wgDate.vue'
 export default {
   props: ['modelValue'], // value es el objeto con los campos de filtro que le pasa accionesMain con v-model
   data () {
@@ -127,9 +120,9 @@ export default {
       return date.formatDate(pdate, 'DD-MM-YYYY')
     }
   },
-  components: {
+  /*components: {
     wgDate: wgDate
-  },
+  },*/
   mounted () {
     this.filterR = Object.assign({}, this.modelValue) // asignamos valor del parametro por si viene de otro tab
   }
