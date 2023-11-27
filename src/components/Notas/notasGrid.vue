@@ -287,7 +287,7 @@ export default {
         cancel: true,
         persistent: true
       }).onOk(() => {
-        return this.$axios.delete(`notas/bd_notas.php/findNotasFilter/${id}`, JSON.stringify({ id: id }))
+        return this.$axios.delete(`notas/bd_notas.php/findNotasFilter/${id}`)
           .then(response => {
             this.$emit('generarArbol')
           })

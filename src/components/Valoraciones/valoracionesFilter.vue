@@ -48,7 +48,8 @@
         input-debounce="0"
       />
       <q-input outlined clearable label="Nombre" stack-label v-model="filterR.nombre" />
-      <q-input outlined clearable label="Fecha Desde" stack-label :model-value="formatDate(filterR.fechaDesde)" @update:model-value="val => filterR.fechaDesde=val" >
+      <q-input outlined clearable label="Fecha Desde" stack-label v-model="filterR.fechaDesde" type="date" />
+      <!--q-input outlined clearable label="Fecha Desde" stack-label :model-value="formatDate(filterR.fechaDesde)" @update:model-value="val => filterR.fechaDesde=val" >
         <template v-slot:append>
             <q-icon name="event" class="cursos-pointer">
               <q-popup-proxy>
@@ -56,16 +57,8 @@
               </q-popup-proxy>
             </q-icon>
         </template>
-      </q-input>
-      <q-input outlined clearable label="Fecha Hasta" stack-label :model-value="formatDate(filterR.fechaHasta)" @update:model-value="val => filterR.fechaHasta=val" >
-        <template v-slot:append>
-            <q-icon name="event" class="cursos-pointer">
-              <q-popup-proxy>
-                <wgDate v-model="filterR.fechaHasta" />
-              </q-popup-proxy>
-            </q-icon>
-        </template>
-      </q-input>
+      </q-input-->
+      <q-input outlined clearable label="Fecha Hasta" stack-label v-model="filterR.fechaHasta" type="date" />
       <q-select
         outlined
         clearable
@@ -144,7 +137,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import { date } from 'quasar'
-import wgDate from 'components/General/wgDate.vue'
+//import wgDate from 'components/General/wgDate.vue'
 export default {
   props: ['modelValue'], // value es el objeto con los campos de filtro que le pasa accionesMain con v-model
   data () {
@@ -180,8 +173,8 @@ export default {
     // guardamos valor en tabs por si despus queremos recuperarlo
     this.$emit('saveChanges', this.filterR)
   },
-  components: {
+  /*components: {
     wgDate: wgDate
-  }
+  }*/
 }
 </script>

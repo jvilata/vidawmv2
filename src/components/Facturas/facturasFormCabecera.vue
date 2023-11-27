@@ -34,8 +34,8 @@
         <q-input class="col-xs-5 col-sm-2" outlined label="Fecha" stack-label :model-value="formatDate(recordToSubmit.fecha)" @update:model-value="val => recordToSubmit.fecha=val" >
           <template v-slot:append>
               <q-icon name="event" class="cursos-pointer">
-                <q-popup-proxy>
-                  <wgDate v-model="recordToSubmit.fecha" />
+                <q-popup-proxy >
+                  <wgDate v-model="recordToSubmit.fecha"/>
                 </q-popup-proxy>
               </q-icon>
           </template>

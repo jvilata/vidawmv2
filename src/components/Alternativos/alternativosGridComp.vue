@@ -292,9 +292,13 @@ export default {
         })
     },
     updateRecord (row) {
-      this.registrosSeleccionados.sort((a, b) => (a.seleccionado === '0' ? 'xx0' : 'xx1') <= (b.seleccionado === '0' ? 'xx0' : 'xx1') ? 1 : -1)
-      this.calcTotales(this.registrosSeleccionados)
-      this.getAnalisisFondos()
+      var objFilter = {}
+      this.$axios.get('activos/bd_activos.php/findAnalisisFondos1/', { params: objFilter })
+        .then(response => {
+          this.registrosSeleccionados.sort((a, b) => (a.seleccionado === '0' ? 'xx0' : 'xx1') <= (b.seleccionado === '0' ? 'xx0' : 'xx1') ? 1 : -1)
+          this.calcTotales(this.registrosSeleccionados)
+          this.getAnalisisFondos()
+        })
     },
     getAnalisisFondos () {
       var objFilter = {}
