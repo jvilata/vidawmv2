@@ -447,8 +447,10 @@ export default {
   },
   mounted () {
     this.value = this.modelValue
-    if (this.value === undefined) Object.assign(this.value, this.tabs[this.id].meta.value)
+    if (this.value === undefined) this.value = Object.assign({}, this.tabs[this.id].meta.value)
     this.getRecords()
+    /*Object.assign(this.value, this.tabs[this.id].meta.value)
+    this.getRecords()*/
   }
 }
 </script>
