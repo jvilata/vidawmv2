@@ -125,7 +125,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import { date } from 'quasar'
-import { headerFormData } from 'boot/axios.js'
+import { headerFormData, axiosInstance } from 'boot/axios.js'
 export default {
   props: ['modelValue'], // en 'value' tenemos la tabla de datos del filtro
   data () {
@@ -208,7 +208,7 @@ export default {
         cancel: true,
         persistent: true
       }).onOk(() => {
-        return this.$axios.delete(`activos/bd_activos.php/findActivosFilter/${id}`)
+        return axiosInstance.delete(`activos/bd_activos.php/findActivosFilter/${id}`, headerFormData)
           .then(response => {
             var index = this.registrosSeleccionados.findIndex(function (record) { // busco elemento del array con este id
               if (record.id === id) return true

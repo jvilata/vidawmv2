@@ -52,7 +52,15 @@ const routes = [
               { path: 'entidadesAccionesGrid', name: 'entidadesAccionesGrid', component: () => import('components/Entidades/entidadesAccionesGrid.vue'), props: true }
             ]
           },
-          { path: 'Facturas', name: 'Facturas', component: () => import('components/Facturas/FacturasMain.vue'), props: true },
+          { path: 'Facturas/:id', 
+            name: 'Facturas', 
+            component: () => import('components/Facturas/FacturasMain.vue'), 
+            props: true,
+            children: [
+              { path: 'facturasMainGeneral', name: 'facturasMainGeneral', component: () => import('components/Facturas/facturasMainGeneral.vue'), props: true },
+              { path: 'facturasGrafico', name: 'facturasGrafico', component: () => import('components/Facturas/facturasGrafico.vue'), props: true }
+            ] 
+          },
           {
             path: 'facturasFormMain/:id',
             name: 'facturasFormMain',

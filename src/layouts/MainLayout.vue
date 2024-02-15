@@ -1,10 +1,11 @@
 <template>
   <q-layout view="lHh lpR fFf" class="shadow-2 rounded-borders">
-    <q-header elevated >
+    <q-header elevated :class="modoTest ? 'bg-red-9': $primary">
       <q-toolbar>
         <q-btn flat @click="leftDrawerOpen = !leftDrawerOpen" round dense icon="menu" />
         <div class="items-center no-wrap absolute-center">
-          <div class="text-subtitle1">{{ nomAplicacion }}</div>
+          <div v-if="modoTest" class="text-subtitle1">{{ nomAplicacion }} TEST - TEST - TEST</div>
+          <div v-if="!modoTest" class="text-subtitle1">{{ nomAplicacion }}</div>
           <div class="text-caption">{{ tmpUser.nomEmpresa }}</div>
         </div>
         <div class="q-gutter-sm q-pr-md row items-center no-wrap absolute-right">
@@ -115,6 +116,7 @@ export default {
   name: 'MainLayout',
   data () {
     return {
+      modoTest: false,
       nomAplicacion: 'Wealth Management',
       tmpUser: { user: { email: '' }, pers: { userRol: -1 } },
       accionesPendientes: 0,
@@ -310,6 +312,7 @@ export default {
     } else {
       Object.assign(this.tmpUser, this.user)
       // llamo a la action->addTab del store->tabs y param: ['acciones','acciones',{},1]
+      if (this.$axios.defaults.baseURL.includes('localhost')) this.modoTest = true
       if (this.user.pers.userRol !== '2') this.addTab(['Acciones', 'Acciones', {}, 1])
       else this.addTab(['fichajesMain', 'Fichajes', {}, 1])
     }

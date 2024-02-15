@@ -76,14 +76,23 @@
         emit-value
         map-options
       />
+      <q-select
+        label="Track Record / Cartera Actual"
+        stack-label
+        outlined
+        v-model="filterR.trackRecord"
+        :options="listaTrackRecord"
+        @update:model-value="cargarDatos"
+      />
       <q-input outlined clearable label="Launch Desde" stack-label v-model="filterR.launch" />
+      <!--<q-input outlined clearable label="Launch Hasta" stack-label v-model="filterR.launchHasta" />-->
       <q-input outlined clearable label="Avg Gross Mult Desde" stack-label v-model="filterR.avgGrossMult" />
       <q-input outlined clearable label="Avg Gross IRR Desde" stack-label v-model="filterR.avgGrossIrr" />
       <q-input outlined clearable label="Avg Net Mult Desde" stack-label v-model="filterR.avgNetMult" />
       <q-input outlined clearable label="Avg Net IRR Desde" stack-label v-model="filterR.avgNetIrr" />
       <q-input outlined clearable label="Avg Cash Yeld Desde" stack-label v-model="filterR.avgCashYeld" />
       <q-card-actions align="right">
-        <q-btn  flat type="submit" label="Buscar" color="primary"/>
+        <q-btn  flat type="submit" label="Buscar" color="primary" @click="getRecords"/>
         <q-btn  flat label="Cancel" color="primary" @click="$emit('hide')"/><!-- lo captura accionesMain -->
       </q-card-actions>
   </q-form>
@@ -97,9 +106,14 @@ export default {
   props: ['value'], // value es el objeto con los campos de filtro que le pasa accionesMain con v-model
   data () {
     return {
-      filterR: {},
+      filterR: {
+        trackRecord: 'Track Record' //por defecto - inicializamos a track record
+        //launchHasta: ''
+      },
       listaEntidadesFilter: [],
-      listaActivosFilter: []
+      listaActivosFilter: [],
+      listaTrackRecord: ['Track Record', 'Cartera Actual']
+      
     }
   },
   computed: {
@@ -117,6 +131,9 @@ export default {
         this.listaActivosFilter = this.listaActivos.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
       })
     },
+    cargarDatos(){
+      //console.log('Valor de filterR.trackRecord', this.filterR.trackRecord)
+    },
     filterEntidades (val, update, abort) {
       update(() => {
         const needle = val.toLowerCase()
@@ -124,6 +141,7 @@ export default {
       })
     },
     getRecords () {
+      console.log('this.filterR', this.filterR)
       this.$emit('getRecords', this.filterR) // lo captura accionesMain
     },
     formatDate (pdate) {
@@ -132,6 +150,7 @@ export default {
   },
   mounted () {
     this.filterR = Object.assign({}, this.value) // asignamos valor del parametro por si viene de otro tab
+    //this.filterR.launchHasta = (new Date()).getFullYear()
     this.loadEntidades()
     if (this.listaActivos.length <= 0) this.loadActivos(this.user.codEmpresa) // carga store listaActivos
   },

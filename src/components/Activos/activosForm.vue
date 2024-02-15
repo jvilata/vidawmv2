@@ -106,6 +106,13 @@
             type="textarea"
             counter
             @keyup.enter.stop />
+        <div class="row q-mb-sm" v-if="recordToSubmit.tipoActivo ==='CAJA'"  >
+          <q-input 
+          class="col-xs-12 col-sm-12" 
+            outlined 
+            v-model="recordToSubmit.iban" 
+            label="IBAN"/>
+        </div>
         <div class="row q-mb-sm">
           <q-select
               class="col-xs-12 col-sm-6"
@@ -175,6 +182,7 @@ export default {
         tipoActivo: '',
         estadoActivo: '',
         tipoProducto: '',
+        iban: '',
         moneda: '',
         idEntidad: 0,
         computa: '',
