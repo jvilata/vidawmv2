@@ -12,14 +12,16 @@ const headerFormData = {
     'Content-Type': 'application/x-www-form-urlencoded'
   }
 }
+
 const axiosInstance = axios.create({
-  baseURL: 'https://vidawm.com/privado/php/', //  'http://localhost/vidawm/php/', // 
+  baseURL: 'https://vidawm.com/privado/php/', //  'bbdd local: http://localhost/vidawm/php/', produccion: https://vidawm.com/privado/php/ // 
   withCredentials: true,
   headers: {
     Accept: ['application/json', 'text/html', 'application/xhtml+xml', 'application/xml'],
     'Content-Type': 'application/json'
   }
 })
+
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api

@@ -216,6 +216,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import { headerFormData } from 'boot/axios.js'
 import { date, openURL } from 'quasar'
 import { openBlobFile } from 'components/General/cordova.js'
 import sendMail from 'components/SendMail/sendMail.vue'
@@ -282,7 +283,7 @@ export default {
       if (this.fromFacturasMain === undefined) {
         Object.assign(objFilter, { codEmpresa: this.user.codEmpresa, tipoObjeto: (this.value.tipoForm === 'ENTIDADES' ? 'E' : 'A'), idObjeto: this.value.id })
       } else Object.assign(objFilter, this.value) // viene de facturasMain
-      return this.$axios.get('facturas/bd_facturas.php/findFacturasFilter', { params: objFilter })
+      return this.$axios.get('facturas/bd_facturas.php/findFacturasFilter', { params: objFilter }, headerFormData)
         .then(response => {
           this.registrosSeleccionados = response.data
         })
@@ -374,7 +375,7 @@ export default {
             document.body.appendChild(link)
             // window.open('', 'view') // abre nueva ventana para que no sustituya a la actual
             link.click()
-          } else { // estamos en un disp movil            console.log('hola3')
+          } else { // estamos en un disp movil
             const blobPdf = response.data // new Blob([response.data], { type: response.data.type })
             openBlobFile(selected.archivoDrive, blobPdf, response.data.type)
           }

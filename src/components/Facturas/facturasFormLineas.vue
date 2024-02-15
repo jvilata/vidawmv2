@@ -108,6 +108,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import { date } from 'quasar'
+import { headerFormData } from 'boot/axios.js'
 import facturasFormLinDetalle from 'components/Facturas/facturasFormLinDetalle'
 import wgDate from 'components/General/wgDate.vue'
 export default {
@@ -167,7 +168,7 @@ export default {
         user: this.user.user.email,
         ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
       }
-      return this.$axios.post('facturas/bd_facturas.php/findLinFacturasFilter/', record)
+      return this.$axios.post('facturas/bd_facturas.php/findLinFacturasFilter/', record, headerFormData)
         .then(response => {
           record.id = response.data.id
           this.registrosSeleccionados.push(record)
@@ -185,7 +186,7 @@ export default {
         cancel: true,
         persistent: true
       }).onOk(() => {
-        return this.$axios.delete(`facturas/bd_facturas.php/findLinFacturasFilter/${id}`, JSON.stringify({ id: id }))
+        return this.$axios.delete(`facturas/bd_facturas.php/findLinFacturasFilter/${id}`, headerFormData)
           .then(response => {
             var index = this.registrosSeleccionados.findIndex(function (record) { // busco elemento del array con este id
               if (record.id === id) return true
@@ -206,9 +207,9 @@ export default {
     },
     updateRecord (recordToSubmit) {
       Object.assign(recordToSubmit, { user: this.user.user.email, ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss') })
-      return this.$axios.put(`facturas/bd_facturas.php/findLinFacturasFilter/${recordToSubmit.id}`, recordToSubmit)
+      return this.$axios.put(`facturas/bd_facturas.php/findLinFacturasFilter/${recordToSubmit.id}`, recordToSubmit, headerFormData)
         .then(response => {
-          return this.$axios.put(`facturas/bd_facturas.php/findLinFacturasFilter/${recordToSubmit.id}`, recordToSubmit)
+          return this.$axios.put(`facturas/bd_facturas.php/findLinFacturasFilter/${recordToSubmit.id}`, recordToSubmit, headerFormData)
             .then(response => {
               this.calcularTotalesLineas()
             })
