@@ -33,7 +33,7 @@
           <div class="text-h6">Resumen de Patrimonio (Moneda)</div>
         </q-item-section>
       </q-item>
-      <q-item >
+      <q-item class="q-ma-md q-pb-xl" >
         <q-item-section align="center">
           <dashboardResumenPatrimonio :value="registrosResumenPatrimonioM" :key="refreshRec2"/>
         </q-item-section>

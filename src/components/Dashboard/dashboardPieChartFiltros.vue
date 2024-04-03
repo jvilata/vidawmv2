@@ -67,7 +67,7 @@
             <div class="text-h6">Análisis de Patrimonio</div>
           </q-item-section>
         </q-item>
-        <q-item >
+        <q-item class="q-ma-md q-pb-xl">
           <q-item-section align="center">
             <dashboardResumenPatrimonio :value="registrosResumenPatrimonio" :key="refreshRec"/>
           </q-item-section>

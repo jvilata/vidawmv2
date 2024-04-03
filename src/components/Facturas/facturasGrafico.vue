@@ -137,6 +137,7 @@ export default {
     },
     getRecordsGraph () {
       this.series = []
+      //etiquetavalor == eje x (años / meses)
       this.registrosGraficoFacturas = [...this.registrosGraficoFacturasTmp] //registros: etiquetavalor y totalbase
 
       this.registrosGraficoFacturas.sort(function (a, b) { // ordeno el array por etiquetavalor (year)
