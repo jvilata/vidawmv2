@@ -12,7 +12,8 @@ export default {
       chartOptionsdonut: {
         labels: [],
         legend: {
-          show: false
+          show: false,
+          position: 'top'
         },
         theme: {
           palette: 'palette3'
@@ -44,7 +45,7 @@ export default {
             },
             dataLabels: {
               offset: 20,
-              minAngleToShowLabel: 10
+              minAngleToShowLabel: 11
             }
           }
         },
