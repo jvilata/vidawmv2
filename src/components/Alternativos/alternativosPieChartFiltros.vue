@@ -48,10 +48,13 @@ export default {
     getResumenPatrimonio () {
       var objFilter = Object.assign({}, this.filterR)
       objFilter.idActivo = ''
+      objFilter.seleccionado = ''
       this.value.forEach(r => {
-        if (r.seleccionado === '1') {
+        if (r.seleccionado > '0') {
           if (objFilter.idActivo.length > 0) objFilter.idActivo += ','
+          if (objFilter.seleccionado.length > 0) objFilter.seleccionado += ','
           objFilter.idActivo += r.id
+          objFilter.seleccionado += r.seleccionado //concatenamos los pesos asignados a cada activo en la misma posición que el arrays de ids
         }
       })
       // objFilter.tipoProducto = (objFilter.tipoProducto && objFilter.tipoProducto !== null ? objFilter.tipoProducto.join() : null) // paso de array a concatenacion de strings (join)
