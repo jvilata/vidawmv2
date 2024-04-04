@@ -83,12 +83,12 @@
       >
       
         <q-item class="row">
-          <q-input class="col-xs-3 col-sm-2" outlined suffix="x" label="Avg.Gross Multiple" stack-label v-model="recordToSubmit.avgSoldGrossMultiple" />
-          <q-input class="col-xs-3 col-sm-2" outlined suffix="%" label="Avg.Gross IRR" stack-label v-model="recordToSubmit.avgSoldGrossIrr" />
-          <q-input class="col-xs-3 col-sm-2" outlined suffix="x" label="Avg.Net MUltiple" stack-label v-model="recordToSubmit.avgSoldNetMultiple" />
-          <q-input class="col-xs-3 col-sm-2" outlined suffix="%" label="Avg.Net IRR" stack-label v-model="recordToSubmit.avgSoldNetIrr" />
-          <q-input class="col-xs-3 col-sm-2" outlined label="DPI" stack-label v-model="recordToSubmit.avgDpi" />
-          <q-input class="col-xs-3 col-sm-2" outlined suffix="%" label="Avg.Annual Cash Yield" stack-label v-model="recordToSubmit.avgSoldAnnualCashYield" />
+          <q-input class="col-xs-3 col-sm-2" outlined suffix="x" label="Avg.Gross Multiple" stack-label v-model="recordToSubmit.avgSoldGrossMultiple" mask="#.##"/>
+          <q-input class="col-xs-3 col-sm-2" outlined suffix="%" label="Avg.Gross IRR" stack-label v-model="recordToSubmit.avgSoldGrossIrr" mask="##.##"/>
+          <q-input class="col-xs-3 col-sm-2" outlined suffix="x" label="Avg.Net Multiple" stack-label v-model="recordToSubmit.avgSoldNetMultiple" mask="#.##" />
+          <q-input class="col-xs-3 col-sm-2" outlined suffix="%" label="Avg.Net IRR" stack-label v-model="recordToSubmit.avgSoldNetIrr" mask="##.##" />
+          <q-input class="col-xs-3 col-sm-2" outlined label="DPI" stack-label v-model="recordToSubmit.avgDpi" mask="#.##"/>
+          <q-input class="col-xs-3 col-sm-2" outlined suffix="%" label="Avg.Annual Cash Yield" stack-label v-model="recordToSubmit.avgSoldAnnualCashYield" mask="#.##"/>
         </q-item>
         <q-item class="row">
           <!-- GRID. en row-key ponemos la columna del json que sea la id unica de la fila -->
@@ -140,7 +140,10 @@
                       v-slot="scope"
                       @save="updateRecord(props.row)">
                       <!-- aqui definimos las ediciones especificas para cada columna -->
-                    <q-select v-if="col.name === 'seleccionado'"
+                      <q-input 
+                        v-model="scope.value"
+                      />
+                    <!--q-select v-if="col.name === 'seleccionado'"
                         class="col-xs-12 col-sm-6"
                         v-model="scope.value"
                         :options="listaSINO"
@@ -148,7 +151,7 @@
                         option-label="desc"
                         emit-value
                         map-options
-                    />
+                    -->
                   </q-popup-edit>
                 </q-td>
               </q-tr>
@@ -204,7 +207,7 @@ export default {
         avgDpi: 0
       },
       columns: [
-        { name: 'seleccionado', align: 'left', label: 'Selec.', field: 'seleccionado', sortable: true, style: 'width: 50px; whiteSpace: normal', format: val => (val === '1' ? 'SI' : '') },
+        { name: 'seleccionado', align: 'left', label: 'Selec.', field: 'seleccionado', sortable: true, style: 'width: 50px; whiteSpace: normal' },
         { name: 'nombre', align: 'left', label: 'Fund Name', field: 'nombre', sortable: true, style: 'width: 300px; whiteSpace: normal' },
         { name: 'nombreEntidad', align: 'left', label: 'Entity', field: 'nombreEntidad', sortable: true, style: 'width: 200px; whiteSpace: normal' },
         { name: 'descEstadoActivo', align: 'left', label: 'State', field: 'descEstadoActivo', sortable: true, style: 'width: 100px;' },
@@ -250,7 +253,7 @@ export default {
         this.addTab(['activosFormMain', 'Activo-' + row.id, row, row.id])
       }
     },
-    calcTotales (lineas) {
+    calcTotales (lineas) { //lineas === this.registrosSeleccionados (datos del grid)
       var numl = 0
       this.recordToSubmit = {
         avgSoldGrossMultiple: 0,
@@ -260,26 +263,33 @@ export default {
         avgSoldAnnualCashYield: 0,
         avgDpi: 0
       }
+      //en totSelecc iré acumulando el total asignado a cada fondo (commitment)
+      var totSelecc = 0
       lineas.forEach(r => {
-        if (r.seleccionado === '1') {
+        if(r.seleccionado > '0') totSelecc = totSelecc + parseFloat(r.seleccionado)
+      })
+
+      lineas.forEach(r => {
+        if (r.seleccionado > '0') {
           numl++
           if (this.filterRecord.trackRecord == 'Track Record') {
-            this.recordToSubmit.avgSoldGrossMultiple += (r.avgGrossMultiple !== null ? parseFloat(r.avgGrossMultiple) : 0)
-            this.recordToSubmit.avgSoldGrossIrr += (r.avgGrossIrr !== null ? parseFloat(r.avgGrossIrr) : 0)
-            this.recordToSubmit.avgSoldNetMultiple += (r.avgNetMultiple !== null ? parseFloat(r.avgNetMultiple) : 0)
-            this.recordToSubmit.avgSoldNetIrr += (r.avgNetIrr !== null ? parseFloat(r.avgNetIrr) : 0)
-            this.recordToSubmit.avgSoldAnnualCashYield += (r.avgAnnualCashYield !== null ? parseFloat(r.avgAnnualCashYield) : 0)
-            this.recordToSubmit.avgDpi += (r.avgDpi !== null ? parseFloat(r.avgDpi) : 0)
+            this.recordToSubmit.avgSoldGrossMultiple += (r.avgGrossMultiple !== null ? parseFloat(r.avgGrossMultiple) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgSoldGrossIrr += (r.avgGrossIrr !== null ? parseFloat(r.avgGrossIrr) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgSoldNetMultiple += (r.avgNetMultiple !== null ? parseFloat(r.avgNetMultiple) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgSoldNetIrr += (r.avgNetIrr !== null ? parseFloat(r.avgNetIrr) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgSoldAnnualCashYield += (r.avgAnnualCashYield !== null ? parseFloat(r.avgAnnualCashYield) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgDpi += (r.avgDpi !== null ? parseFloat(r.avgDpi) : 0) * (parseFloat(r.seleccionado) / totSelecc)
           } else { //cartera actual
-            this.recordToSubmit.avgSoldGrossMultiple += (r.grossmult !== null ? parseFloat(r.grossmult) : 0)
-            this.recordToSubmit.avgSoldGrossIrr += (r.grossirr !== null ? parseFloat(r.grossirr) : 0)
-            this.recordToSubmit.avgSoldNetMultiple += (r.netmult !== null ? parseFloat(r.netmult) : 0)
-            this.recordToSubmit.avgSoldNetIrr += (r.netirr !== null ? parseFloat(r.netirr) : 0)
-            this.recordToSubmit.avgSoldAnnualCashYield += (r.annualyield !== null ? parseFloat(r.annualyield) : 0)
-            this.recordToSubmit.avgDpi += (r.dpi !== null ? parseFloat(r.dpi) : 0)
+            this.recordToSubmit.avgSoldGrossMultiple += (r.grossmult !== null ? parseFloat(r.grossmult) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgSoldGrossIrr += (r.grossirr !== null ? parseFloat(r.grossirr) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgSoldNetMultiple += (r.netmult !== null ? parseFloat(r.netmult) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgSoldNetIrr += (r.netirr !== null ? parseFloat(r.netirr) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgSoldAnnualCashYield += (r.annualyield !== null ? parseFloat(r.annualyield) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgDpi += (r.dpi !== null ? parseFloat(r.dpi) : 0) * (parseFloat(r.seleccionado) / totSelecc)
           }
         }
       })
+      /* antes seleccionado era un 0 o 1, ahora le asignamos valor para trabajar con pesos ponderados
       if (numl > 0) {
         this.recordToSubmit.avgSoldGrossMultiple = Math.round(this.recordToSubmit.avgSoldGrossMultiple * 100.0 / numl) / 100
         this.recordToSubmit.avgSoldGrossIrr = Math.round(this.recordToSubmit.avgSoldGrossIrr * 100 / numl) / 100
@@ -287,7 +297,7 @@ export default {
         this.recordToSubmit.avgSoldNetIrr = Math.round(this.recordToSubmit.avgSoldNetIrr * 100 / numl) / 100
         this.recordToSubmit.avgSoldAnnualCashYield = Math.round(this.recordToSubmit.avgSoldAnnualCashYield * 100 / numl) / 100
         this.recordToSubmit.avgDpi = Math.round(this.recordToSubmit.avgDpi * 100 / numl) / 100
-      }
+      }*/
     },
     getRecords (v) {
       //cuando cierro el filtro seleccion de alternativos, el emit hace que se ejecute este método.
@@ -358,6 +368,7 @@ export default {
     },
     updateRecord (row) {
       var objFilter = {}
+      // en this.registrosSeleccionados tenemos todos los datos del grid -> campo seleccionado que mostrará "0" o "1"
       this.$axios.get('activos/bd_activos.php/findAnalisisFondos1/', { params: objFilter })
         .then(response => {
           this.registrosSeleccionados.sort((a, b) => (a.seleccionado === '0' ? 'xx0' : 'xx1') <= (b.seleccionado === '0' ? 'xx0' : 'xx1') ? 1 : -1)
@@ -368,16 +379,21 @@ export default {
     getAnalisisFondos () {
       var objFilter = {}
       objFilter.idActivo = ''
+      objFilter.seleccionado = ''
       this.registrosSeleccionados.forEach(r => {
-        if (r.seleccionado === '1') {
+        if (r.seleccionado > '0') {
           if (objFilter.idActivo.length > 0) objFilter.idActivo += ','
+          if (objFilter.seleccionado.length > 0) objFilter.seleccionado += ','
           objFilter.idActivo += r.id
+          objFilter.seleccionado += r.seleccionado
         }
-      })
-
+      }) //en objFilter ahora tengo un objeto con 2 atributos: idActivo y su commitment (en seleccionado)
+  
       // donut analisis fondos moneda
       this.$axios.get('activos/bd_activos.php/findAnalisisFondos1/', { params: objFilter })
         .then(response => {
+          console.log('response.data fondos1', response.data)
+          console.log('objFilter fondos1', objFilter)
           this.registrosAnalisisFondos1 = response.data
           this.refreshRec++ // para que refresque el componente
         })
@@ -387,6 +403,7 @@ export default {
         // donut analisis fondos gestor
       this.$axios.get('activos/bd_activos.php/findAnalisisFondos2/', { params: objFilter })
         .then(response => {
+          console.log('response.data fondos2', response.data)
           this.registrosAnalisisFondos2 = response.data
           this.registrosAnalisisFondos2.forEach(r => r.serie === null ? r.serie = '.' : '')
           this.refreshRec1++ // para que refresque el componente

@@ -96,6 +96,7 @@ export default {
       ...this.chartOptionsdonut,
       labels: Array.from(this.value, row => row.serie)
     }
+    console.log('this.value desde dashboard resumen patr', this.value)
     this.seriesdonut = Array.from(this.value, row => parseFloat(row.valor))
     this.refresh++
   } 
