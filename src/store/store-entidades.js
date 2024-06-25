@@ -1,6 +1,7 @@
 import { axiosInstance } from 'boot/axios.js'
 const state = {
   listaEntidades: [],
+  listaEntidadesActivos: [],
   entidadSelf: {},
   entidadAsesor: {}
 }
@@ -8,6 +9,9 @@ const state = {
 const mutations = {
   loadEntidades (state, entidades) {
     state.listaEntidades = entidades
+  },
+  loadEntidadesActivos (state, entidades) {
+    state.listaEntidadesActivos = entidades
   },
   loadEntidadSelf (state, entidad) {
     state.entidadSelf = entidad
@@ -29,6 +33,19 @@ const actions = {
       })
       .catch(error => {
         this.dispatch('mensajeLog/addMensaje', 'loadEntidades' + error, { root: true })
+      })
+  },
+  loadEntidadesActivos ({ commit }) {
+    axiosInstance.get('entidades/bd_entidades.php/findEntidadesActivos/', {}, { withCredentials: true })
+      .then((response) => {
+        if (response.data.length === 0) {
+          this.dispatch('mensajeLog/addMensaje', 'loadEntidades' + 'No existen datos', { root: true })
+        } else {
+          commit('loadEntidadesActivos', response.data)
+        }
+      })
+      .catch(error => {
+        this.dispatch('mensajeLog/addMensaje', 'loadEntidadesActivos' + error, { root: true })
       })
   },
   loadEntidadSelf ({ commit }, codEmpresa) {

@@ -13,7 +13,7 @@ export default {
         labels: [],
         legend: {
           show: false,
-          position: 'top'
+          position: 'bottom'
         },
         theme: {
           palette: 'palette3'
@@ -44,8 +44,8 @@ export default {
               }
             },
             dataLabels: {
-              offset: 20,
-              minAngleToShowLabel: 11
+              offsetX: 20,
+              minAngleToShowLabel: 15
             }
           }
         },
@@ -96,7 +96,6 @@ export default {
       ...this.chartOptionsdonut,
       labels: Array.from(this.value, row => row.serie)
     }
-    console.log('this.value desde dashboard resumen patr', this.value)
     this.seriesdonut = Array.from(this.value, row => parseFloat(row.valor))
     this.refresh++
   } 

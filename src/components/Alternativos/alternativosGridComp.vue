@@ -338,7 +338,7 @@ export default {
       objFilter.tipoActivo = (objFilter.tipoActivo && objFilter.tipoActivo !== null ? objFilter.tipoActivo.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.estadoActivo = (objFilter.estadoActivo && objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.tipoProducto = (objFilter.tipoProducto && objFilter.tipoProducto !== null ? objFilter.tipoProducto.join() : null) // paso de array a concatenacion de strings (join)
-    
+      objFilter.codOtraEmpresa = (objFilter.codOtraEmpresa && objFilter.codOtraEmpresa !== null ? objFilter.codOtraEmpresa.join() : null) // paso de array a concatenacion de strings (join)
 
       return this.$axios.get('activos/bd_activos.php/findActivosActFilter', { params: objFilter })
         .then(response => {
@@ -392,8 +392,6 @@ export default {
       // donut analisis fondos moneda
       this.$axios.get('activos/bd_activos.php/findAnalisisFondos1/', { params: objFilter })
         .then(response => {
-          console.log('response.data fondos1', response.data)
-          console.log('objFilter fondos1', objFilter)
           this.registrosAnalisisFondos1 = response.data
           this.refreshRec++ // para que refresque el componente
         })
@@ -403,7 +401,6 @@ export default {
         // donut analisis fondos gestor
       this.$axios.get('activos/bd_activos.php/findAnalisisFondos2/', { params: objFilter })
         .then(response => {
-          console.log('response.data fondos2', response.data)
           this.registrosAnalisisFondos2 = response.data
           this.registrosAnalisisFondos2.forEach(r => r.serie === null ? r.serie = '.' : '')
           this.refreshRec1++ // para que refresque el componente
@@ -440,7 +437,7 @@ export default {
       
       
       this.updateRecord()
-    } else { // es la primera vez que entro, cargo valores po defecto
+    } else { // es la primera vez que entro, cargo valores por defecto
       this.filterRecord = {
         idActivo: [],
         tipoActivo: ['CAP.RIESGO', 'ALTERN.R FIJA'],
