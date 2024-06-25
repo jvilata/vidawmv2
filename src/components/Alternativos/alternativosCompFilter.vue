@@ -4,33 +4,34 @@
     <q-card-section class="bg-primary text-white">
       <div class="text-h6">Filtrar por</div>
     </q-card-section>
-
+    
     <q-form @submit="getRecords" class="q-gutter-y-xs">
       <q-select class="col"
-        outlined
-        clearable
-        label="Tipo Activo"
-        stack-label
-        v-model="filterR.tipoActivo"
-        :options="listaTiposActivo"
-        option-value="codElemento"
-        option-label="codElemento"
-        multiple
-        use-chips
-        emit-value
+      outlined
+      clearable
+      label="Tipo Activo"
+      stack-label
+      v-model="filterR.tipoActivo"
+      :options="listaTiposActivo"
+      option-value="codElemento"
+      option-label="codElemento"
+      multiple
+      use-chips
+      emit-value
       />
       <q-select
         outlined
         clearable
-        label="Tipo Producto"
+        label="Cod.empresa"
         stack-label
-        v-model="filterR.tipoProducto"
-        :options="listaTiposProducto"
+        v-model="filterR.codOtraEmpresa"
+        :options="listaEmpresas"
         option-value="codElemento"
-        option-label="codElemento"
-        emit-value
+        option-label="valor1"
         multiple
         use-chips
+        emit-value
+        map-options
       />
       <q-select class="col"
         outlined
@@ -47,9 +48,6 @@
         map-options
         @filter="filterEntidades"
       />
-      <!--q-input outlined clearable label="Nombre" stack-label v-model="filterR.nombre" /-->
-      <!-- en q-select multiple los valores estan en un array, como en nuestro caso estan en un string separados por comas
-          hay que crear un array con los valores en el columns format (split) y aqui volver a convertir el array a string (join) -->
       <q-select
         label="Estado Activo"
         stack-label
@@ -64,6 +62,22 @@
         map-options
         use-chips
       />
+      <q-select
+      outlined
+      clearable
+      label="Tipo Producto"
+      stack-label
+      v-model="filterR.tipoProducto"
+      :options="listaTiposProducto"
+      option-value="codElemento"
+      option-label="codElemento"
+      emit-value
+        multiple
+        use-chips
+      />
+      <!--q-input outlined clearable label="Nombre" stack-label v-model="filterR.nombre" /-->
+      <!-- en q-select multiple los valores estan en un array, como en nuestro caso estan en un string separados por comas
+          hay que crear un array con los valores en el columns format (split) y aqui volver a convertir el array a string (join) -->
       <q-select
         label="Computa"
         stack-label
@@ -117,7 +131,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('tablasAux', ['listaSINO', 'listaUsers', 'listaTipoAcc', 'listaTiposActivo', 'listaMeses', 'listaTiposProducto', 'listaEstadosActivo', 'listaTipoOperacion']),
+    ...mapState('tablasAux', ['listaEmpresas','listaSINO', 'listaUsers', 'listaTipoAcc', 'listaTiposActivo', 'listaMeses', 'listaTiposProducto', 'listaEstadosActivo', 'listaTipoOperacion']),
     ...mapState('entidades', ['listaEntidades']),
     ...mapState('activos', ['listaActivos']),
     ...mapState('login', ['user']) // importo state.user desde store-login
@@ -141,7 +155,6 @@ export default {
       })
     },
     getRecords () {
-      console.log('this.filterR', this.filterR)
       this.$emit('getRecords', this.filterR) // lo captura accionesMain
     },
     formatDate (pdate) {

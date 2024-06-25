@@ -36,12 +36,12 @@
         label="Gestor/Arrend"
         stack-label
         v-model="filterR.idEntidad"
-        :options="listaEntidadesFilter"
+        :options="listaEntidadesActivosFilter"
         option-value="id"
         option-label="nombre"
         emit-value
         map-options
-        @filter="filterEntidades"
+        @filter="filterEntidadesActivos"
         use-input
         hide-selected
         fill-input
@@ -143,19 +143,26 @@ export default {
   data () {
     return {
       filterR: {},
-      listaEntidadesFilter: []
+      listaEntidadesFilter: [],
+      listaEntidadesActivosFilter: []
     }
   },
   computed: {
     ...mapState('tablasAux', ['listaSINO', 'listaUsers', 'listaTipoAcc', 'listaTiposActivo', 'listaMeses', 'listaTiposProducto', 'listaEstadosActivo', 'listaTipoOperacion']),
-    ...mapState('entidades', ['listaEntidades'])
+    ...mapState('entidades', ['listaEntidades', 'listaEntidadesActivos'])
   },
   methods: {
-    ...mapActions('entidades', ['loadEntidades']),
+    ...mapActions('entidades', ['loadEntidades', 'loadEntidadesActivos']),
     filterEntidades (val, update, abort) {
       update(() => {
         const needle = val.toLowerCase()
         this.listaEntidadesFilter = this.listaEntidades.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
+      })
+    },
+    filterEntidadesActivos (val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase()
+        this.listaEntidadesActivosFilter = this.listaEntidadesActivos.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
       })
     },
     getRecords () {
@@ -167,7 +174,7 @@ export default {
   },
   mounted () {
     this.filterR = Object.assign({}, this.modelValue) // asignamos valor del parametro por si viene de otro tab
-    this.loadEntidades()
+    this.loadEntidadesActivos()
   },
   unmounted () {
     // guardamos valor en tabs por si despus queremos recuperarlo

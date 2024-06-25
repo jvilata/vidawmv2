@@ -171,7 +171,6 @@ export default {
     this.filterRecord.codEmpresa = this.user.codEmpresa
     this.filterRecord.tipoFactura= "EMITIDA"
     this.value = this.filterRecord
-    console.log(this.filterRecord)
     if (this.listaEntidades.length <= 0) this.loadEntidades() // carga store listaEntidades
     if (this.listaActivos.length <= 0) this.loadActivos(this.user.codEmpresa) // carga store listaActivos
     if (this.value === undefined) this.value = Object.assign({}, this.tabs[this.id].meta.value)
