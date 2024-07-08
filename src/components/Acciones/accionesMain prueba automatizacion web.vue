@@ -81,7 +81,7 @@ export default {
       this.refreshKey++
       this.expanded = false
     },
-    prueba () {
+    prueba () { 
       const corsAnywhere = 'https://cors-anywhere.herokuapp.com/';
       fetch(corsAnywhere+'www.morningstar.es/es/funds/snapshot/snapshot.aspx?id=F000010L35') 
         .then((response) => {
