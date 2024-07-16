@@ -33,20 +33,22 @@
         emit-value
         map-options
       />
-      <q-select class="col"
+      <q-select
         outlined
         clearable
         label="Gestor/Arrend"
         stack-label
         v-model="filterR.idEntidad"
-        :options="listaEntidadesFilter"
+        :options="listaEntidadesActivosFilter"
         option-value="id"
         option-label="nombre"
-        multiple
-        use-chips
         emit-value
         map-options
-        @filter="filterEntidades"
+        @filter="filterEntidadesActivos"
+        use-input
+        hide-selected
+        fill-input
+        input-debounce="0"
       />
       <q-select
         label="Estado Activo"
@@ -124,7 +126,7 @@ export default {
         trackRecord: 'Track Record' //por defecto - inicializamos a track record
         //launchHasta: ''
       },
-      listaEntidadesFilter: [],
+      listaEntidadesActivosFilter: [],
       listaActivosFilter: [],
       listaTrackRecord: ['Track Record', 'Cartera Actual']
       
@@ -132,12 +134,12 @@ export default {
   },
   computed: {
     ...mapState('tablasAux', ['listaEmpresas','listaSINO', 'listaUsers', 'listaTipoAcc', 'listaTiposActivo', 'listaMeses', 'listaTiposProducto', 'listaEstadosActivo', 'listaTipoOperacion']),
-    ...mapState('entidades', ['listaEntidades']),
+    ...mapState('entidades', ['listaEntidadesActivos']),
     ...mapState('activos', ['listaActivos']),
     ...mapState('login', ['user']) // importo state.user desde store-login
   },
   methods: {
-    ...mapActions('entidades', ['loadEntidades']),
+    ...mapActions('entidades', ['loadEntidadesActivos']),
     ...mapActions('activos', ['loadActivos']),
     filterActivos (val, update, abort) {
       update(() => {
@@ -145,14 +147,14 @@ export default {
         this.listaActivosFilter = this.listaActivos.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
       })
     },
-    cargarDatos(){
-      //console.log('Valor de filterR.trackRecord', this.filterR.trackRecord)
-    },
-    filterEntidades (val, update, abort) {
+    filterEntidadesActivos (val, update, abort) {
       update(() => {
         const needle = val.toLowerCase()
-        this.listaEntidadesFilter = this.listaEntidades.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
+        this.listaEntidadesActivosFilter = this.listaEntidadesActivos.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
       })
+    },
+    cargarDatos(){
+      //console.log('Valor de filterR.trackRecord', this.filterR.trackRecord)
     },
     getRecords () {
       this.$emit('getRecords', this.filterR) // lo captura accionesMain
@@ -164,7 +166,7 @@ export default {
   mounted () {
     this.filterR = Object.assign({}, this.value) // asignamos valor del parametro por si viene de otro tab
     //this.filterR.launchHasta = (new Date()).getFullYear()
-    this.loadEntidades()
+    this.loadEntidadesActivos()
     if (this.listaActivos.length <= 0) this.loadActivos(this.user.codEmpresa) // carga store listaActivos
   },
   unmounted () {

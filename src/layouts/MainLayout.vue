@@ -267,6 +267,14 @@ export default {
             name: 'userMain',
             label: 'Usuarios'
           }
+        },
+        {
+          title: 'Estrategias',
+          icon: 'workspace_premium',
+          link: {
+            name: 'estrategiasMain',
+            label: 'Estrategias'
+          }
         }
       ]
     }

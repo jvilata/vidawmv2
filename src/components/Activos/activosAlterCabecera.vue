@@ -56,7 +56,7 @@
             class="col-xs-3 col-sm-2" 
             @blur="updateRec" 
             outlined 
-            label="Satus" 
+            label="Status" 
             stack-label 
             clearable 
             v-model="recordToSubmit.status"
@@ -82,23 +82,62 @@
           default-opened
           header-class="bg-orange-1 text-grey-8"
         >
+        <div class="row q-pt-sm">
+          <q-select 
+              class="col-xs-4 col-sm-2" 
+              @blur="updateRec"
+              outlined 
+              clearable
+              label="Estrategias" 
+              stack-label 
+              v-model="recordToSubmit.idEstrategia"
+              emit-value
+              :options="listaEstrategiasComp"
+              option-value="id"
+              option-label="nombre"
+              map-options
+              @filter="filterEstrategias"
+              use-input
+              hide-selected
+              fill-input
+          />
+          <div class="row q-pa-xs">
+             <q-btn 
+              outline
+              rounded
+              @click.stop="addRecords"
+              label="Añadir"
+              color="primary"
+              size="15px">
+            </q-btn>
+              <q-dialog v-model="expanded"  >
+               
+                <estrategiasForm 
+                  @addRecords="addRecords"
+                  @hide="expanded = !expanded"
+                />
+              </q-dialog>
+          </div>
+        </div>
         <activosAlterLineas :key="refresh" :model-value="value"/>
       </q-expansion-item>
   </q-card>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import { date } from 'quasar'
 import { headerFormData } from 'boot/axios.js'
 import wgDate from 'components/General/wgDate.vue'
 import activosAlterLineas from 'components/Activos/activosAlterLineas.vue'
+import estrategiasForm from 'src/components/Estrategias/estrategiasForm.vue'
 export default {
   props: ['id'], // value es el objeto con los campos de filtro que le pasa accionesMain con v-model
   data () {
     return {
       refresh: 0,
       value: {},
+      listaEstrategiasFilter: [],
       recordToSubmit: {
         minimumTicket: 0,
         duration: 0,
@@ -118,7 +157,12 @@ export default {
         netmult: 0,
         netirr: 0,
         dpi: 0,
-        annualyield: 0
+        annualyield: 0,
+        idEstrategia:''
+      },
+      recordEstrategia: {
+        idEstrategia: '',
+        idActivo: ''
       }
     }
   },
@@ -126,11 +170,41 @@ export default {
     ...mapState('login', ['user']),
     ...mapState('tabs', ['tabs']),
     ...mapState('tablasAux', ['listaStatusAlt']),
+    ...mapState('activos', ['listaEstrategias']),
+    listaEstrategiasComp () {
+      if (this.listaEstrategiasFilter.length <= 0) return this.listaEstrategias
+      else return this.listaEstrategiasFilter
+    }
   },
   methods: {
+    ...mapActions('activos', ['loadEstrategias']),
+    ...mapActions('tabs', ['addTab']),
     formatDate (pdate) {
       return date.formatDate(pdate, 'DD-MM-YYYY')
     },
+    filterEstrategias (val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase()
+        this.listaEstrategiasFilter = this.listaEstrategias.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
+      })
+    },
+    /*
+    updateRecEstrateg () {
+      var formData = new FormData()
+      this.recordEstrategia = {
+        idActivo: this.value.id
+       }
+      for (var key in this.recordEstrategia) {
+        formData.append(key, this.recordEstrategia[key])
+      }
+    
+      return this.$axios.post('activos/bd_act_altdatos.php/updateEstrategiaTrackRecord', formData, headerFormData)
+        .then(response => {
+        })
+        .catch(error => {
+          this.$q.dialog({ title: 'Error', message: error })
+        }) 
+    },*/
     updateRec () {
       var formData = new FormData()
       for (var key in this.recordToSubmit) {
@@ -138,17 +212,70 @@ export default {
       }
       return this.$axios.post('activos/bd_activos.php/guardarBD', formData, headerFormData)
         .then(response => {
-        })
+          //refrescar tablón
+          this.refresh += 1;
+          Object.assign(this.value, this.recordToSubmit)
+          })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })
         })
+    },
+    editRecord (rowChanges, id) { // no lo uso aqui pero lod ejo como demo
+        this.addTab(['estrategiasFormMain', 'Estrategias-' + rowChanges.id, rowChanges, rowChanges.id])
+      },
+    addRecords () {
+        this.$q.dialog({
+        title: 'Añadir Estrategia',
+        message: 'Desea añadir una nueva estrategia?',
+        ok: {
+          push: true
+        },
+        cancel: {
+          push: true,
+          color: 'negative'
+        },
+        persistent: true
+      }).onOk(() => {
+        //usuario pulsa OK
+        var record = {
+          id: -1,
+          nombre: 'Nueva Estrategia',
+          idEntidad: '',
+          codEmpresa: this.user.codEmpresa,
+          tipoActivo: 'CAP.RIESGO',
+          descripcion: '',
+          user: this.user.user.email,
+          ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
+        }
+        var formData = new FormData()
+        for (var key in record) {
+          formData.append(key, record[key])
+        }
+        
+        return this.$axios.post('estrategias/bd_estrategias.php/guardarBD', formData, headerFormData)
+          .then(response => {
+            record.id = response.data.id
+            // this.registrosSeleccionados.push(record)
+            this.editRecord(record, record.id)
+          })
+          .catch(error => {
+            this.$q.dialog({ title: 'Error', message: error })
+          })
+
+      }).onCancel(() => {
+         console.log('>>>> Cancel')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
     }
   },
   components: {
     wgDate: wgDate,
-    activosAlterLineas: activosAlterLineas    
+    activosAlterLineas: activosAlterLineas,
+    estrategiasForm : estrategiasForm
   },
   mounted () {
+    this.loadEstrategias(this.user.codEmpresa)
     Object.assign(this.value, this.tabs[this.id].meta.value)
     Object.assign(this.recordToSubmit, this.value)
     var objFilter = {
@@ -158,6 +285,7 @@ export default {
     this.$axios.get('activos/bd_activos.php/findActivosFilter', { params: objFilter })
       .then(response => {
         Object.assign(this.recordToSubmit, response.data[0])
+        Object.assign(this.value, response.data[0])
       })
       .catch(error => {
         this.$q.dialog({ title: 'Error', message: error })

@@ -84,6 +84,21 @@ const routes = [
             ]
           },
           {
+            path: 'estrategiasMain',
+            name: 'estrategiasMain',
+            component: () => import('src/components/Estrategias/estrategiasMain.vue'),
+            props: true
+          },
+          {
+            path: 'EstrategiasFormMain/:id',
+            name: 'estrategiasFormMain',
+            component: () => import('components/Estrategias/estrategiasFormMain.vue'),
+            props: true,
+            children: [
+              { path: 'estrategiasForm', name: 'estrategiasForm', component: () => import('components/Estrategias/estrategiasForm.vue'), props: true }
+            ]
+          },
+          {
             path: 'dashboard',
             name: 'dashboard',
             component: () => import('components/Dashboard/dashboardMain.vue'),

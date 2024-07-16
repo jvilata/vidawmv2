@@ -193,10 +193,22 @@ export default {
   computed: {
     ...mapState('tablasAux', ['listaSINO', 'listaStatusAlt']),
     ...mapState('login', ['user']),
-    ...mapState('tabs', ['tabs'])
+    ...mapState('tabs', ['tabs']),
+    ...mapState('activos', ['listaEstrategias']),
+    listaEstrategiasComp () {
+      if (this.listaEstrategiasFilter.length <= 0) return this.listaEstrategias
+      else return this.listaEstrategiasFilter
+    }
   },
   methods: {
     ...mapActions('tabs', ['addTab']),
+    ...mapActions('activos', ['loadEstrategias']),
+    filterEstrategias (val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase()
+        this.listaEstrategiasFilter = this.listaEstrategias.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
+      })
+    },
     calcTotales (lineas) {
       var numl = 0
       var numlt = 0
@@ -243,7 +255,11 @@ export default {
     getRecords () {
       if (this.value.id === undefined) return // en el primer render no hay nada y es mejor no gastar tiempo
       // se reutiliza el grid de movimientos para el form de activos y de facturas
-      var objFilter = { idActivo: this.value.id }
+      var objFilter = { 
+        idActivo: this.value.id,
+        idEstrategia: this.value.idEstrategia
+      }
+      //var objFilter = Object.assign({}, this.value)
       return this.$axios.get('activos/bd_act_altdatos.php/findAct_trackrecordFilter', { params: objFilter })
         .then(response => {
           this.registrosSeleccionados = response.data
@@ -257,6 +273,7 @@ export default {
       // se reutiliza el grid de movimientos para el form de activos y de facturas
       var record = {
         idActivo: this.value.id,
+        idEstrategia: this.value.idEstrategia,
         fundName: this.value.nombre,
         user: this.user.user.email,
         ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
@@ -291,6 +308,7 @@ export default {
       })
     },
     updateRecord (record) {
+      console.log('record', record)
       return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(record))
         .then(response => {
           return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(record))
@@ -302,6 +320,7 @@ export default {
     }
   },
   mounted () {
+    this.loadEstrategias(this.user.codEmpresa)
     Object.assign(this.value, this.modelValue)
     this.getRecords()
   }
