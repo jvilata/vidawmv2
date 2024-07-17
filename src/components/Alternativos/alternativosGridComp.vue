@@ -339,7 +339,6 @@ export default {
       objFilter.estadoActivo = (objFilter.estadoActivo && objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.tipoProducto = (objFilter.tipoProducto && objFilter.tipoProducto !== null ? objFilter.tipoProducto.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.codOtraEmpresa = (objFilter.codOtraEmpresa && objFilter.codOtraEmpresa !== null ? objFilter.codOtraEmpresa.join() : null) // paso de array a concatenacion de strings (join)
-
       return this.$axios.get('activos/bd_activos.php/findActivosActFilter', { params: objFilter })
         .then(response => {
           // var i = 0
@@ -440,6 +439,7 @@ export default {
     } else { // es la primera vez que entro, cargo valores por defecto
       this.filterRecord = {
         idActivo: [],
+        idEntidad: [],
         tipoActivo: ['CAP.RIESGO', 'ALTERN.R FIJA'],
         computa: '1',
         launch: (new Date()).getFullYear(),

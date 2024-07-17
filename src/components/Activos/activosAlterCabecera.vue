@@ -50,28 +50,28 @@
           <q-input class="col-xs-6 col-sm-1" @blur="updateRec" outlined suffix="%" label="Hurdle Rate" stack-label v-model="recordToSubmit.hurdleRate" />
         </div>
         <div class="row q-pt-sm">
-          <q-input class="col-xs-6 col-sm-1" @blur="updateRec" outlined label="Launch (Vintage)" stack-label v-model="recordToSubmit.launch" />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined suffix="m" label="Target Size" stack-label v-model="recordToSubmit.targetSize" />
+          <q-input class="col-xs-6 col-sm-1" @blur="updateRec" readonly outlined label="Launch (Vintage)" stack-label v-model="recordToSubmit.launch" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined suffix="m" label="Target Size" stack-label v-model="recordToSubmit.targetSize" />
           <q-select 
             class="col-xs-3 col-sm-2" 
             @blur="updateRec" 
             outlined 
             label="Status" 
             stack-label 
-            clearable 
+            readonly  
             v-model="recordToSubmit.status"
             :options="listaStatusAlt"
             option-value="codElemento"
             option-label="codElemento"
             emit-value
               />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined suffix="%" label="%Committed" stack-label v-model="recordToSubmit.committed" />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined suffix="x" label="Gross Mult." stack-label v-model="recordToSubmit.grossmult" />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined suffix="%" label="Gross IRR" stack-label v-model="recordToSubmit.grossirr" />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined suffix="x" label="Net Mult." stack-label v-model="recordToSubmit.netmult" />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined suffix="%" label="Net IRR" stack-label v-model="recordToSubmit.netirr" />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined label="DPI" stack-label v-model="recordToSubmit.dpi" />
-          <q-input class="col-xs-6 col-sm-2" @blur="updateRec" outlined suffix="%" label="Annual Cash Yield" stack-label v-model="recordToSubmit.annualyield" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined suffix="%" label="%Committed" stack-label v-model="recordToSubmit.committed" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined suffix="x" label="Gross Mult." stack-label v-model="recordToSubmit.grossmult" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined suffix="%" label="Gross IRR" stack-label v-model="recordToSubmit.grossirr" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined suffix="x" label="Net Mult." stack-label v-model="recordToSubmit.netmult" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined suffix="%" label="Net IRR" stack-label v-model="recordToSubmit.netirr" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined label="DPI" stack-label v-model="recordToSubmit.dpi" />
+          <q-input class="col-xs-6 col-sm-2" @blur="updateRec" readonly outlined suffix="%" label="Annual Cash Yield" stack-label v-model="recordToSubmit.annualyield" />
         </div>
       </q-expansion-item>
       <q-expansion-item
@@ -119,7 +119,7 @@
               </q-dialog>
           </div>
         </div>
-        <activosAlterLineas :key="refresh" :model-value="value"/>
+        <activosAlterLineas :key="refresh" :model-value="value" @refrescar="getDatos()"/>
       </q-expansion-item>
   </q-card>
 </template>
@@ -188,23 +188,6 @@ export default {
         this.listaEstrategiasFilter = this.listaEstrategias.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
       })
     },
-    /*
-    updateRecEstrateg () {
-      var formData = new FormData()
-      this.recordEstrategia = {
-        idActivo: this.value.id
-       }
-      for (var key in this.recordEstrategia) {
-        formData.append(key, this.recordEstrategia[key])
-      }
-    
-      return this.$axios.post('activos/bd_act_altdatos.php/updateEstrategiaTrackRecord', formData, headerFormData)
-        .then(response => {
-        })
-        .catch(error => {
-          this.$q.dialog({ title: 'Error', message: error })
-        }) 
-    },*/
     updateRec () {
       var formData = new FormData()
       for (var key in this.recordToSubmit) {
@@ -223,6 +206,54 @@ export default {
     editRecord (rowChanges, id) { // no lo uso aqui pero lod ejo como demo
         this.addTab(['estrategiasFormMain', 'Estrategias-' + rowChanges.id, rowChanges, rowChanges.id])
       },
+    getDatos() {
+      var objFilter = {
+        id: this.value.id
+      }
+      this.$axios.get('activos/bd_activos.php/findActivosFilter', { params: objFilter })
+      .then(response => {
+        Object.assign(this.recordToSubmit, response.data[0])
+        Object.assign(this.value, response.data[0])
+       
+        //llamada a act_trackrecord
+        this.$axios.get('activos/bd_activos.php/findActivosTrack', { params: objFilter })
+        .then(response => {
+          if (response.data.length > 0) {
+            this.recordToSubmit.targetSize = response.data[0].size 
+            this.recordToSubmit.launch= response.data[0].vintage
+            this.recordToSubmit.status= response.data[0].status
+            this.recordToSubmit.committed= response.data[0].pCommitted
+            this.recordToSubmit.grossmult= response.data[0].grossMultiple
+            this.recordToSubmit.grossirr= response.data[0].grossIrr
+            this.recordToSubmit.netmult= response.data[0].netMultiple
+            this.recordToSubmit.netirr= response.data[0].netIrr
+            this.recordToSubmit.dpi= response.data[0].dpi
+            this.recordToSubmit.annualyield= response.data[0].annualCashYield
+            this.refresh += 1;
+          } else {
+            this.recordToSubmit.targetSize = 0 
+            this.recordToSubmit.launch= ''
+            this.recordToSubmit.status= ''
+            this.recordToSubmit.committed= 0
+            this.recordToSubmit.grossmult= 0
+            this.recordToSubmit.grossirr= 0
+            this.recordToSubmit.netmult= 0
+            this.recordToSubmit.netirr= 0
+            this.recordToSubmit.dpi= 0
+            this.recordToSubmit.annualyield= 0
+            this.refresh += 1;
+          }
+          
+        })
+        .catch(error => {
+          this.$q.dialog({ title: 'Error', message: error })
+        })
+
+      })
+      .catch(error => {
+        this.$q.dialog({ title: 'Error', message: error })
+      })
+    },
     addRecords () {
         this.$q.dialog({
         title: 'Añadir Estrategia',
@@ -278,18 +309,10 @@ export default {
     this.loadEstrategias(this.user.codEmpresa)
     Object.assign(this.value, this.tabs[this.id].meta.value)
     Object.assign(this.recordToSubmit, this.value)
-    var objFilter = {
-      id: this.value.id
-    }
     this.refresh++ // para  que refresque las líneas
-    this.$axios.get('activos/bd_activos.php/findActivosFilter', { params: objFilter })
-      .then(response => {
-        Object.assign(this.recordToSubmit, response.data[0])
-        Object.assign(this.value, response.data[0])
-      })
-      .catch(error => {
-        this.$q.dialog({ title: 'Error', message: error })
-      })
+    
+    this.getDatos()
+    
   }
 }
 </script>

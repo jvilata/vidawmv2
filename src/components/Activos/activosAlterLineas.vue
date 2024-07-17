@@ -32,7 +32,7 @@
       </template>
 
       <template v-slot:body="props">
-        <q-tr :props="props" :key="`m_${props.row.id}`" @mouseover="rowId=`m_${props.row.id}`">
+        <q-tr :props="props" :key="`m_${props.row.id}`" @click="rowId=`m_${props.row.id}`" @mouseover="rowId=`m_${props.row.id}`" >
           <q-td>
             <!-- columna de acciones: editar, borrar, etc -->
             <div style="max-width: 30px">
@@ -62,10 +62,10 @@
                 v-slot="scope"
                 @save="updateRecord(props.row)">
                 <!-- aqui definimos las ediciones especificas para cada columna -->
-                <q-input v-if="col.name !== 'status'" v-model="scope.value"/>
+                <q-input v-if="!['status', 'seleccionado'].includes(col.name)" v-model="scope.value"/>
                 <q-select v-if="col.name === 'status'"
                   class="col-xs-12 col-sm-6"
-                  label="Satus"
+                  label="Status"
                   stack-label
                   outlined
                   clearable
@@ -75,7 +75,18 @@
                   option-label="codElemento"
                   emit-value
               />
+              <q-select v-if="col.name === 'seleccionado'"
+                @update:model-value="v=> updateSelecc(v, props.row)"
+                v-model="scope.value"
+                :options="listaSINO"
+                option-value="id"
+                option-label="desc"
+                stack-label
+                emit-value
+                map-options
+              />
             </q-popup-edit>
+
           </q-td>
         </q-tr>
       </template>
@@ -122,6 +133,7 @@
             :key="col.name"
             :align="col.align"
           >
+          
             <div v-if="['fundName'].includes(col.name)">Media total</div>
             <div v-if="['grossMultiple'].includes(col.name)">{{ recordToSubmit.totGrossMultiple }}x</div>
             <div v-if="['grossIrr'].includes(col.name)">{{ recordToSubmit.totGrossIrr }}%</div>
@@ -152,6 +164,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import { date } from 'quasar'
+import { ref } from 'vue'
 export default {
   props: ['modelValue'], // en 'value' tenemos la tabla de datos del grid
   data () {
@@ -161,6 +174,7 @@ export default {
       mostrarDialog: false,
       registrosSeleccionados: [],
       registroEditado: {},
+      esteActivo: false,
       recordToSubmit: {
         totGrossMultiple: 0,
         totGrossIrr: 0,
@@ -173,6 +187,8 @@ export default {
         avgSoldAnnualCashYield: 0
       },
       columns: [
+       // { name: 'idActivo', align: 'left', label: 'idActivo', field: 'idActivo' },
+        { name: 'seleccionado', align: 'left', label: 'Activo actual', field: row =>(row.idActivo===this.value.id ? 'SI' : ''), sortable: true, style: 'width: 50px; whiteSpace: normal' },
         { name: 'fundName', align: 'left', label: 'Fund Name', field: 'fundName', sortable: true, style: 'width: 200px; whiteSpace: normal' },
         { name: 'vintage', align: 'left', label: 'Vintage', field: 'vintage', sortable: true },
         { name: 'size', align: 'left', label: 'Size', field: 'size', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
@@ -259,7 +275,7 @@ export default {
         idActivo: this.value.id,
         idEstrategia: this.value.idEstrategia
       }
-      //var objFilter = Object.assign({}, this.value)
+     
       return this.$axios.get('activos/bd_act_altdatos.php/findAct_trackrecordFilter', { params: objFilter })
         .then(response => {
           this.registrosSeleccionados = response.data
@@ -272,6 +288,7 @@ export default {
     addRecord () {
       // se reutiliza el grid de movimientos para el form de activos y de facturas
       var record = {
+        //Quitar id Activo y solo poner cuando check = true
         idActivo: this.value.id,
         idEstrategia: this.value.idEstrategia,
         fundName: this.value.nombre,
@@ -307,12 +324,29 @@ export default {
           })
       })
     },
+    updateSelecc (v, row) {
+      
+      if (v === "1") {
+        row.idActivo = this.value.id
+      } else row.idActivo = 0
+      
+      //this.$emit('refrescar')
+    },
     updateRecord (record) {
-      console.log('record', record)
-      return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(record))
+      
+      var tmp = {}
+      Object.assign(tmp, record)
+      delete tmp.seleccionado
+
+      console.log('record temp', tmp)
+      
+      return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(tmp))
         .then(response => {
-          return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(record))
-            .then()
+          Object.assign(tmp, record)
+          delete tmp.seleccionado
+          console.log('record despues', tmp)
+          return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(tmp))
+            .then(this.$emit('refrescar'))
         })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error.message })

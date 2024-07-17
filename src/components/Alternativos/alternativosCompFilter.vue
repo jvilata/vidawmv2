@@ -42,14 +42,15 @@
         :options="listaEntidadesActivosFilter"
         option-value="id"
         option-label="nombre"
-        emit-value
-        map-options
-        @filter="filterEntidadesActivos"
         use-input
-        hide-selected
-        fill-input
-        input-debounce="0"
+        multiple
+        use-chips
+        emit-value
+        @filter="filterEntidadesActivos"
+        map-options
+              
       />
+
       <q-select
         label="Estado Activo"
         stack-label
