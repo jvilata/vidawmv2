@@ -301,10 +301,11 @@ export default {
     },
     getRecords (v) {
       //cuando cierro el filtro seleccion de alternativos, el emit hace que se ejecute este método.
-      if (v.trackRecord !== 'Track Record') { //cartera actual  
+      console.log('componente de filter record es:', v)
+      if (v.trackRecord !== 'Track Record') { //cartera actual: 
         var obj;
         obj = this.columns.find(r => r.name=='grossMultiple')
-        obj.field = 'grossmult'
+        obj.field = 'grossmult' //cogemos valores de tabla activo
         obj = this.columns.find(r => r.name=='grossIrr')
         obj.field = 'grossirr'
         obj = this.columns.find(r => r.name=='netMultiple')
@@ -315,7 +316,7 @@ export default {
         obj.field = 'annualyield'
         obj = this.columns.find(r => r.name=='dpi')
         obj.field = 'dpi'
-      } else {
+      } else { // se ha seleccionado Track Record (por defecto)
         obj = this.columns.find(r => r.name=='grossMultiple')
         obj.field = 'avgGrossMultiple'
         obj = this.columns.find(r => r.name=='grossIrr')
@@ -339,10 +340,12 @@ export default {
       objFilter.estadoActivo = (objFilter.estadoActivo && objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.tipoProducto = (objFilter.tipoProducto && objFilter.tipoProducto !== null ? objFilter.tipoProducto.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.codOtraEmpresa = (objFilter.codOtraEmpresa && objFilter.codOtraEmpresa !== null ? objFilter.codOtraEmpresa.join() : null) // paso de array a concatenacion de strings (join)
+      console.log('objFilter antes de llamda al back', objFilter)
       return this.$axios.get('activos/bd_activos.php/findActivosActFilter', { params: objFilter })
         .then(response => {
           // var i = 0
           //console.log('Error producido en llamada a findActivosActFilter')
+          console.log('response de back', response.data)
           response.data.forEach(row => {
             // row.id = i++
             row.seleccionado = '0'

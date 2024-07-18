@@ -163,8 +163,8 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import { headerFormData } from 'boot/axios.js'
 import { date } from 'quasar'
-import { ref } from 'vue'
 export default {
   props: ['modelValue'], // en 'value' tenemos la tabla de datos del grid
   data () {
@@ -328,6 +328,38 @@ export default {
       
       if (v === "1") {
         row.idActivo = this.value.id
+        console.log('row', row)
+        //fuerzo copiado de esa fila de track record en su activo
+        var tmp = {        
+          id: row.idActivo,
+          annualyield: row.annualCashYield,
+          dpi: row.dpi,
+          grossirr: row.grossIrr,
+          grossmult: row.grossMultiple,
+          netirr: row.netIrr,
+          netmult: row.netMultiple,
+          committed: row.pCommitted,
+          targetSize: row.size,
+          status: row.status,
+          launch: row.vintage
+        }
+
+        
+        return this.$axios.put(`activos/bd_activos.php/guardarMetricas/${tmp.id}`, JSON.stringify(tmp))
+        .then(response => {
+
+          return this.$axios.put(`activos/bd_activos.php/guardarMetricas/${tmp.id}`, JSON.stringify(tmp))
+          .then(response => {
+            this.$q.notify('Se ha seleccionado el activo actual')
+          })
+          .catch(error => {
+            this.$q.dialog({ title: 'Error', message: error })
+          })
+        
+        })
+        .catch(error => {
+          this.$q.dialog({ title: 'Error', message: error })
+        })
       } else row.idActivo = 0
       
       //this.$emit('refrescar')
