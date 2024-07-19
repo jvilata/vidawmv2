@@ -1,85 +1,129 @@
 <template>
   <div>
-  <q-btn dense label="+/- Columnas" color="primary" @click="ocultar=!ocultar"/>
-  <q-btn dense label="INTERPRETACIÓN" color="primary" @click="mostrarAyuda" style="left: 45vw"/>
-  <q-item class="row center" >
-    <!-- GRID. en row-key ponemos la columna del json que sea la id unica de la fila -->
-    <q-table
-      class="col dashboardGridPlanif-header-table"
-      dense
-      :pagination="pagination"
-      :rows-per-page-options="[0]"
-      :virtual-scroll-sticky-size-start="48"
-      row-key="id"
-      :rows="registrosSeleccionados"
-      :columns="columns"
-      table-style="max-height: 70vh; max-width: 93vw"
-      hide-bottom
-    >
+    <q-scroll-area style="height: calc(100vh - 210px); ">
+    <div>
+      <q-btn dense label="+/- Columnas" color="primary" @click="ocultar=!ocultar"/>
+      <q-btn dense label="INTERPRETACIÓN" color="primary" @click="mostrarAyuda" style="left: 45vw"/>
+      <q-item class="row center" >
+        <!-- GRID. en row-key ponemos la columna del json que sea la id unica de la fila -->
+        <q-table
+          class="col dashboardGridPlanif-header-table"
+          dense
+          :pagination="pagination"
+          :rows-per-page-options="[0]"
+          :virtual-scroll-sticky-size-start="48"
+          row-key="id"
+          :rows="registrosSeleccionados"
+          :columns="columns"
+          table-style="max-height: 70vh; max-width: 93vw"
+          hide-bottom
+        >
 
-      <template v-slot:header="props">
-        <!-- CABECERA DE LA TABLA -->
-        <q-tr :props="props">
-          <q-th
-            v-for="col in props.cols"
-            :key="col.name"
-            :props="props"
-          >
-            <div v-if="!ocultar || ocultar && !['comprometido7_2', 'distribuido', 'comprometido', 'comprometidotot', 'realcomprometido', 'pprevisto', 'pajuste', 'importeAjuste', 'cajaExtra'].includes(col.name.substring(0,col.name.length-2))">
-              {{ col.label }}
+          <template v-slot:header="props">
+            <!-- CABECERA DE LA TABLA -->
+            <q-tr :props="props">
+              <q-th
+                v-for="col in props.cols"
+                :key="col.name"
+                :props="props"
+              >
+                <div v-if="!ocultar || ocultar && !['comprometido7_2', 'distribuido', 'comprometido', 'comprometidotot', 'realcomprometido', 'pprevisto', 'pajuste', 'importeAjuste', 'cajaExtra'].includes(col.name.substring(0,col.name.length-2))">
+                  {{ col.label }}
+                </div>
+              </q-th>
+            </q-tr>
+          </template>
+
+          <template v-slot:body="props">
+            <q-tr :props="props" :key="`m_${props.row.id}`" @mouseover="rowId=`m_${props.row.id}`">
+              <q-td
+                v-for="col in props.cols"
+                :key="col.name"
+                :props="props"
+              >
+                <div :style="col.style"
+                  v-if="!ocultar || ocultar && !['comprometido7_2', 'distribuido', 'comprometido', 'comprometidotot', 'realcomprometido', 'pprevisto', 'pajuste', 'importeAjuste', 'cajaExtra'].includes(col.name.substring(0,col.name.length-2))">
+                  {{ col.value }}
+                  <q-popup-edit v-if="['pRentTeorica', 'pTeorico'].includes(col.name)"
+                    v-model="props.row[col.name]"
+                    max-height="600px"
+                    buttons
+                    v-slot="scope"
+                    @save="updateRecord(props.row)">
+                    <!-- aqui definimos las ediciones especificas para cada columna -->
+                    <q-input v-if="['pRentTeorica'].includes(col.name)" v-model="scope.value"
+                      autofocus counter />
+                    <q-input v-if="['pTeorico'].includes(col.name)" v-model="scope.value"
+                      autofocus counter />
+                  </q-popup-edit>
+                </div>
+              </q-td>
+            </q-tr>
+          </template>
+
+          <template v-slot:bottom-row>
+            <!-- BOTTOM-ROW DE LA TABLA -->
+            <q-tr >
+              <q-th
+                v-for="col in columns"
+                :key="col.name"
+                :align="col.align"
+              >
+                <div v-if="['pRentTeorica'].includes(col.name)">{{ numeralFormat(registrosSeleccionados.reduce((a, b) => a + (parseFloat(b.pRentTeorica) * parseFloat(b.pTeorico)/10000 || 0), 0), '0.00%') }}</div>
+                <div v-if="['pRentEsperada'].includes(col.name)">{{ numeralFormat(registrosSeleccionados.reduce((a, b) => a + (parseFloat(b.pRentEsperada) * parseFloat(b.prealInicial)/10000 || 0), 0), '0.00%') }}</div>
+                <div v-if="['rentabAcum'].includes(col.name)">{{ numeralFormat(parseFloat(registrosPanelDatos.rentabilidadReal)/100, '0.00%') }}</div>
+                  <div v-if="['aInvertirY0Mes'].includes(col.name)">{{ numeralFormat(registrosSeleccionados.reduce((a, b) => a + (parseFloat(b.aInvertirY0) / 12), 0), '0,00') }}</div>
+                <div v-if="!['pRentTeorica','pRentEsperada','tipoActivo', 'aInvertirY0Mes', 'rentabAcum'].includes(col.name) && (!ocultar || ocultar && !['comprometido7_2', 'distribuido', 'comprometido', 'comprometidotot', 'realcomprometido', 'pprevisto', 'pajuste', 'importeAjuste', 'cajaExtra'].includes(col.name.substring(0,col.name.length-2)))">
+                  {{ numeralFormat(Math.round(registrosSeleccionados.reduce((a, b) => a + (b[col.name]===undefined?0:parseFloat(b[col.name])), 0) * 100) / 100) }}
+                </div>
+              </q-th>
+            </q-tr>
+          </template>
+        </q-table>
+      </q-item>
+    </div>
+    <div class="q-mx-md">
+      <q-item class="q-mt-md q-mb-sm q-pa-xs bg-indigo-1 text-grey-8">
+        <q-item-section align="center">
+          <div class="text-h6">Control de Riesgos</div>
+        </q-item-section>
+      </q-item>
+      <div class="q-mt-sm q-mb-md row items-start q-gutter-md">
+        <q-card class="col-6 col-md my-card">
+            <q-card-section align="center" >
+              <div class="text-subtitle-2 text-grey-8 text-weight-light">Compromisos a 6 meses: {{ numeralFormat(parseFloat(`${compr6m}`)) }}
+                <q-btn v-if="compromisos6m" fill flat bold round color="green" icon="check_circle" />
+                <q-btn v-if="!compromisos6m" flat bold round color="red" icon="error" />
+              </div>
+              <div v-if="compromisos6m" class="text-h5 text-green-7 text-weight-light">Caja: {{ numeralFormat(parseFloat(`${cajaPatr}`)) }} €</div>
+              <div v-if="!compromisos6m" class="text-h5 text-red-7 text-weight-light">Caja: {{ numeralFormat(parseFloat(`${cajaPatr}`)) }}€</div>
+            </q-card-section>
+        </q-card>
+        <q-card class="col-6 col-md my-card">
+          <q-card-section align="center">
+            <div class="text-subtitle-2 text-grey-8 text-weight-light">Compromisos a 24 meses: {{ numeralFormat(parseFloat(`${compr24m}`)) }}
+              <q-btn v-if="compromisos24m" flat round color="green" icon="check_circle" />
+              <q-btn v-if="!compromisos24m" flat bold round color="red" icon="error" />
+
             </div>
-          </q-th>
-        </q-tr>
-      </template>
+            <div v-if="compromisos24m" class="text-h5 text-green-7 text-weight-light">Caja + Renta Fija: {{ numeralFormat(parseFloat(`${cajaRtaFija}`)) }}€</div>
+            <div v-if="!compromisos24m" class="text-h5 text-red-7 text-weight-light">Caja + Renta Fija: {{ numeralFormat(parseFloat(`${cajaRtaFija}`)) }}€</div>
+          </q-card-section>
+        </q-card>
+        <q-card class="col-6 col-md my-card">
+          <q-card-section align="center">
+            <div class="text-subtitle-2 text-grey-8 text-weight-light">Compromisos totales: {{ numeralFormat(parseFloat(`${comprTot}`)) }}
+              <q-btn v-if="compromisosTot" flat round color="green" icon="check_circle" />
+              <q-btn v-if="!compromisosTot" flat bold round color="red" icon="error" />
 
-      <template v-slot:body="props">
-        <q-tr :props="props" :key="`m_${props.row.id}`" @mouseover="rowId=`m_${props.row.id}`">
-          <q-td
-            v-for="col in props.cols"
-            :key="col.name"
-            :props="props"
-          >
-            <div :style="col.style"
-              v-if="!ocultar || ocultar && !['comprometido7_2', 'distribuido', 'comprometido', 'comprometidotot', 'realcomprometido', 'pprevisto', 'pajuste', 'importeAjuste', 'cajaExtra'].includes(col.name.substring(0,col.name.length-2))">
-              {{ col.value }}
-              <q-popup-edit v-if="['pRentTeorica', 'pTeorico'].includes(col.name)"
-                v-model="props.row[col.name]"
-                max-height="600px"
-                buttons
-                v-slot="scope"
-                @save="updateRecord(props.row)">
-                <!-- aqui definimos las ediciones especificas para cada columna -->
-                <q-input v-if="['pRentTeorica'].includes(col.name)" v-model="scope.value"
-                  autofocus counter />
-                <q-input v-if="['pTeorico'].includes(col.name)" v-model="scope.value"
-                  autofocus counter />
-              </q-popup-edit>
             </div>
-          </q-td>
-        </q-tr>
-      </template>
-
-      <template v-slot:bottom-row>
-        <!-- BOTTOM-ROW DE LA TABLA -->
-        <q-tr >
-          <q-th
-            v-for="col in columns"
-            :key="col.name"
-            :align="col.align"
-          >
-            <div v-if="['pRentTeorica'].includes(col.name)">{{ numeralFormat(registrosSeleccionados.reduce((a, b) => a + (parseFloat(b.pRentTeorica) * parseFloat(b.pTeorico)/10000 || 0), 0), '0.00%') }}</div>
-            <div v-if="['pRentEsperada'].includes(col.name)">{{ numeralFormat(registrosSeleccionados.reduce((a, b) => a + (parseFloat(b.pRentEsperada) * parseFloat(b.prealInicial)/10000 || 0), 0), '0.00%') }}</div>
-            <div v-if="['rentabAcum'].includes(col.name)">{{ numeralFormat(parseFloat(registrosPanelDatos.rentabilidadReal)/100, '0.00%') }}</div>
-              <div v-if="['aInvertirY0Mes'].includes(col.name)">{{ numeralFormat(registrosSeleccionados.reduce((a, b) => a + (parseFloat(b.aInvertirY0) / 12), 0), '0,00') }}</div>
-            <div v-if="!['pRentTeorica','pRentEsperada','tipoActivo', 'aInvertirY0Mes', 'rentabAcum'].includes(col.name) && (!ocultar || ocultar && !['comprometido7_2', 'distribuido', 'comprometido', 'comprometidotot', 'realcomprometido', 'pprevisto', 'pajuste', 'importeAjuste', 'cajaExtra'].includes(col.name.substring(0,col.name.length-2)))">
-              {{ numeralFormat(Math.round(registrosSeleccionados.reduce((a, b) => a + (b[col.name]===undefined?0:parseFloat(b[col.name])), 0) * 100) / 100) }}
-            </div>
-          </q-th>
-        </q-tr>
-      </template>
-
-    </q-table>
-  </q-item>
+            <div v-if="compromisosTot" class="text-h5 text-green-7 text-weight-light">Caja + Rta Fija + Rta Vble: {{ numeralFormat(parseFloat(`${cajaRtaFijaVble}`)) }}€</div>
+            <div v-if="!compromisosTot" class="text-h5 text-red-7 text-weight-light">Caja + Rta Fija + Rta Vble: {{ numeralFormat(parseFloat(`${cajaRtaFijaVble}`)) }}€</div>
+          </q-card-section>
+        </q-card>
+      </div>
+    </div>
+  </q-scroll-area>
   </div>
 </template>
 
@@ -91,6 +135,15 @@ export default {
     return {
       rowId: '',
       ocultar: false,
+      compromisos6m: false,
+      compromisos24m: false,
+      compromisosTot: false,
+      compr6m: 0.0,
+      compr24m: 0.0,
+      comprTot: 0.0,
+      cajaPatr: '',
+      cajaRtaFija: '',
+      cajaRtaFijaVble: '',
       registrosSeleccionados: [],
       proyCompRFija: [],
       proyCompCapRiesgo: [],
@@ -203,25 +256,26 @@ export default {
       this.$axios.get('activos/bd_activos.php/cActivosInversion/', { params: obj1 })
         .then(response => {
           this.registrosSeleccionados = response.data
+          
           Object.assign(obj1, {
             anyoDesde: ejercicioY0,
             estadoActivo: '1,4',
             computa: 1,
             tipoActivo: 'ALTERN.R FIJA'
           })
-          this.$axios.get('https://vidawm.com/privado/php/movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: obj1 })
+          this.$axios.get('movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: obj1 })
             .then(response => {
               this.proyCompRFija = response.data
               obj1.tipoActivo = 'CAP.RIESGO'
-              this.$axios.get('https://vidawm.com/privado/php/movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: obj1 })
+              this.$axios.get('movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: obj1 })
                 .then(response => {
                   this.proyCompCapRiesgo = response.data
                   obj1.tipoActivo = 'INM.EN CONSTR'
-                  this.$axios.get('https://vidawm.com/privado/php/movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: obj1 })
+                  this.$axios.get('movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: obj1 })
                     .then(response => {
                       this.proyCompInmuebles = response.data
                       obj1.tipoActivo = 'PARTICIPACION'
-                      this.$axios.get('https://vidawm.com/privado/php/movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: obj1 })
+                      this.$axios.get('movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: obj1 })
                         .then(response => {
                           this.proyCompParticipacion = response.data
                           // PONER CODIGO AQUI -----------------
@@ -259,10 +313,16 @@ export default {
                                   this.acumulaTotales(ejercicioY0, element, rfija)
                                 })
                             }
+
                             element.realcomprometidoY0 = parseFloat(element.patrimonio) + element.comprometidototY0
                             this.totRealCompY0 += element.realcomprometidoY0
+                            // AQUI
+                            
+
                           })
                           // ejercicio Y0
+
+                          this.comprobarCompromisos(this.registrosSeleccionados)
                           const cCompAltFija = 0.20 // 20% anual durante 5 años
                           const cCompAltCRiesgo = 0.20
                           var altFija = 0
@@ -413,6 +473,30 @@ export default {
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })
         })
+    },
+    comprobarCompromisos(regSelec){
+     
+      var rtaFijaPatr = ''
+      var rtaVblePatr = ''
+
+      regSelec.forEach(r => {
+        if (r.tipoActivo === 'CAJA') this.cajaPatr = r.patrimonio
+        if (r.tipoActivo === 'RENTA FIJA') rtaFijaPatr = r.patrimonio
+        if (r.tipoActivo === 'RENTA VBLE') rtaVblePatr = r.patrimonio
+        this.compr6m += parseFloat(r.comprometido6m)
+        this.compr24m += parseFloat(r.comprometido7_24m)
+        if (r.comprometidototY0 && !['RENTA FIJA', 'RENTA VBLE'].includes(r.tipoActivo)) this.comprTot += parseFloat(r.comprometidototY0) //parseFloat((r.comprometidototY0)) 
+        
+      })
+      this.compr24m += this.compr6m
+      this.cajaRtaFija = parseFloat(this.cajaPatr) + parseFloat(rtaFijaPatr)
+      this.cajaRtaFijaVble = parseFloat(this.cajaPatr) + parseFloat(rtaFijaPatr) + parseFloat(rtaVblePatr)
+     
+      if (parseFloat(this.cajaPatr) > parseFloat(this.compr6m) ) this.compromisos6m = true 
+      if (parseFloat(this.cajaRtaFija) > parseFloat(this.compr24m) ) this.compromisos24m = true 
+      if (parseFloat(this.cajaRtaFijaVble)  > this.comprTot ) this.compromisosTot = true 
+      
+
     }
   },
   mounted () {
