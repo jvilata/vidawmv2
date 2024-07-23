@@ -122,6 +122,21 @@
           </q-card-section>
         </q-card>
       </div>
+      <!--Graficos de activos líquidos & ilíquidos-->
+      <div class="row">
+        <div class="col-md justify-center" >
+          <q-item class="q-mt-md q-mb-sm q-pa-xs bg-indigo-1 text-grey-8">
+            <q-item-section align="center">
+              <div class="text-h6">Resumen Liquidez de Activos</div>
+            </q-item-section>
+          </q-item>
+          <q-item class="q-ma-md q-pb-xl" >
+            <q-item-section align="center">
+              <dashboardResumenLiquidez :value="liquidez" :key="refresh"/>
+            </q-item-section>
+          </q-item>
+        </div>
+      </div>
     </div>
   </q-scroll-area>
   </div>
@@ -129,11 +144,13 @@
 
 <script>
 import { openURL } from 'quasar'
+import dashboardResumenLiquidez from 'components/Dashboard/dashboardResumenLiquidez.vue'
 export default {
   props: ['value'], // en 'value' tenemos la tabla de datos del grid
   data () {
     return {
       rowId: '',
+      refresh: 0,
       ocultar: false,
       compromisos6m: false,
       compromisos24m: false,
@@ -141,6 +158,21 @@ export default {
       compr6m: 0.0,
       compr24m: 0.0,
       comprTot: 0.0,
+      /**
+      etiquetavalor: "02/2024"
+      serie: "DOLAR"
+      valor: "63269205.0000"
+       */
+      liquidez: [
+        {
+          serie: 'Activos Liquidos',
+          valor: 0.0
+        },
+        {
+          serie: 'Activos No Liquidos',
+          valor: 0.0
+        }
+    ],
       cajaPatr: '',
       cajaRtaFija: '',
       cajaRtaFijaVble: '',
@@ -480,28 +512,52 @@ export default {
       var rtaVblePatr = ''
 
       regSelec.forEach(r => {
-        if (r.tipoActivo === 'CAJA') this.cajaPatr = r.patrimonio
-        if (r.tipoActivo === 'RENTA FIJA') rtaFijaPatr = r.patrimonio
-        if (r.tipoActivo === 'RENTA VBLE') rtaVblePatr = r.patrimonio
+        //CAJA, RTA VBLE, RTA FIJA, ALTERN.R FIJA, CAP.RIESGO, INM.EN CONSTR, INMUEB  RENTA, PARTICIPACION, PRESTAMO (NO AÑADIMOS NI DEUDA NI DIVIDENDO)
+        //serie: 'activosLiquidos'
+        if (r.tipoActivo === 'ALTERN.R FIJA') this.liquidez[1].valor += parseFloat(r.patrimonio)
+        if (r.tipoActivo === 'CAP.RIESGO') this.liquidez[1].valor += parseFloat(r.patrimonio)
+        if (r.tipoActivo === 'INM.EN CONSTR') this.liquidez[1].valor += parseFloat(r.patrimonio)
+        if (r.tipoActivo === 'INMUEB  RENTA') this.liquidez[1].valor += parseFloat(r.patrimonio)
+        if (r.tipoActivo === 'PARTICIPACION') this.liquidez[1].valor += parseFloat(r.patrimonio)
+        if (r.tipoActivo === 'PRESTAMO') this.liquidez[1].valor += parseFloat(r.patrimonio)
+
+        if (r.tipoActivo === 'CAJA'){
+          this.cajaPatr = r.patrimonio
+          this.liquidez[0].valor += parseFloat(r.patrimonio)
+        }
+        if (r.tipoActivo === 'RENTA FIJA') { 
+          rtaFijaPatr = r.patrimonio
+          this.liquidez[0].valor += parseFloat(r.patrimonio)
+        }
+        if (r.tipoActivo === 'RENTA VBLE') {
+          rtaVblePatr = r.patrimonio
+          this.liquidez[0].valor += parseFloat(r.patrimonio)
+        }
+        
         this.compr6m += parseFloat(r.comprometido6m)
         this.compr24m += parseFloat(r.comprometido7_24m)
         if (r.comprometidototY0 && !['RENTA FIJA', 'RENTA VBLE'].includes(r.tipoActivo)) this.comprTot += parseFloat(r.comprometidototY0) //parseFloat((r.comprometidototY0)) 
         
       })
+      console.log('Liquidez de los activos', this.liquidez)
+      
+      this.refresh++
       this.compr24m += this.compr6m
       this.cajaRtaFija = parseFloat(this.cajaPatr) + parseFloat(rtaFijaPatr)
       this.cajaRtaFijaVble = parseFloat(this.cajaPatr) + parseFloat(rtaFijaPatr) + parseFloat(rtaVblePatr)
      
       if (parseFloat(this.cajaPatr) > parseFloat(this.compr6m) ) this.compromisos6m = true 
       if (parseFloat(this.cajaRtaFija) > parseFloat(this.compr24m) ) this.compromisos24m = true 
-      if (parseFloat(this.cajaRtaFijaVble)  > this.comprTot ) this.compromisosTot = true 
-      
+      if (parseFloat(this.cajaRtaFijaVble)  > this.comprTot ) this.compromisosTot = true    
 
     }
   },
   mounted () {
     this.getActivosInversion(this.value) // carga grid de activos Inversion
     this.getPanelDatos(this.value) // carga panel de datos, me hace falta para totales grid
+  },
+  components: {
+    dashboardResumenLiquidez: dashboardResumenLiquidez
   }
 }
 </script>

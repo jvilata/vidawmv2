@@ -163,7 +163,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import { headerFormData } from 'boot/axios.js'
+import { headerFormData, axiosInstance } from 'boot/axios.js'
 import { date } from 'quasar'
 export default {
   props: ['modelValue'], // en 'value' tenemos la tabla de datos del grid
