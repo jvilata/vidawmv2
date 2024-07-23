@@ -190,12 +190,11 @@ export default {
           }
         },
         {
-          title: 'Fichajes',
-          rol: '0',
-          icon: 'credit_card',
+          title: 'Estrategias',
+          icon: 'workspace_premium',
           link: {
-            name: 'fichajesMain',
-            label: 'Fichajes'
+            name: 'estrategiasMain',
+            label: 'Estrategias'
           }
         },
         {
@@ -269,11 +268,12 @@ export default {
           }
         },
         {
-          title: 'Estrategias',
-          icon: 'workspace_premium',
+          title: 'Fichajes',
+          rol: '0',
+          icon: 'credit_card',
           link: {
-            name: 'estrategiasMain',
-            label: 'Estrategias'
+            name: 'fichajesMain',
+            label: 'Fichajes'
           }
         }
       ]

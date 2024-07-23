@@ -208,7 +208,8 @@ export default {
       },
     getDatos() {
       var objFilter = {
-        id: this.value.id
+        id: this.value.id,
+        idEstrategia: this.value.idEstrategia
       }
       this.$axios.get('activos/bd_activos.php/findActivosFilter', { params: objFilter })
       .then(response => {
@@ -219,17 +220,21 @@ export default {
         this.$axios.get('activos/bd_activos.php/findActivosTrack', { params: objFilter })
         .then(response => {
           if (response.data.length > 0) {
-            this.recordToSubmit.targetSize = response.data[0].size 
-            this.recordToSubmit.launch= response.data[0].vintage
-            this.recordToSubmit.status= response.data[0].status
-            this.recordToSubmit.committed= response.data[0].pCommitted
-            this.recordToSubmit.grossmult= response.data[0].grossMultiple
-            this.recordToSubmit.grossirr= response.data[0].grossIrr
-            this.recordToSubmit.netmult= response.data[0].netMultiple
-            this.recordToSubmit.netirr= response.data[0].netIrr
-            this.recordToSubmit.dpi= response.data[0].dpi
-            this.recordToSubmit.annualyield= response.data[0].annualCashYield
-            this.refresh += 1;
+            response.data.forEach(element => {
+              if (element.id == objFilter.id){
+                this.recordToSubmit.targetSize = element.size 
+                this.recordToSubmit.launch= element.vintage
+                this.recordToSubmit.status= element.status
+                this.recordToSubmit.committed= element.pCommitted
+                this.recordToSubmit.grossmult= element.grossMultiple
+                this.recordToSubmit.grossirr= element.grossIrr
+                this.recordToSubmit.netmult= element.netMultiple
+                this.recordToSubmit.netirr= element.netIrr
+                this.recordToSubmit.dpi= element.dpi
+                this.recordToSubmit.annualyield= element.annualCashYield
+                this.refresh += 1;
+              }
+            })
           } else {
             this.recordToSubmit.targetSize = 0 
             this.recordToSubmit.launch= ''
@@ -243,7 +248,7 @@ export default {
             this.recordToSubmit.annualyield= 0
             this.refresh += 1;
           }
-          
+        
         })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })

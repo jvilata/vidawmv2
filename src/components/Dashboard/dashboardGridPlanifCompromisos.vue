@@ -539,7 +539,7 @@ export default {
         if (r.comprometidototY0 && !['RENTA FIJA', 'RENTA VBLE'].includes(r.tipoActivo)) this.comprTot += parseFloat(r.comprometidototY0) //parseFloat((r.comprometidototY0)) 
         
       })
-      console.log('Liquidez de los activos', this.liquidez)
+      
       
       this.refresh++
       this.compr24m += this.compr6m

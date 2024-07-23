@@ -324,11 +324,12 @@ export default {
           })
       })
     },
+    //mejora para quitar metricas de la tabla activos
     updateSelecc (v, row) {
       
       if (v === "1") {
         row.idActivo = this.value.id
-        console.log('row', row)
+        
         //fuerzo copiado de esa fila de track record en su activo
         var tmp = {        
           id: row.idActivo,
@@ -367,18 +368,25 @@ export default {
     updateRecord (record) {
       
       var tmp = {}
+      var v = (record.idActivo == this.value.id ? "1" : "0")
       Object.assign(tmp, record)
-      delete tmp.seleccionado
-
-      console.log('record temp', tmp)
+      
+      delete tmp.seleccionado   
       
       return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(tmp))
         .then(response => {
           Object.assign(tmp, record)
           delete tmp.seleccionado
-          console.log('record despues', tmp)
           return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(tmp))
-            .then(this.$emit('refrescar'))
+            .then(response =>{
+              
+              //mejora para quitar metricas de la tabla activos
+              this.updateSelecc (v, tmp)
+
+              this.$emit('refrescar')
+              
+            }    
+            )
         })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error.message })
