@@ -62,7 +62,7 @@
                 v-slot="scope"
                 @save="updateRecord(props.row)">
                 <!-- aqui definimos las ediciones especificas para cada columna -->
-                <q-input v-if="!['status', 'seleccionado'].includes(col.name)" v-model="scope.value"/>
+                <q-input v-if="!['status'].includes(col.name)" v-model="scope.value"/>
                 <q-select v-if="col.name === 'status'"
                   class="col-xs-12 col-sm-6"
                   label="Status"
@@ -75,16 +75,7 @@
                   option-label="codElemento"
                   emit-value
               />
-              <q-select v-if="col.name === 'seleccionado'"
-                @update:model-value="v=> updateSelecc(v, props.row)"
-                v-model="scope.value"
-                :options="listaSINO"
-                option-value="id"
-                option-label="desc"
-                stack-label
-                emit-value
-                map-options
-              />
+              
             </q-popup-edit>
 
           </q-td>
@@ -188,7 +179,6 @@ export default {
       },
       columns: [
        // { name: 'idActivo', align: 'left', label: 'idActivo', field: 'idActivo' },
-        { name: 'seleccionado', align: 'left', label: 'Activo actual', field: row =>(row.idActivo===this.value.id ? 'SI' : ''), sortable: true, style: 'width: 50px; whiteSpace: normal' },
         { name: 'fundName', align: 'left', label: 'Fund Name', field: 'fundName', sortable: true, style: 'width: 200px; whiteSpace: normal' },
         { name: 'vintage', align: 'left', label: 'Vintage', field: 'vintage', sortable: true },
         { name: 'size', align: 'left', label: 'Size', field: 'size', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
@@ -269,17 +259,19 @@ export default {
       }
     },
     getRecords () {
-      if (this.value.id === undefined) return // en el primer render no hay nada y es mejor no gastar tiempo
+      console.log('ID', this.modelValue.id, this.modelValue)
+
+      if (this.modelValue.id === undefined) return // en el primer render no hay nada y es mejor no gastar tiempo
       // se reutiliza el grid de movimientos para el form de activos y de facturas
       var objFilter = { 
-        idActivo: this.value.id,
-        idEstrategia: this.value.idEstrategia
+        idEstrategia: this.modelValue.id
       }
-     
       return this.$axios.get('activos/bd_act_altdatos.php/findAct_trackrecordFilter', { params: objFilter })
         .then(response => {
+          console.log('response data', response.data)
           this.registrosSeleccionados = response.data
           this.calcTotales(this.registrosSeleccionados)
+          
         })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error.message })
@@ -325,67 +317,20 @@ export default {
       })
     },
     //mejora para quitar metricas de la tabla activos
-    updateSelecc (v, row) {
-      
-      if (v === "1") row.idActivo = this.value.id
-      else row.idActivo = 0
-      /*if (v === "1") {
-        row.idActivo = this.value.id
-        
-        //fuerzo copiado de esa fila de track record en su activo
-        var tmp = {        
-          id: row.idActivo,
-          annualyield: row.annualCashYield,
-          dpi: row.dpi,
-          grossirr: row.grossIrr,
-          grossmult: row.grossMultiple,
-          netirr: row.netIrr,
-          netmult: row.netMultiple,
-          committed: row.pCommitted,
-          targetSize: row.size,
-          status: row.status,
-          launch: row.vintage
-        }
-
-        
-        return this.$axios.put(`activos/bd_activos.php/guardarMetricas/${tmp.id}`, JSON.stringify(tmp))
-        .then(response => {
-
-          return this.$axios.put(`activos/bd_activos.php/guardarMetricas/${tmp.id}`, JSON.stringify(tmp))
-          .then(response => {
-            this.$q.notify('Se ha seleccionado el activo actual')
-          })
-          .catch(error => {
-            this.$q.dialog({ title: 'Error', message: error })
-          })
-        
-        })
-        .catch(error => {
-          this.$q.dialog({ title: 'Error', message: error })
-        })
-      } else row.idActivo = 0
-      */
-      //this.$emit('refrescar')
-    },
     updateRecord (record) {
       
       var tmp = {}
-      var v = (record.idActivo == this.value.id ? "1" : "0")
+
       Object.assign(tmp, record)
-      
-      delete tmp.seleccionado   
-      
+          
       return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(tmp))
         .then(response => {
           Object.assign(tmp, record)
-          delete tmp.seleccionado
           return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(tmp))
             .then(response =>{
-              
-              //mejora para quitar metricas de la tabla activos
-              this.updateSelecc (v, tmp)
+                            
 
-              this.$emit('refrescar')
+              
               
             }    
             )

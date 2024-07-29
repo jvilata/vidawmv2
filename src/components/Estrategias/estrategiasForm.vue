@@ -67,6 +67,7 @@
         
           </q-card-section>
       </q-card>
+      <estrategiaTrackRecordAlterLineas :key="refresh" :model-value="value"/>
       </q-scroll-area>
     </div>
   </template>
@@ -74,12 +75,14 @@
   <script>
   import { mapState, mapActions } from 'vuex'
   import { axiosInstance, headerFormData } from 'boot/axios.js'
+  import estrategiaTrackRecordAlterLineas from 'components/Estrategias/estrategiaTrackRecordAlterLineas.vue'
   export default {
     props: ['id'],
     data () {
       return {
         title: 'Estrategias',
         value: {},
+        refresh: 0,
         hasChanges: false,
         colorBotonSave: 'primary',
         listaEntidadesActivosFilter: [],
@@ -126,7 +129,10 @@
           this.$q.dialog({ title: 'Error', message: error })
         })
     },
-    },
+    getDatos() {
+      console.log('recojo evento de hijo')
+    }
+  },
     watch: {
       recordToSubmit: { // detecta cambios en las propiedades de este objeto (tienen que estar inicializadas en data())
         handler (val) {
@@ -147,10 +153,13 @@
         .then(response => {
           Object.assign(this.recordToSubmit, response.data[0])
           setTimeout(() => { this.colorBotonSave = 'primary'; this.hasChanges = false }, 50) // dejo pasar un poco porque en el render se modifica el registro
+          
         })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })
         })
+        this.refresh++
+      
     },
     unmounted () {
       if (this.hasChanges) {
@@ -159,6 +168,9 @@
       }
       // this.$emit('input', this.recordToSubmit) // v-model: para devolver el valor a atributo 'value', evento input
       // this.$emit('changeTab', { idTab: this.value.idTab, filterRecord: {}, registrosSeleccionados: Object.assign({}, this.recordToSubmit) }) // para conservar valores cuando vuelva a selec tab
+    },
+    components: {
+      estrategiaTrackRecordAlterLineas: estrategiaTrackRecordAlterLineas
     }
   }
   </script>

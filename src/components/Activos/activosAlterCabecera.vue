@@ -216,12 +216,26 @@ export default {
         Object.assign(this.recordToSubmit, response.data[0])
         Object.assign(this.value, response.data[0])
        
+        
+        this.recordToSubmit.targetSize = 0 
+        this.recordToSubmit.launch= ''
+        this.recordToSubmit.status= ''
+        this.recordToSubmit.committed= 0
+        this.recordToSubmit.grossmult= 0
+        this.recordToSubmit.grossirr= 0
+        this.recordToSubmit.netmult= 0
+        this.recordToSubmit.netirr= 0
+        this.recordToSubmit.dpi= 0
+        this.recordToSubmit.annualyield= 0
+
         //llamada a act_trackrecord
         this.$axios.get('activos/bd_activos.php/findActivosTrack', { params: objFilter })
         .then(response => {
           if (response.data.length > 0) {
+            var exists = false
             response.data.forEach(element => {
-              if (element.id == objFilter.id){
+              if (element.idActivo == objFilter.id){
+                exists = true
                 this.recordToSubmit.targetSize = element.size 
                 this.recordToSubmit.launch= element.vintage
                 this.recordToSubmit.status= element.status
@@ -232,23 +246,26 @@ export default {
                 this.recordToSubmit.netirr= element.netIrr
                 this.recordToSubmit.dpi= element.dpi
                 this.recordToSubmit.annualyield= element.annualCashYield
-                this.refresh += 1;
+                //this.refresh += 1;
               }
-            })
-          } else {
-            this.recordToSubmit.targetSize = 0 
-            this.recordToSubmit.launch= ''
-            this.recordToSubmit.status= ''
-            this.recordToSubmit.committed= 0
-            this.recordToSubmit.grossmult= 0
-            this.recordToSubmit.grossirr= 0
-            this.recordToSubmit.netmult= 0
-            this.recordToSubmit.netirr= 0
-            this.recordToSubmit.dpi= 0
-            this.recordToSubmit.annualyield= 0
-            this.refresh += 1;
-          }
-        
+            }) 
+            /*if (!exists) { //no existe ninguna fila seleccionada a SI
+              this.recordToSubmit.targetSize = 0 
+              this.recordToSubmit.launch= ''
+              this.recordToSubmit.status= ''
+              this.recordToSubmit.committed= 0
+              this.recordToSubmit.grossmult= 0
+              this.recordToSubmit.grossirr= 0
+              this.recordToSubmit.netmult= 0
+              this.recordToSubmit.netirr= 0
+              this.recordToSubmit.dpi= 0
+              this.recordToSubmit.annualyield= 0
+            }*/
+          }// else // no existen filas d etrack record
+            
+            
+          
+          //this.refresh += 1;
         })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })
