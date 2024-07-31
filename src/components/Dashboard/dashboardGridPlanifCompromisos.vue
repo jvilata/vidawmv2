@@ -1,6 +1,5 @@
 <template>
   <div>
-    <q-scroll-area style="height: calc(100vh - 210px); ">
     <div>
       <q-btn dense label="+/- Columnas" color="primary" @click="ocultar=!ocultar"/>
       <q-btn dense label="INTERPRETACIÓN" color="primary" @click="mostrarAyuda" style="left: 45vw"/>
@@ -82,63 +81,64 @@
         </q-table>
       </q-item>
     </div>
-    <div class="q-mx-md">
-      <q-item class="q-mt-md q-mb-sm q-pa-xs bg-indigo-1 text-grey-8">
-        <q-item-section align="center">
-          <div class="text-h6">Control de Riesgos</div>
-        </q-item-section>
-      </q-item>
-      <div class="q-mt-sm q-mb-md row items-start q-gutter-md">
-        <q-card class="col-6 col-md my-card">
-            <q-card-section align="center" >
-              <div class="text-subtitle-2 text-grey-8 text-weight-light">Compromisos a 6 meses: {{ numeralFormat(parseFloat(`${compr6m}`)) }}
-                <q-btn v-if="compromisos6m" fill flat bold round color="green" icon="check_circle" />
-                <q-btn v-if="!compromisos6m" flat bold round color="red" icon="error" />
+    <div class="q-mx-md" :virtual-scroll-sticky-size-start="48" >
+      <!--<q-scroll-area style="height: calc(100vh - 210px); ">-->
+        <q-item class="q-mt-md q-mb-sm q-pa-xs bg-indigo-1 text-grey-8">
+          <q-item-section align="center">
+            <div class="text-h6">Control de Riesgos</div>
+          </q-item-section>
+        </q-item>
+        <div class="q-mt-sm q-mb-md row items-start q-gutter-md">
+          <q-card class="col-6 col-md my-card">
+              <q-card-section align="center" >
+                <div class="text-subtitle-2 text-grey-8 text-weight-light">Compromisos a 6 meses: {{ numeralFormat(parseFloat(`${compr6m}`)) }}
+                  <q-btn v-if="compromisos6m" fill flat bold round color="green" icon="check_circle" />
+                  <q-btn v-if="!compromisos6m" flat bold round color="red" icon="error" />
+                </div>
+                <div v-if="compromisos6m" class="text-h5 text-green-7 text-weight-light">Caja: {{ numeralFormat(parseFloat(`${cajaPatr}`)) }} €</div>
+                <div v-if="!compromisos6m" class="text-h5 text-red-7 text-weight-light">Caja: {{ numeralFormat(parseFloat(`${cajaPatr}`)) }}€</div>
+              </q-card-section>
+          </q-card>
+          <q-card class="col-6 col-md my-card">
+            <q-card-section align="center">
+              <div class="text-subtitle-2 text-grey-8 text-weight-light">Compromisos a 24 meses: {{ numeralFormat(parseFloat(`${compr24m}`)) }}
+                <q-btn v-if="compromisos24m" flat round color="green" icon="check_circle" />
+                <q-btn v-if="!compromisos24m" flat bold round color="red" icon="error" />
+
               </div>
-              <div v-if="compromisos6m" class="text-h5 text-green-7 text-weight-light">Caja: {{ numeralFormat(parseFloat(`${cajaPatr}`)) }} €</div>
-              <div v-if="!compromisos6m" class="text-h5 text-red-7 text-weight-light">Caja: {{ numeralFormat(parseFloat(`${cajaPatr}`)) }}€</div>
+              <div v-if="compromisos24m" class="text-h5 text-green-7 text-weight-light">Caja + Renta Fija: {{ numeralFormat(parseFloat(`${cajaRtaFija}`)) }}€</div>
+              <div v-if="!compromisos24m" class="text-h5 text-red-7 text-weight-light">Caja + Renta Fija: {{ numeralFormat(parseFloat(`${cajaRtaFija}`)) }}€</div>
             </q-card-section>
-        </q-card>
-        <q-card class="col-6 col-md my-card">
-          <q-card-section align="center">
-            <div class="text-subtitle-2 text-grey-8 text-weight-light">Compromisos a 24 meses: {{ numeralFormat(parseFloat(`${compr24m}`)) }}
-              <q-btn v-if="compromisos24m" flat round color="green" icon="check_circle" />
-              <q-btn v-if="!compromisos24m" flat bold round color="red" icon="error" />
+          </q-card>
+          <q-card class="col-6 col-md my-card">
+            <q-card-section align="center">
+              <div class="text-subtitle-2 text-grey-8 text-weight-light">Compromisos totales: {{ numeralFormat(parseFloat(`${comprTot}`)) }}
+                <q-btn v-if="compromisosTot" flat round color="green" icon="check_circle" />
+                <q-btn v-if="!compromisosTot" flat bold round color="red" icon="error" />
 
-            </div>
-            <div v-if="compromisos24m" class="text-h5 text-green-7 text-weight-light">Caja + Renta Fija: {{ numeralFormat(parseFloat(`${cajaRtaFija}`)) }}€</div>
-            <div v-if="!compromisos24m" class="text-h5 text-red-7 text-weight-light">Caja + Renta Fija: {{ numeralFormat(parseFloat(`${cajaRtaFija}`)) }}€</div>
-          </q-card-section>
-        </q-card>
-        <q-card class="col-6 col-md my-card">
-          <q-card-section align="center">
-            <div class="text-subtitle-2 text-grey-8 text-weight-light">Compromisos totales: {{ numeralFormat(parseFloat(`${comprTot}`)) }}
-              <q-btn v-if="compromisosTot" flat round color="green" icon="check_circle" />
-              <q-btn v-if="!compromisosTot" flat bold round color="red" icon="error" />
-
-            </div>
-            <div v-if="compromisosTot" class="text-h5 text-green-7 text-weight-light">Caja + Rta Fija + Rta Vble: {{ numeralFormat(parseFloat(`${cajaRtaFijaVble}`)) }}€</div>
-            <div v-if="!compromisosTot" class="text-h5 text-red-7 text-weight-light">Caja + Rta Fija + Rta Vble: {{ numeralFormat(parseFloat(`${cajaRtaFijaVble}`)) }}€</div>
-          </q-card-section>
-        </q-card>
-      </div>
-      <!--Graficos de activos líquidos & ilíquidos-->
-      <div class="row">
-        <div class="col-md justify-center" >
-          <q-item class="q-mt-md q-mb-sm q-pa-xs bg-indigo-1 text-grey-8">
-            <q-item-section align="center">
-              <div class="text-h6">Resumen Liquidez de Activos</div>
-            </q-item-section>
-          </q-item>
-          <q-item class="q-ma-md q-pb-xl" >
-            <q-item-section align="center">
-              <dashboardResumenLiquidez :value="liquidez" :key="refresh"/>
-            </q-item-section>
-          </q-item>
+              </div>
+              <div v-if="compromisosTot" class="text-h5 text-green-7 text-weight-light">Caja + Rta Fija + Rta Vble: {{ numeralFormat(parseFloat(`${cajaRtaFijaVble}`)) }}€</div>
+              <div v-if="!compromisosTot" class="text-h5 text-red-7 text-weight-light">Caja + Rta Fija + Rta Vble: {{ numeralFormat(parseFloat(`${cajaRtaFijaVble}`)) }}€</div>
+            </q-card-section>
+          </q-card>
         </div>
-      </div>
+        <!--Graficos de activos líquidos & ilíquidos-->
+        <div class="row">
+          <div class="col-md justify-center" >
+            <q-item class="q-mt-md q-mb-sm q-pa-xs bg-indigo-1 text-grey-8">
+              <q-item-section align="center">
+                <div class="text-h6">Resumen Liquidez de Activos</div>
+              </q-item-section>
+            </q-item>
+            <q-item class="q-ma-md q-pb-xl" >
+              <q-item-section align="center">
+                <dashboardResumenLiquidez :value="liquidez" :key="refresh"/>
+              </q-item-section>
+            </q-item>
+          </div>
+        </div>
+      <!---</q-scroll-area>-->
     </div>
-  </q-scroll-area>
   </div>
 </template>
 
