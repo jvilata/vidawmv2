@@ -31,7 +31,7 @@
           <div class="row q-mb-sm">
               <q-input outlined v-model="recordToSubmit.id" label="Id" class="col-xs-3 col-sm-2" />
               <q-select
-                class="col-xs-6 col-sm-10"
+                class="col-xs-9 col-sm-10"
                 outlined
                 label="Tipo Activo"
                 stack-label
@@ -42,29 +42,35 @@
                 emit-value
               />      
           </div>
-          <q-input class="row q-mb-sm" autofocus outlined v-model="recordToSubmit.nombre" label="Nombre de la estrategia"/>
-            <q-select
-                class="row q-mb-sm"
-                outlined
-                clearable
-                label="Gestor/Arrend"
-                stack-label
-                v-model="recordToSubmit.idEntidad"
-                :options="listaEntidadesComp"
-                option-value="id"
-                option-label="nombre"
-                emit-value
-                map-options
-                @filter="filterEntidadesActivos"
-              />
-          
-          
-          <q-input class="q-my-md" outlined v-model="recordToSubmit.descripcion" label="Descripción (opcional)"
-              type="textarea"
+          <div class="row q-mb-sm">
+          <q-input class="col-xs-12 col-sm-6" autofocus outlined v-model="recordToSubmit.nombre" label="Nombre de la estrategia"/>
+          <q-select
+              class="col-xs-12 col-sm-6"
+              outlined
+              clearable
+              label="Gestor/Arrend"
+              stack-label
+              v-model="recordToSubmit.idEntidad"
+              :options="listaEntidadesComp"
+              option-value="id"
+              option-label="nombre"
+              emit-value
+              map-options
+              @filter="filterEntidadesActivos"
+            />
+          </div>
+            <q-input class="q-mb-sm" outlined v-model="recordToSubmit.descripcion" label="Descripción de la Estrategia (opcional)"
+            type="textarea"
               counter
               @keyup.enter.stop />
 
-        
+            <q-input class="q-mb-sm" outlined v-model="recordToSubmit.operationsTeam" label="Operations Team (internal name)"/>
+             
+            <q-input class="q-mb-md" outlined v-model="recordToSubmit.descripcionOperations" label="Descripción del Operations Team (opcional)"
+            type="textarea"
+              counter
+              @keyup.enter.stop />
+              
           </q-card-section>
       </q-card>
       <estrategiaTrackRecordAlterLineas :key="refresh" :model-value="value"/>

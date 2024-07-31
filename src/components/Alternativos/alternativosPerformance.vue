@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div class="col" >
-      <q-item class="q-ma-md q-pa-xs  text-grey-8">
+      <q-item class="text-grey-8">
         <q-item-section  class="col-sm-2" align="center">
           <q-select 
             outlined
@@ -13,9 +13,10 @@
           />
         </q-item-section>
       </q-item>
+
       <q-item >
-        <q-item-section align="center">
-          <apexchart ref="evol1" height= "400px" width="1000px" type="scatter" :options="chartOptions" :series="series" :key="refresh"></apexchart>
+        <q-item-section  align="center">
+          <apexchart ref="evol1" height= "650px" width="1000px" type="scatter" :options="chartOptions" :series="series" :key="refresh"></apexchart>
         </q-item-section>
       </q-item>
     </div>
@@ -38,13 +39,17 @@ export default {
         stacked: false,
         legend: {
           show: true,
-          position: 'top'
+          position: 'bottom',
+          itemMargin: {
+            horizontal: 5,
+            vertical: 5
+          }
         },
         dataLabels: {
           enabled: true,
           formatter: function (val, opt) {
             if (val == 0) { return '' }
-            else return val + 'x'
+            else return val + 'x '
           },
           style: {
             fontSize: '12px',
@@ -88,7 +93,18 @@ export default {
   },
   methods: {
     cargarDatosGraficos () {
-      
+      if(this.filterR.kpi === "Net IRR") {
+        this.chartOptions = {
+          ...this.chartOptions,
+          dataLabels: {
+            enabled: true,
+            formatter: function (val, opt) {
+              if (val == 0) { return '' }
+              else return val + '% '
+            }
+          }
+        }
+      }
       this.series = []
       
       //Recorro datos, para ir extrayendo holding period

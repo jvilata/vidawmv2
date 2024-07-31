@@ -50,6 +50,11 @@
           <q-input class="col-xs-6 col-sm-1" @blur="updateRec" outlined suffix="%" label="Hurdle Rate" stack-label v-model="recordToSubmit.hurdleRate" />
         </div>
         <div class="row q-pt-sm">
+          <q-input class="col-xs-6 col-sm-6" readonly outlined label="Operations Team (internal name)" stack-label v-model="recordEstrategia.operationsTeam" />
+          <q-input class="col-xs-6 col-sm-3" readonly outlined label="Investing Employees" stack-label v-model="recordEstrategia.investingEmployees" />
+          <q-input class="col-xs-6 col-sm-3" readonly outlined label="Operations Employees" stack-label v-model="recordEstrategia.operatingEmployees" />
+        </div>
+        <div class="row q-pt-sm">
           <q-input class="col-xs-6 col-sm-1" @blur="updateRec" readonly outlined label="Launch (Vintage)" stack-label v-model="recordToSubmit.launch" />
           <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined suffix="m" label="Target Size" stack-label v-model="recordToSubmit.targetSize" />
           <q-select 
@@ -162,7 +167,9 @@ export default {
       },
       recordEstrategia: {
         idEstrategia: '',
-        idActivo: ''
+        operationsTeam: '',
+        investingEmployees: '',
+        operatingEmployees: ''
       }
     }
   },
@@ -211,6 +218,10 @@ export default {
         id: this.value.id,
         idEstrategia: this.value.idEstrategia
       }
+      var objFilter2 = {
+        id: this.value.idEstrategia
+      }
+
       this.$axios.get('activos/bd_activos.php/findActivosFilter', { params: objFilter })
       .then(response => {
         Object.assign(this.recordToSubmit, response.data[0])
@@ -246,6 +257,8 @@ export default {
                 this.recordToSubmit.netirr= element.netIrr
                 this.recordToSubmit.dpi= element.dpi
                 this.recordToSubmit.annualyield= element.annualCashYield
+                this.recordEstrategia.investingEmployees = element.investingEmployees
+                this.recordEstrategia.operatingEmployees = element.operatingEmployees
                 //this.refresh += 1;
               }
             }) 
@@ -263,9 +276,14 @@ export default {
             }*/
           }// else // no existen filas d etrack record
             
-            
-          
-          //this.refresh += 1;
+          this.$axios.get('estrategias/bd_estrategias.php/getOperationsEstrategias', { params: objFilter2 })
+          .then(response => { 
+            this.recordEstrategia.operationsTeam = response.data[0].operationsTeam
+          })
+          .catch(error => {
+          this.$q.dialog({ title: 'Error', message: error })
+          })
+
         })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })
