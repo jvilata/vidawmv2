@@ -142,7 +142,7 @@ export default {
       var pos = -1
       var rowAnt = {}
       this.copiaSeleccionados.forEach(row => {
-        console.log('row', row)
+        
         // meto data (eje Y)
         var objSerieX = {
           name: row.nombre,
@@ -172,12 +172,6 @@ export default {
         rowAnt = row
       })
 
-
-
-           
-      console.log('series', this.series)
-      
-      console.log('array de labels', arr)
       
       this.refresh++
     }

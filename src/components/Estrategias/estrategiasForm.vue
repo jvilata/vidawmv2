@@ -136,7 +136,7 @@
         })
     },
     getDatos() {
-      console.log('recojo evento de hijo')
+      
     }
   },
     watch: {

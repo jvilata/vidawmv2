@@ -190,6 +190,8 @@ export default {
         { name: 'netIrr', align: 'left', label: 'Net IRR', field: 'netIrr', sortable: true },
         { name: 'annualCashYield', label: 'Annual Cash Yeld', align: 'left', field: 'annualCashYield', sortable: true },
         { name: 'dpi', label: 'DPI', align: 'left', field: 'dpi', sortable: true },
+        { name: 'investingEmployees', label: 'Investing Empl.', align: 'left', field: 'investingEmployees', sortable: true },
+        { name: 'operatingEmployees', label: 'Operating Empl.', align: 'left', field: 'operatingEmployees', sortable: true },
         { name: 'user', align: 'left', label: 'user', field: 'user', sortable: true },
         { name: 'ts', align: 'left', label: 'ts', field: 'ts', sortable: true }
       ],

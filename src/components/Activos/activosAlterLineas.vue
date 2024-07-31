@@ -283,7 +283,6 @@ export default {
       return this.$axios.get('activos/bd_act_altdatos.php/findAct_trackrecordFilter', { params: objFilter })
         .then(response => {
           this.registrosSeleccionados = response.data
-          console.log(response.data)
           this.calcTotales(this.registrosSeleccionados)
         })
         .catch(error => {
@@ -373,7 +372,6 @@ export default {
       //this.$emit('refrescar')
     },
     updateRecord (record) {
-      console.log('record', record)
       var tmp = {}
       var v = (record.idActivo == this.value.id ? "1" : "0")
       Object.assign(tmp, record)
