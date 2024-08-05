@@ -261,7 +261,6 @@ export default {
       }
     },
     getRecords () {
-      console.log('ID', this.modelValue.id, this.modelValue)
 
       if (this.modelValue.id === undefined) return // en el primer render no hay nada y es mejor no gastar tiempo
       // se reutiliza el grid de movimientos para el form de activos y de facturas
@@ -270,7 +269,6 @@ export default {
       }
       return this.$axios.get('activos/bd_act_altdatos.php/findAct_trackrecordFilter', { params: objFilter })
         .then(response => {
-          console.log('response data', response.data)
           this.registrosSeleccionados = response.data
           this.calcTotales(this.registrosSeleccionados)
           

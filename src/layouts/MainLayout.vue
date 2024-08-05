@@ -198,6 +198,14 @@ export default {
           }
         },
         {
+          title: 'Portfolio Companies',
+          icon: 'add_business',
+          link: {
+            name: 'portfolioMain',
+            label: 'Portfolio Companies'
+          }
+        },
+        {
           title: 'Otros',
           rol: '1',
           icon: 'chat',

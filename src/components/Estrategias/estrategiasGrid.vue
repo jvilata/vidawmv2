@@ -265,7 +265,6 @@
     },
     mounted () {
       if (Object.keys(this.modelValue).length > 0) this.getRecords(this.modelValue)
-      console.log(this.modelValue)
     }
   }
   </script>

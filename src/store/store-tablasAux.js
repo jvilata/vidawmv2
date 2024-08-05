@@ -13,6 +13,8 @@ const state = {
   listaTipoAcc: [],
   listaTiposActivo: [],
   listaTiposProducto: [],
+  listaGeografias: [],
+  listaSectores: [],
   listaResumenTiposProducto: [],
   listaEstadosActivo: [],
   listaTipoOPeracion: [],
@@ -51,6 +53,12 @@ const mutations = {
   },
   loadTiposProducto (state, tiposAcc) {
     state.listaTiposProducto = tiposAcc
+  },
+  loadGeografias (state, tiposAcc) {
+    state.listaGeografias = tiposAcc
+  },
+  loadSectores (state, tiposAcc) {
+    state.listaSectores = tiposAcc
   },
   loadResumenTiposProducto (state, tiposAcc) {
     state.listaResumenTiposProducto = tiposAcc
@@ -117,6 +125,32 @@ const actions = {
       })
       .catch(error => {
         this.dispatch('mensajeLog/addMensaje', 'loadUsers' + error, { root: true })
+      })
+  },
+  loadGeografias ({ commit }, codEmpresa) {
+    axiosInstance.get(`tablaAuxiliar/bd_tablaAuxiliar.php/filterGeografiasTabAux?codEmpresa=${codEmpresa}`, {}, { withCredentials: true })
+      .then((response) => {
+        if (response.data.length === 0) {
+          this.dispatch('mensajeLog/addMensaje', 'loadGeografias' + 'No existen datos', { root: true })
+        } else {
+          commit('loadGeografias', response.data)
+        }
+      })
+      .catch(error => {
+        this.dispatch('mensajeLog/addMensaje', 'loadGeografias' + error, { root: true })
+      })
+  },
+  loadSectores ({ commit }, codEmpresa) {
+    axiosInstance.get(`tablaAuxiliar/bd_tablaAuxiliar.php/filterSectoresTabAux?codEmpresa=${codEmpresa}`, {}, { withCredentials: true })
+      .then((response) => {
+        if (response.data.length === 0) {
+          this.dispatch('mensajeLog/addMensaje', 'loadSectores' + 'No existen datos', { root: true })
+        } else {
+          commit('loadSectores', response.data)
+        }
+      })
+      .catch(error => {
+        this.dispatch('mensajeLog/addMensaje', 'loadSectores' + error, { root: true })
       })
   },
   loadTablaAux ({ commit }, tabAux) { // tabAux: { codTabla: x, mutation: 'mutation' }

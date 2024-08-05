@@ -99,6 +99,24 @@ const routes = [
             ]
           },
           {
+            path: 'portfolioMain',
+            name: 'portfolioMain',
+            component: () => import('src/components/Portfolio/portfolioMain.vue'),
+            props: true,
+            children: [
+              { path: 'portfolioGrid', name: 'portfolioGrid', component: () => import('components/Portfolio/portfolioGrid.vue'), props: true }
+            ]
+          },
+          {
+            path: 'PortfolioFormMain/:id',
+            name: 'portfolioFormMain',
+            component: () => import('components/Portfolio/portfolioFormMain.vue'),
+            props: true,
+            children: [
+              { path: 'portfolioForm', name: 'portfolioForm', component: () => import('components/Portfolio/portfolioForm.vue'), props: true }
+            ]
+          },
+          {
             path: 'dashboard',
             name: 'dashboard',
             component: () => import('components/Dashboard/dashboardMain.vue'),

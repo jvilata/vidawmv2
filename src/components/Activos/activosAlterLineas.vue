@@ -35,8 +35,17 @@
         <q-tr :props="props" :key="`m_${props.row.id}`" @click="rowId=`m_${props.row.id}`" @mouseover="rowId=`m_${props.row.id}`" >
           <q-td>
             <!-- columna de acciones: editar, borrar, etc -->
-            <div style="max-width: 30px">
+            <div style="max-width: 80px">
             <!--edit icon . Decomentamos si necesitamos accion especifica de edicion -->
+            <q-btn flat v-if="rowId===`m_${props.row.id}`"
+              @click.stop="editRecord(props.row, props.row.id)"
+              round
+              dense
+              size="sm"
+              color="primary"
+              icon="edit">
+              <q-tooltip>Editar</q-tooltip>
+            </q-btn>
             <q-btn flat v-if="rowId===`m_${props.row.id}`"
               @click.stop="deleteRecord(props.row.id)"
               round
@@ -228,6 +237,12 @@ export default {
         const needle = val.toLowerCase()
         this.listaEstrategiasFilter = this.listaEstrategias.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
       })
+    },
+    editRecord (rowChanges, id) { // no lo uso aqui pero lod ejo como demo
+      /*
+      id -> idAct_trackrecord
+      */
+        this.addTab(['portfolioFormMain', 'Portfolio Companies - ' + rowChanges.id, rowChanges, rowChanges.id])
     },
     calcTotales (lineas) {
       var numl = 0
