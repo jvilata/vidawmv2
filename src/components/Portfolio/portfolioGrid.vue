@@ -90,7 +90,7 @@
                 <wgDate v-if="['fechaInversion'].includes(col.name)"
                 v-model="scope.value" />
                 <wgDate v-if="['fechaDesinversion'].includes(col.name)"
-                v-model="scope.value" />
+                v-model="scope.value"/>
             </q-popup-edit>
             
             </q-td>
@@ -148,12 +148,12 @@
         registrosSeleccionados: [],
         columns: [
           { name: 'id', label: 'ID', align: 'left', field: 'id', sortable: true },
-          { name: 'nombre', align: 'left', label: 'Portfolio Company Name', field: 'nombre', sortable: true, style: 'width: 250px; whiteSpace: normal' },
-          { name: 'fundName', align: 'left', label: 'Fund Name', field: 'fundName', sortable: true, style: 'width: 300px; whiteSpace: normal' },
-          { name: 'geografia', label: 'Geografía', align: 'left', field: 'geografia', sortable: true },
-          { name: 'sector', label: 'Sector', align: 'left', field: 'sector', sortable: true },
-          { name: 'fechaInversion', label: 'Fecha Inversion', align: 'left', field: 'fechaInversion', sortable: true },
-          { name: 'fechaDesinversion', label: 'Fecha Desinversion', align: 'left', field: 'fechaDesinversion', sortable: true },
+          { name: 'nombre', align: 'left', label: 'Portfolio Company Name', field: 'nombre', sortable: true, style: 'width: 200px; whiteSpace: normal' },
+          { name: 'fundName', align: 'left', label: 'Fund Name', field: 'fundName', sortable: true, style: 'width: 150px; whiteSpace: normal' },
+          { name: 'geografia', label: 'Geografía', align: 'left', field: 'geografia', sortable: true, style: 'width: 150px; whiteSpace: normal' },
+          { name: 'sector', label: 'Sector', align: 'left', field: 'sector', sortable: true, style: 'width: 200px; whiteSpace: normal' },
+          { name: 'fechaInversion', label: 'Fecha Inversion', align: 'left', field: 'fechaInversion', sortable: true, format: val => (val !== null ? date.formatDate(date.extractDate(val, 'YYYY-MM-DD HH:mm:ss'), 'MM/YYYY') : '') },
+          { name: 'fechaDesinversion', label: 'Fecha Desinversion', align: 'left', field: 'fechaDesinversion', sortable: true, format: val => (val !== null ? date.formatDate(date.extractDate(val, 'YYYY-MM-DD HH:mm:ss'), 'MM/YYYY') : '') },
           //falta por definir en bbdd
           { name: 'investedCapital', label: 'Invested Capital', align: 'left', field: 'investedCapital', sortable: true },
           { name: 'realizedCapital', label: 'Realized Capital', align: 'left', field: 'realizedCapital', sortable: true },
@@ -196,7 +196,7 @@
           geografia: '',
           sector: '',
           fechaInversion: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss'),
-          fechaDesinversion: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+          fechaDesinversion: '',
           investedCapital: 0,
           realizedCapital: 0,
           ebitdaIni: '',
