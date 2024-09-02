@@ -279,14 +279,16 @@ export default {
     },
     addRecord () {
       // se reutiliza el grid de movimientos para el form de activos y de facturas
+      
       var record = {
         //Quitar id Activo y solo poner cuando check = true
         idActivo: 0,
-        idEstrategia: this.value.idEstrategia,
+        idEstrategia: this.value.id,
         fundName: this.value.nombre,
         user: this.user.user.email,
         ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
       }
+      
       return this.$axios.post('activos/bd_act_altdatos.php/act_trackrecord', JSON.stringify(record))
         .then(response => {
           record.id = response.data.id

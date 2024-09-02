@@ -275,14 +275,18 @@ export default {
               this.recordToSubmit.annualyield= 0
             }*/
           }// else // no existen filas d etrack record
-            
-          this.$axios.get('estrategias/bd_estrategias.php/getOperationsEstrategias', { params: objFilter2 })
-          .then(response => { 
-            this.recordEstrategia.operationsTeam = response.data[0].operationsTeam
-          })
-          .catch(error => {
-          this.$q.dialog({ title: 'Error', message: error })
-          })
+          
+          
+          if(objFilter2.id !== 0) {
+            this.$axios.get('estrategias/bd_estrategias.php/getOperationsEstrategias', { params: objFilter2 })
+            .then(response => { 
+                            
+              this.recordEstrategia.operationsTeam = response.data[0].operationsTeam
+            })
+            .catch(error => {
+            this.$q.dialog({ title: 'Error', message: error })
+            })
+          }
 
         })
         .catch(error => {
