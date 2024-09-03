@@ -63,7 +63,13 @@
                 buttons
                 auto-save
                 @save="updateRecord(props.row)">
-                <q-input v-if="['nombre', 'investedCapital', 'realizedCapital', 'ebitdaIni', 'debtEbitdaIni', 'netMult'].includes(col.name)" v-model="scope.value"/>
+                <q-input v-if="['nombre', 'ownership', 'revenueCurrent','ebitdaCurrentAbs', 'ebitdaCurrent', 'debtCurrent', 'investedCapital', 'revenueIni', 'ebitdaIniAbs', 'ebitdaIni', 'debtEbitdaIni'].includes(col.name)" v-model="scope.value"/>
+                <q-input v-if="['comentario'].includes(col.name)"
+                  type="textarea"
+                  v-model="scope.value"
+                  autofocus counter
+                  @keyup.enter.stop
+                  style="width: 400px;"/>
                 <q-select v-if="['geografia'].includes(col.name)"
                     outlined
                     clearable
@@ -75,6 +81,7 @@
                     option-label="codElemento"
                     emit-value
                     />
+                    
                     <q-select v-if="['sector'].includes(col.name)"
                     outlined
                     clearable
@@ -86,11 +93,24 @@
                     option-label="codElemento"
                     emit-value
                     />
+                    <q-select v-if="['divisa'].includes(col.name)"
+                      label="Currency"
+                      stack-label
+                      outlined
+                      clearable
+                      v-model="scope.value"
+                      :options="listaDivisasPortfolio"
+                      option-value="codElemento"
+                      option-label="codElemento"
+                      emit-value
+                  />
                 <q-input v-if="['fundName'].includes(col.name)" readonly v-model="scope.value"/>
                 <wgDate v-if="['fechaInversion'].includes(col.name)"
-                v-model="scope.value" />
+                v-model="scope.value"
+                clearable />
                 <wgDate v-if="['fechaDesinversion'].includes(col.name)"
-                v-model="scope.value"/>
+                v-model="scope.value"
+                clearable/>
             </q-popup-edit>
             
             </q-td>
@@ -145,33 +165,47 @@
     data () {
       return {
         rowId: '',
+        listaMonedasFilter: [],
         registrosSeleccionados: [],
         columns: [
-          { name: 'id', label: 'ID', align: 'left', field: 'id', sortable: true },
+          //{ name: 'id', label: 'ID', align: 'left', field: 'id', sortable: true },
           { name: 'nombre', align: 'left', label: 'Portfolio Company Name', field: 'nombre', sortable: true, style: 'width: 200px; whiteSpace: normal' },
           { name: 'fundName', align: 'left', label: 'Fund Name', field: 'fundName', sortable: true, style: 'width: 150px; whiteSpace: normal' },
           { name: 'geografia', label: 'Geografía', align: 'left', field: 'geografia', sortable: true, style: 'width: 150px; whiteSpace: normal' },
-          { name: 'sector', label: 'Sector', align: 'left', field: 'sector', sortable: true, style: 'width: 200px; whiteSpace: normal' },
-          { name: 'fechaInversion', label: 'Fecha Inversion', align: 'left', field: 'fechaInversion', sortable: true, format: val => (val !== null ? date.formatDate(date.extractDate(val, 'YYYY-MM-DD HH:mm:ss'), 'MM/YYYY') : '') },
-          { name: 'fechaDesinversion', label: 'Fecha Desinversion', align: 'left', field: 'fechaDesinversion', sortable: true, format: val => (val !== null ? date.formatDate(date.extractDate(val, 'YYYY-MM-DD HH:mm:ss'), 'MM/YYYY') : '') },
-          //falta por definir en bbdd
+          { name: 'sector', label: 'General Sector', align: 'left', field: 'sector', sortable: true, style: 'width: 150px' },
+          { name: 'divisa', label: 'Currency', align: 'left', field: 'divisa', sortable: true, style: 'width: 70px' },
+          { name: 'ownership', label: 'Ownership (%)', align: 'left', field: 'ownership', sortable: true },
+          //{ name: 'ownershipType', label: 'Ownership Type', align: 'left', field: 'ownershipType', sortable: true },
+          { name: 'fechaInversion', label: 'Investment Date', align: 'left', field: 'fechaInversion', sortable: true, format: val => (val !== null ? date.formatDate(date.extractDate(val, 'YYYY-MM-DD HH:mm:ss'), 'MM/YYYY') : '') },
+          //current data
+          { name: 'revenueCurrent', label: 'LTM Revenue (abs)', align: 'left', field: 'revenueCurrent', sortable: true },
+          { name: 'ebitdaCurrentAbs', label: 'LTM EBITDA (abs)', align: 'left', field: 'ebitdaCurrentAbs', sortable: true },
+          { name: 'ebitdaCurrent', label: 'LTM EV/EBITDA', align: 'left', field: 'ebitdaCurrent', sortable: true },
+          { name: 'debtCurrent', label: 'LTM Debt/EBITDA', align: 'left', field: 'debtCurrent', sortable: true },
+
+          //entry data
           { name: 'investedCapital', label: 'Invested Capital', align: 'left', field: 'investedCapital', sortable: true },
-          { name: 'realizedCapital', label: 'Realized Capital', align: 'left', field: 'realizedCapital', sortable: true },
-          { name: 'ebitdaIni', label: 'Entry EBITDA', align: 'left', field: 'ebitdaIni', sortable: true },
-          { name: 'debtEbitdaIni', label: 'Entry Net Debt/EBITDA', align: 'left', field: 'debtEbitdaIni', sortable: true },
-          { name: 'netMult', label: 'Net TVPI', align: 'left', field: 'netMult', sortable: true } 
+          { name: 'revenueIni', label: 'ENTRY Revenue (abs)', align: 'left', field: 'revenueIni', sortable: true },
+          { name: 'ebitdaIniAbs', label: 'ENTRY EBITDA (abs)', align: 'left', field: 'ebitdaIniAbs', sortable: true },
+          { name: 'ebitdaIni', label: 'ENTRY EV/EBITDA', align: 'left', field: 'ebitdaIni', sortable: true },
+          { name: 'debtEbitdaIni', label: 'ENTRY Debt/EBITDA', align: 'left', field: 'debtEbitdaIni', sortable: true },
+          { name: 'fechaDesinversion', label: 'Divestment Date', align: 'left', field: 'fechaDesinversion', sortable: true, format: val => (val !== null ? date.formatDate(date.extractDate(val, 'YYYY-MM-DD HH:mm:ss'), 'MM/YYYY') : '') },
+          { name: 'comentario', label: 'Observations', align: 'left', field: 'comentario', sortable: true, style: 'width: 300px; whiteSpace: normal' },
+
+
           //A medida que inserto campos los añado también en el metodo addRecord
         ],
         pagination: { rowsPerPage: 0 }
       }
     },
     computed: {
-      ...mapState('tablasAux', ['listaSINO', 'listaTiposProducto', 'listaGeografias', 'listaSectores']),
+      ...mapState('tablasAux', ['listaSINO', 'listaTiposProducto', 'listaGeografias', 'listaSectores', 'listaMonedas', 'listaDivisasPortfolio']),
       ...mapState('login', ['user'])
     },
     methods: {
       ...mapActions('tabs', ['addTab']),
       ...mapActions('tablasAux', ['loadGeografias', 'loadSectores']),
+
       getRecords (filter) { //filter es lo que recojo de modelValue
         // hago la busqueda de registros segun condiciones del formulario Filter que ha lanzado el evento getRecords
         var objFilter = Object.assign({}, filter)
@@ -189,20 +223,25 @@
         //ir añadiendo a medida que se añaden en tablas
         var record = {
           id: -1,
-          nombre: 'Nueva Portfolio Company',
+          nombre: 'New Company',
           codEmpresa: this.user.codEmpresa,
           idEstrategia: this.value.idEstrategia,
           idAct_trackrecord: this.value.idAct_trackrecord,
           geografia: '',
           sector: '',
+          ownership: '',
           fechaInversion: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss'),
           fechaDesinversion: '',
+          revenueCurrent: '',
+          ebitdaCurrentAbs: '',
+          ebitdaCurrent: '',
+          debtCurrent: '',
           investedCapital: 0,
-          realizedCapital: 0,
-          ebitdaIni: '',
-          debtEbitdaIni: '',
-          netMult: ''
+          revenueIni: 0,
+          ebitdaIniAbs: '',
+          debtEbitdaIni: ''
         }
+       
         var formData = new FormData()
         for (var key in record) {
           formData.append(key, record[key])
@@ -214,6 +253,7 @@
             record.fundName = this.value.fundName
             this.registrosSeleccionados.push(record)
             //this.getRecords(record)
+            
           })
           .catch(error => {
             this.$q.dialog({ title: 'Error', message: error })

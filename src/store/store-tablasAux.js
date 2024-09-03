@@ -10,6 +10,7 @@ const state = {
   listaUsers: [], // [{id, codEmpresa, email, username, idPersonal}]
   listaSINO: [{ id: '1', desc: 'SI' }, { id: '0', desc: 'NO' }],
   listaMonedas: [], // ['EUROS', 'DOLAR'],
+  listaDivisasPortfolio: [], //'EUR / USD, OTHER (->EUR),
   listaTipoAcc: [],
   listaTiposActivo: [],
   listaTiposProducto: [],
@@ -86,7 +87,10 @@ const mutations = {
   },
   loadMonedas (state, lista) {
     state.listaMonedas = lista
-  }
+  },
+  loadDivisasPortfolio (state, lista) {
+    state.listaDivisasPortfolio = lista
+  },
 }
 // actions: accesibles desde componentes a traves de ...mapActions('tablaAux', ['loadTablasAux'])
 // actualmente se esta llamando desde components/mainTabs.vue, es decir, cuando se pasa la validacion de usuario
@@ -105,6 +109,7 @@ const actions = {
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 13, mutation: 'loadMonedas' })
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 14, mutation: 'loadStatusAlt' })
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 15, mutation: 'loadResumenTiposProducto' })
+    this.dispatch('tablasAux/loadTablaAux', { codTabla: 16, mutation: 'loadDivisasPortfolio' })
     this.dispatch('tablasAux/loadUsers')
     this.dispatch('tablasAux/loadListaMeses')
   },
