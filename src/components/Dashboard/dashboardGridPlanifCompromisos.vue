@@ -28,6 +28,7 @@
               >
                 <div v-if="!ocultar || ocultar && !['comprometido7_2', 'distribuido', 'comprometido', 'comprometidotot', 'realcomprometido', 'pprevisto', 'pajuste', 'importeAjuste', 'cajaExtra'].includes(col.name.substring(0,col.name.length-2))">
                   {{ col.label }}
+                  <q-tooltip v-if="col.tooltip"> {{ col.tooltip }} </q-tooltip>
                 </div>
               </q-th>
             </q-tr>
@@ -215,19 +216,19 @@ export default {
         },
         { name: 'pTeorico', required: true, label: '%Part.Ideal', align: 'right', field: 'pTeorico' },
         { name: 'dividendos', required: true, label: 'Dividendos', align: 'right', field: 'dividendos', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-        { name: 'patrimonio', required: true, label: 'patrimonioY-1', align: 'right', field: 'patrimonio', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-        { name: 'preal', required: true, label: '%RealY-1', align: 'right', field: 'preal', format: val => parseFloat(val).toFixed(2) },
-        { name: 'comprometido6m', required: true, label: 'comprom.+6m', align: 'right', field: 'comprometido6m', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-        { name: 'comprometido7_24m', required: true, label: 'comprom.7-24m', align: 'right', field: 'comprometido7_24m', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-        { name: 'comprometidoY0', required: true, label: 'comprometidoY0', align: 'right', field: 'comprometidoY0', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
+        { name: 'patrimonio', required: true, label: 'patrimonioY-1', tooltip:'Patrimonio Actual: Capital desembolsado para ese activo', align: 'right', field: 'patrimonio', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
+        { name: 'preal', required: true, label: '%RealY-1', align: 'right', field: 'preal', tooltip:'(iPatrimonioY-1) / suma(PatrimonioY-1)', format: val => parseFloat(val).toFixed(2) },
+        { name: 'comprometido6m', required: true, label: 'comprom.+6m', align: 'right', tooltip:'Capital comprometido desde la fecha hasta +6meses', field: 'comprometido6m', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
+        { name: 'comprometido7_24m', required: true, label: 'comprom.7-24m', align: 'right', field: 'comprometido7_24m', tooltip:'Capital comprometido a partir del mes 7 hasta los 24meses siguientes', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
+        { name: 'comprometidoY0', required: true, label: 'comprometidoY0', tooltip:'Capital comprometido desde la fecha hasta 31/12', align: 'right', field: 'comprometidoY0', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
         { name: 'distribuidoY0', required: true, label: 'distribuidoY0', align: 'right', field: 'distribuidoY0', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-        { name: 'comprometidototY0', required: true, label: 'comprometidototY0', align: 'right', field: 'comprometidototY0', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-        { name: 'realcomprometidoY0', required: true, label: 'realcomprometidoY0', align: 'right', field: 'realcomprometidoY0', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-        { name: 'pprevistoY0', required: true, label: '%PrevistoY0', align: 'right', field: 'pprevistoY0', format: val => parseFloat(val).toFixed(2) },
-        { name: 'pajusteY0', required: true, label: '%AjusteY0', align: 'right', field: 'pajusteY0', format: val => parseFloat(val).toFixed(2) },
-        { name: 'importeAjusteY0', required: true, label: 'Imp.Ajuste0', align: 'right', field: 'importeAjusteY0', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-        { name: 'aInvertirY0', required: true, label: 'aInvertirY0', align: 'right', field: 'aInvertirY0', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-        { name: 'aInvertirY0Mes', required: true, label: 'aInv.MesY0', align: 'right', field: b => parseFloat(b.aInvertirY0) / 12, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
+        { name: 'comprometidototY0', required: true, label: 'comprometidototY0', align: 'right', field: 'comprometidototY0', tooltip:'Total capital comprometido (sin fecha fin)', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
+        { name: 'realcomprometidoY0', required: true, label: 'realcomprometidoY0', align: 'right', field: 'realcomprometidoY0', tooltip:'Total capital comprometido incluyendo patrimonio actual: comprometidototY0 + (patrimonioY-1)', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
+        { name: 'pprevistoY0', required: true, label: '%PrevistoY0', align: 'right', field: 'pprevistoY0', tooltip:'(irealcomprometidoY0) / suma(realcomprometidoY0)', format: val => parseFloat(val).toFixed(2) },
+        { name: 'pajusteY0', required: true, label: '%AjusteY0', align: 'right', field: 'pajusteY0', tooltip:'Diferencia entre: %Part.Ideal - %PrevistoY0',  format: val => parseFloat(val).toFixed(2) },
+        { name: 'importeAjusteY0', required: true, label: 'Imp.Ajuste0', align: 'right', field: 'importeAjusteY0', tooltip:'realcomprometidoY0 * (AjusteY0/100)', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
+        { name: 'aInvertirY0', required: true, label: 'aInvertirY0', align: 'right', field: 'aInvertirY0', tooltip:'Dividendos + importeAjusteY0', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
+        { name: 'aInvertirY0Mes', required: true, label: 'aInv.MesY0', align: 'right', tooltip:'aInvertirY0 / 12', field: b => parseFloat(b.aInvertirY0) / 12, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
         { name: 'cajaExtraY0', required: true, label: 'cajaExtraY0', align: 'right', field: 'cajaExtraY0', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
         { name: 'patrimonioY0', required: true, label: 'patrimonioY0', align: 'right', field: 'patrimonioY0', format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
         { name: 'prealY0', required: true, label: '%RealY0', align: 'right', field: 'prealY0', format: val => parseFloat(val).toFixed(2) },

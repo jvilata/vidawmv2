@@ -34,6 +34,7 @@ export default {
       listaKpi: ['Net Mult.', 'Net IRR', 'DPI'],
       copiaSeleccionados: [],
       refresh: 0,
+      copiaSeries: [],
       chartOptions: {
         labels: [],
         stacked: false,
@@ -50,6 +51,7 @@ export default {
           formatter: function (val, opt) {
             if (val == 0) { return '' }
             else return val + 'x '
+            
           },
           style: {
             fontSize: '12px',
@@ -59,7 +61,6 @@ export default {
           }
         },
         tooltip: {
-
           y: {
             formatter: function (valY) {
               if (valY == 0) { return 'No aplica' }
@@ -169,6 +170,7 @@ export default {
           objSerieX.data.push(row.cartDpi)
         }
         this.series.push(objSerieX) 
+        this.copiaSeries.push(objSerieX)
         rowAnt = row
       })
 
