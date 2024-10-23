@@ -63,7 +63,7 @@
                 buttons
                 auto-save
                 @save="updateRecord(props.row)">
-                <q-input v-if="['nombre', 'ownership', 'revenueCurrent','ebitdaCurrentAbs', 'ebitdaCurrent', 'debtCurrent', 'investedCapital', 'revenueIni', 'ebitdaIniAbs', 'ebitdaIni', 'debtEbitdaIni'].includes(col.name)" v-model="scope.value"/>
+                <q-input v-if="['nombre', 'ownership', 'revenueCurrent','ebitdaCurrentAbs', 'ebitdaCurrent', 'debtCurrent','grossmult', 'investedCapital', 'revenueIni', 'ebitdaIniAbs', 'ebitdaIni', 'debtEbitdaIni'].includes(col.name)" v-model="scope.value"/>
                 <q-input v-if="['comentario'].includes(col.name)"
                   type="textarea"
                   v-model="scope.value"
@@ -182,7 +182,7 @@
           { name: 'ebitdaCurrentAbs', label: 'LTM EBITDA (abs)', align: 'left', field: 'ebitdaCurrentAbs', sortable: true },
           { name: 'ebitdaCurrent', label: 'LTM EV/EBITDA', align: 'left', field: 'ebitdaCurrent', sortable: true },
           { name: 'debtCurrent', label: 'LTM Debt/EBITDA', align: 'left', field: 'debtCurrent', sortable: true },
-
+          { name: 'grossmult', label: 'Gross mult.', align: 'left', field: 'grossmult', sortable: true },
           //entry data
           { name: 'investedCapital', label: 'Invested Capital', align: 'left', field: 'investedCapital', sortable: true },
           { name: 'revenueIni', label: 'ENTRY Revenue (abs)', align: 'left', field: 'revenueIni', sortable: true },
@@ -236,6 +236,7 @@
           ebitdaCurrentAbs: '',
           ebitdaCurrent: '',
           debtCurrent: '',
+          grossmult: '',
           investedCapital: 0,
           revenueIni: 0,
           ebitdaIniAbs: '',

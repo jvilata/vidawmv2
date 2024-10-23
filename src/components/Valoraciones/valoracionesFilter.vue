@@ -98,6 +98,20 @@
         map-options
         use-chips
       />
+     <!-- <q-select
+        outlined
+        clearable
+        label="Cod.empresa"
+        stack-label
+        v-model="filterR.nomOtraEmpresa"
+        :options="listaEmpresas"
+        option-value="valor1"
+        option-label="valor1"
+        multiple
+        use-chips
+        emit-value
+        map-options
+      />-->
       <div class="row">
       <q-select
         class="col-6"
@@ -148,7 +162,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('tablasAux', ['listaSINO', 'listaUsers', 'listaTipoAcc', 'listaTiposActivo', 'listaMeses', 'listaTiposProducto', 'listaEstadosActivo', 'listaTipoOperacion']),
+    ...mapState('tablasAux', ['listaEmpresas', 'listaSINO', 'listaUsers', 'listaTipoAcc', 'listaTiposActivo', 'listaMeses', 'listaTiposProducto', 'listaEstadosActivo', 'listaTipoOperacion']),
     ...mapState('entidades', ['listaEntidades', 'listaEntidadesActivos'])
   },
   methods: {

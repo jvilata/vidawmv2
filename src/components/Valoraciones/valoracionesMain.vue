@@ -148,6 +148,7 @@ export default {
       var objFilter = Object.assign({}, filter)
       objFilter.estadoActivo = (objFilter.estadoActivo && objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.tipoProducto = (objFilter.tipoProducto && objFilter.tipoProducto !== null ? objFilter.tipoProducto.join() : null) // paso de array a concatenacion de strings (join)
+      //objFilter.nomOtraEmpresa = (objFilter.nomOtraEmpresa && objFilter.nomOtraEmpresa !== null ? objFilter.nomOtraEmpresa.join() : null)
       return this.$axios.get('movimientos/bd_movimientos.php/findcMovimientosComparado', { params: objFilter })
         .then(response => {
           this.registrosSeleccionados = response.data
