@@ -146,6 +146,7 @@ export default {
       // hago la busqueda de registros segun condiciones del formulario Filter que ha lanzado el evento getRecords
       Object.assign(this.filterRecord, filter) // no haría falta pero así obliga a refrescar el componente para que visulice el filtro
       var objFilter = Object.assign({}, filter)
+      objFilter.codOtraEmpresa = (objFilter.codOtraEmpresa && objFilter.codOtraEmpresa !== null ? objFilter.codOtraEmpresa.join() : null)
       objFilter.estadoActivo = (objFilter.estadoActivo && objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.tipoProducto = (objFilter.tipoProducto && objFilter.tipoProducto !== null ? objFilter.tipoProducto.join() : null) // paso de array a concatenacion de strings (join)
       //objFilter.nomOtraEmpresa = (objFilter.nomOtraEmpresa && objFilter.nomOtraEmpresa !== null ? objFilter.nomOtraEmpresa.join() : null)
@@ -168,6 +169,7 @@ export default {
           str += ' and tipoProducto like \'%' + this.filterRecord.tipoProducto[x] + '%\''
         }
       }
+      
       if (this.filterRecord.idEntidad && this.filterRecord.idEntidad.length > 0) str += ' and idEntidad=' + this.filterRecord.idEntidad
       if (this.filterRecord.nombre && this.filterRecord.nombre.length > 0) str += ' and nombre like \'%' + this.filterRecord.nombre + '%\''
       if (this.filterRecord.fechaDesde && this.filterRecord.fechaDesde.length > 0) str += ' and (fecha  >= \'' + this.filterRecord.fechaDesde + '\')'
@@ -185,7 +187,7 @@ export default {
       if (this.filterRecord.computa && this.filterRecord.computa.length > 0) str += ' and computa=' + this.filterRecord.computa
 
       var sql = 'select * from cvaloraciones where ' + str + ' order by fecha,tipoActivo,nombre'
-      console.log(sql)
+      
       var paramRecord = {
         SQL: sql,
         string_con: '',

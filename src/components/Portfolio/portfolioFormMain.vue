@@ -29,6 +29,7 @@
         ltab: '',
         value: {}, // el valor del registro padre (entidad)
         title: 'Portfolio Companies',
+        idAct_trackrecord: '',
         menuItems: [
           {
             title: 'Portfolio',
@@ -45,8 +46,35 @@
       
     },
     mounted () {
-      Object.assign(this.value, this.tabs[this.id].meta.value)
-      this.$router.replace({ name: this.menuItems[0].link.name, params: { id: this.id } }).catch(() => {})
+
+      if (!this.tabs[this.id]) console.log('estamos en portfolio form main', this.id)
+      else Object.assign(this.value, this.tabs[this.id].meta.value)
+       
+      if(this.tabs[this.id].name == 'activosFormMain') { //accedo desde activo
+        //llamada back para recuperar dato idAct_trackrecord por si viene del tab ppal del activo.
+      
+        var objFilter = { 
+          idActivo: this.value.id,
+          idEstrategia: this.value.idEstrategia
+        }
+        return this.$axios.get('activos/bd_portfolio_companies.php/findActTrackRecord', { params: objFilter })
+          .then(response => {
+            //recuperamos id track record 
+            if (response.data.length > 0) { 
+              
+              this.idAct_trackrecord = response.data[0].idAct_trackrecord     
+              this.$router.replace({ name: 'portfolioFormMain1', params: { id: this.idAct_trackrecord } }).catch(() => {})
+            }
+          })
+          .catch(error => {
+            this.$q.dialog({ title: 'Error', message: error })
+          })
+          
+      } else if (this.tabs[this.id].name == 'portfolioFormMain1') {
+        
+        this.$router.replace({ name: this.menuItems[0].link.name, params: { id: this.id } }).catch(() => {})
+      }
+      
     }
   }
   </script>

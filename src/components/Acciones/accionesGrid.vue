@@ -203,7 +203,7 @@ export default {
           field: 'realizada',
           sortable: true,
           format: val => {
-            var obj = this.listaSINO.find(x => x.id === val) // mapea el valor 0 , 1 en la listaSINO a string SI , NO
+            var obj = this.listaSINO.find(x => x.id == val) // mapea el valor 0 , 1 en la listaSINO a string SI , NO
             return (obj !== undefined ? obj.desc : val)
           }
         },

@@ -87,6 +87,10 @@ export default {
           link: { name: 'activosAlterCabecera' }
         },
         {
+          title: 'Portfolio Companies',
+          link: { name: 'activosPortfolioCompanies' } //portfolioFormMain', 'Portfolio Companies - ' + rowChanges.id, rowChanges, rowChanges.id])
+        },
+        {
           title: 'Facturas',
           link: { name: 'facturasGrid' }
         },
@@ -174,6 +178,8 @@ export default {
   },
   mounted () {
     Object.assign(this.value, this.tabs[this.id].meta.value)
+
+    console.log('value en act form ', this.value)
     this.getCounters()
     this.$router.replace({ name: this.menuItems[0].link.name, params: { id: this.id } }).catch(() => {})
   }

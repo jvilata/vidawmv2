@@ -53,17 +53,23 @@
             :key="col.name"
             :props="props"
         >
-              <div :style="col.style">
-                {{ col.value }}
-              </div>
-            <q-popup-edit v-if="this.trackRecord"
+            <div :style="col.style">
+              <div v-if="['fundName', 'nombre'].includes(col.name) && !this.trackRecord" @click="clickColumn(col.name, props.row)" >{{ col.value }} </div>
+              <div v-if="['fundName', 'nombre'].includes(col.name) && this.trackRecord" >{{ col.value }} </div>
+              <div v-if="['ebitdaCurrentAbs'].includes(col.name)" :style="((parseFloat(props.row['ebitdaCurrentAbs']) >= parseFloat(props.row['ebitdaIniAbs'])) ? ((props.row['ebitdaCurrentAbs'] == props.row['ebitdaIniAbs']) ? 'background-color: orange; color: white' : 'background-color: green; color: white') : 'background-color: red; color: white')">{{ col.value }}</div>
+              <div v-if="['revenueCurrent' ].includes(col.name)" :style="((parseFloat(props.row['revenueCurrent']) >= parseFloat(props.row['revenueIni'])) ? ((props.row['revenueCurrent'] == props.row['revenueIni']) ?  'background-color: orange; color: white' : 'background-color: green; color: white') : 'background-color: red; color: white')">{{ col.value }}</div>
+              <div v-if="!['ebitdaCurrentAbs','revenueCurrent', 'fundName', 'nombre' ].includes(col.name)">{{ col.value }}</div>
+            </div>
+            <q-popup-edit v-if="this.trackRecord && !['fundName'].includes(col.name)"
                 v-model="props.row[col.name]"
                 v-slot="scope"
                 max-height="600px"
                 buttons
                 auto-save
                 @save="updateRecord(props.row)">
-                <q-input v-if="['nombre', 'ownership', 'revenueCurrent','ebitdaCurrentAbs', 'ebitdaCurrent', 'debtCurrent','grossmult', 'investedCapital', 'revenueIni', 'ebitdaIniAbs', 'ebitdaIni', 'debtEbitdaIni'].includes(col.name)" v-model="scope.value"/>
+
+                <q-input v-if="['fundName'].includes(col.name)" readonly v-model="scope.value"></q-input>
+                <q-input v-if="['nombre', 'ownership', 'ebitdaCurrent','ebitdaCurrentAbs', 'revenueCurrent', 'debtCurrent','grossmult', 'investedCapital', 'revenueIni', 'ebitdaIniAbs', 'ebitdaIni', 'debtEbitdaIni'].includes(col.name)" v-model="scope.value"/>
                 <q-input v-if="['comentario'].includes(col.name)"
                   type="textarea"
                   v-model="scope.value"
@@ -104,10 +110,20 @@
                       option-label="codElemento"
                       emit-value
                   />
-                <q-input v-if="['fundName'].includes(col.name)" readonly v-model="scope.value"/>
+                <q-select
+                  v-if="['crossTransaction'].includes(col.name)"
+                  class="col-xs-6 col-sm-2"
+                  label="Cross-Transaction"
+                  v-model="scope.value"
+                  :options="listaSINO"
+                  option-value="id"
+                  option-label="desc"
+                  emit-value
+                  map-options
+                />
                 <wgDate v-if="['fechaInversion'].includes(col.name)"
-                v-model="scope.value"
-                clearable />
+                  v-model="scope.value"
+                  clearable />
                 <wgDate v-if="['fechaDesinversion'].includes(col.name)"
                 v-model="scope.value"
                 clearable/>
@@ -161,10 +177,11 @@
   import wgDate from 'components/General/wgDate.vue'
   import { headerFormData } from 'boot/axios.js'
   export default {
-    props: ['value', 'trackRecord'], // en 'value' tenemos la tabla de datos del filtro (se lanza desde estrategiasMain, en v-model="filterRecord")
+    props: ['id', 'value', 'trackRecord'], // en 'value' tenemos la tabla de datos del filtro (se lanza desde estrategiasMain, en v-model="filterRecord")
     data () {
       return {
         rowId: '',
+        trackRecordR: '',
         listaMonedasFilter: [],
         registrosSeleccionados: [],
         columns: [
@@ -189,10 +206,14 @@
           { name: 'ebitdaIniAbs', label: 'ENTRY EBITDA (abs)', align: 'left', field: 'ebitdaIniAbs', sortable: true },
           { name: 'ebitdaIni', label: 'ENTRY EV/EBITDA', align: 'left', field: 'ebitdaIni', sortable: true },
           { name: 'debtEbitdaIni', label: 'ENTRY Debt/EBITDA', align: 'left', field: 'debtEbitdaIni', sortable: true },
-          { name: 'fechaDesinversion', label: 'Divestment Date', align: 'left', field: 'fechaDesinversion', sortable: true, format: val => (val !== null ? date.formatDate(date.extractDate(val, 'YYYY-MM-DD HH:mm:ss'), 'MM/YYYY') : '') },
-          { name: 'comentario', label: 'Observations', align: 'left', field: 'comentario', sortable: true, style: 'width: 300px; whiteSpace: normal' },
-
-
+          { name: 'fechaDesinversion', label: 'Divestment Date', align: 'left', field: 'fechaDesinversion', sortable: true, format: val => ((val !== null) ? ((val !== '0000-00-00 00:00:00' ) ? date.formatDate(date.extractDate(val, 'YYYY-MM-DD HH:mm:ss'), 'MM/YYYY') : '') : '') },
+          { name: 'crossTransaction', label: 'CrossTransaction', align: 'left', field: 'crossTransaction', sortable: true,
+            format: val => {
+              var obj = this.listaSINO.find(x => x.id == val) // mapea el valor 0 , 1 en la listaSINO a string SI , NO
+              return (obj !== undefined ? obj.desc : val)
+            }
+           },
+          { name: 'comentario', label: 'Observations', align: 'left', field: 'comentario', sortable: true, style: 'width: 300px; whiteSpace: normal' }
           //A medida que inserto campos los añado también en el metodo addRecord
         ],
         pagination: { rowsPerPage: 0 }
@@ -209,6 +230,7 @@
       getRecords (filter) { //filter es lo que recojo de modelValue
         // hago la busqueda de registros segun condiciones del formulario Filter que ha lanzado el evento getRecords
         var objFilter = Object.assign({}, filter)
+        console.log('objF', objFilter) //plan =='above' // plan =='below'
         
         // objFilter.estadoActivo = (objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
         return this.$axios.get('activos/bd_portfolio_companies.php/findPortfolioCompaniesFilter', { params: objFilter })
@@ -218,6 +240,27 @@
           .catch(error => {
             this.$q.dialog({ title: 'Error', message: error })
           })
+      },
+      clickColumn (colName, row) {
+        
+        var copia = {}
+        var copiaRow = {}
+        copia.idAct_trackrecord = row.idAct_trackrecord
+          if (colName === ('fundName' || 'nombre')) {
+          //llamada al back para recuperar su idActivo   
+          
+            return this.$axios.get('activos/bd_portfolio_companies.php/getActivoFromPortComp', { params: copia })
+            .then(response => {
+              
+              copiaRow = response.data[0]
+              this.addTab(['activosFormMain', 'Activo-' + copiaRow.id, copiaRow, copiaRow.id])
+            })
+            .catch(error => {
+              this.$q.dialog({ title: 'Error', message: error })
+            })
+            //
+
+          }
       },
       addRecord () {
         //ir añadiendo a medida que se añaden en tablas
@@ -231,7 +274,7 @@
           sector: '',
           ownership: '',
           fechaInversion: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss'),
-          fechaDesinversion: '',
+          fechaDesinversion: null,
           revenueCurrent: '',
           ebitdaCurrentAbs: '',
           ebitdaCurrent: '',
@@ -240,7 +283,8 @@
           investedCapital: 0,
           revenueIni: 0,
           ebitdaIniAbs: '',
-          debtEbitdaIni: ''
+          debtEbitdaIni: '',
+          crossTransaction: '0'
         }
        
         var formData = new FormData()
@@ -265,6 +309,11 @@
       Object.assign(tmp, record)
       delete tmp.fundName
       delete tmp.estrategiaNombre
+
+      // comparo valores EBITDA y SALES
+      if (tmp)
+
+
       return this.$axios.put(`activos/bd_portfolio_companies.php/guardarBD/${record.id}`, JSON.stringify(tmp))
         .then(response => {
           Object.assign(tmp, record)
@@ -299,6 +348,9 @@
       }
     },
     mounted () {
+      this.trackRecordR = this.trackRecord
+      console.log('value en grid', this.value) //aparece param plan
+
       if (Object.keys(this.value).length > 0) this.getRecords(this.value)
       this.loadGeografias(this.user.codEmpresa)
       this.loadSectores(this.user.codEmpresa)

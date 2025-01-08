@@ -224,6 +224,7 @@ export default {
     }
   },
   mounted () {
+    
     Object.assign(this.value, this.tabs[this.id].meta.value)
     this.getRecords()
   }

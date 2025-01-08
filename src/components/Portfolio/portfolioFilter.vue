@@ -54,6 +54,33 @@
         use-chips
         emit-value
       />
+      <q-select
+        outlined
+        clearable
+        label="Below / Above Plan"
+        stack-label
+        v-model="filterR.plan"
+        :options="listaPlan"
+        option-value="value"
+        option-label="label"   
+        use-input
+        emit-value
+        map-options
+     />
+     <q-select
+        outlined
+        clearable
+        label="Gross Mult."
+        stack-label
+        v-model="filterR.grossComp"
+        :options="listaGrossComp"
+        option-value="value"
+        option-label="label"   
+        use-input
+        emit-value
+        map-options
+     />
+
         <q-card-actions align="right">
           <q-btn  flat type="submit" label="Buscar" color="primary"/>
           <q-btn  flat label="Cancel" color="primary" @click="$emit('hide')"/><!-- lo captura accionesMain -->
@@ -70,6 +97,43 @@
     data () {
       return {
         filterR: {},
+        
+        listaPlan: [
+          {
+            label: 'Above Plan',
+            value: 'above'
+          },
+          {
+            label: 'Below Plan',
+            value: 'below'
+          }
+          ],
+          listaGrossComp: [
+          {
+            label: 'Gross mult. < 1x',
+            value: '0'
+          },
+          {
+            label: 'Gross mult. = 1x',
+            value: '1'
+          },
+          {
+            label: 'Gross mult. [1.1x - 1.5x]',
+            value: '1.5'
+          },
+          {
+            label: 'Gross mult. [1.5x - 2x]',
+            value: '2'
+          },
+          {
+            label: 'Gross mult. [2x - 3x]',
+            value: '2.5'
+          },
+          {
+            label: 'Gross mult. > 3x',
+            value: '3'
+          }
+          ],
         listaEstrategiasFilter: []
       }
     },
@@ -88,6 +152,7 @@
         })
       },
       getRecords () {
+        console.log('FILTER', this.filterR)
         this.$emit('getRecords', this.filterR) // lo captura portfolioMain
       },
       formatDate (pdate) {

@@ -96,6 +96,7 @@ export default {
   methods: {
     getRecords (filter) {
       // hago la busqueda de registros segun condiciones del formulario Filter que ha lanzado el evento getRecords
+      console.log('filter', filter)
       this.filterRecord = Object.assign({}, filter)
       this.refreshRec++
       this.expanded = false

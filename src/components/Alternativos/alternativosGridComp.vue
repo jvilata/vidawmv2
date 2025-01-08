@@ -272,6 +272,7 @@ export default {
     },
     clickColumn (colName, row) {
       if (colName === 'nombre') {
+        
         // row.id = row.idActivo
         this.addTab(['activosFormMain', 'Activo-' + row.id, row, row.id])
       }

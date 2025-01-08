@@ -98,20 +98,20 @@
         map-options
         use-chips
       />
-     <!-- <q-select
+      <q-select
         outlined
         clearable
         label="Cod.empresa"
         stack-label
-        v-model="filterR.nomOtraEmpresa"
+        v-model="filterR.codOtraEmpresa"
         :options="listaEmpresas"
-        option-value="valor1"
+        option-value="codElemento"
         option-label="valor1"
         multiple
         use-chips
         emit-value
         map-options
-      />-->
+      />
       <div class="row">
       <q-select
         class="col-6"

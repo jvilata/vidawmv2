@@ -45,11 +45,11 @@
     data () {
       return {
         title: 'Portfolio',
-        value: {},
         refreshKey: 0,
+        value: {},
         hasChanges: false,
         colorBotonSave: 'primary',
-        trackRecord: false,
+        trackRecord: true,
         listaEntidadesActivosFilter: [],
         filterRecord: {},
         recordToSubmit: {
@@ -101,7 +101,6 @@
         idEstrategia: this.value.idEstrategia,
         fundName: this.value.fundName
       }
-      this.trackRecord = true
       this.refreshKey++
     }
   },
@@ -115,11 +114,32 @@
       }
     },
     mounted () {
+      //console.log('id en portfolio form, id', this.id)
 
-      Object.assign(this.value, this.tabs[this.id].meta.value)
+      //Object.assign(this.value, this.tabs[this.id].meta.value)
+
+      if(this.tabs[this.id].name == 'activosFormMain') { //accedo desde activo
+        //llamada back para recuperar dato idAct_trackrecord por si viene del tab ppal del activo.
       
-      this.getDatos(this.value)
-  
+        var objFilter = { 
+          idActivo: this.tabs[this.id].meta.keyValue //quito idEstrategia
+        }
+        return this.$axios.get('activos/bd_portfolio_companies.php/findActTrackRecord', { params: objFilter })
+          .then(response => {
+            //recuperamos id track record 
+            if (response.data.length > 0) { 
+              this.value = Object.assign({}, response.data[0])
+              //Object.assign(this.value, response.data[0])
+              this.getDatos(this.value)
+            }
+          })
+          .catch(error => {
+            this.$q.dialog({ title: 'Error', message: error })
+          })
+      } 
+        
+          
+      
     },
     unmounted () {
       if (this.hasChanges) {

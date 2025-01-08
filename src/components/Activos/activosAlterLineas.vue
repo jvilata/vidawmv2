@@ -242,7 +242,7 @@ export default {
       /*
       id -> idAct_trackrecord
       */
-        this.addTab(['portfolioFormMain', 'Portfolio Companies - ' + rowChanges.id, rowChanges, rowChanges.id])
+      this.addTab(['portfolioFormMain1', 'Portfolio Companies - ' + rowChanges.idActivo, rowChanges, rowChanges.id])
     },
     calcTotales (lineas) {
       var numl = 0

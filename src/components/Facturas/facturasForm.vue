@@ -194,7 +194,7 @@ export default {
         })
         .catch(error => console.log(error))
     },
-    imprimir (selected, aDisco) { // aDisco: 0 -> preview; aDisco: 1 -> imprime en onedrive
+    imprimir (selected, aDisco) { // aDisco: 0 -> preview; aDisco: 2 -> imprime en onedrive
       return new Promise((resolve, reject) => {
         var paramRecord = {
           id: selected.id,
@@ -206,6 +206,7 @@ export default {
         }
         this.$axios.post('facturas/pdf_invoice.php/', formData, { responseType: (aDisco === 0 ? 'blob' : '') })
           .then(function (response) {
+            
             if (aDisco === 2) resolve(response)
             else {
               if (window.cordova === undefined) { // desktop
@@ -261,6 +262,7 @@ export default {
   },
   mounted () {
     Object.assign(this.value, this.tabs[this.id].meta.value)
+    console.log('value EMITIDA', this.value)
     this.getRecord()
   },
   unmounted () {
