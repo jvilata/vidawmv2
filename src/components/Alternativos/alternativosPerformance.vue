@@ -50,8 +50,7 @@ export default {
           enabled: true,
           formatter: function (val, opt) {
             if (val == 0) { return '' }
-            else return val + 'x '
-            
+            else return val + 'x '            
           },
           style: {
             fontSize: '12px',
@@ -102,6 +101,19 @@ export default {
             formatter: function (val, opt) {
               if (val == 0) { return '' }
               else return val + '% '
+            }
+          }
+        }
+      }
+      if(this.filterR.kpi === "Net Mult.") {
+        this.chartOptions = {
+          ...this.chartOptions,
+          dataLabels: {
+            enabled: true,
+            formatter: function (val, opt) {
+              if (val == 0) { return '' }
+              else return val + 'x '
+                //return opt.w.globals.seriesNames[opt.dataPointIndex] + ': ' + val + 'x '
             }
           }
         }

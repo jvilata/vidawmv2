@@ -334,16 +334,29 @@ export default {
     },
     getRecords (filter) {
       // hago la busqueda de registros segun condiciones del formulario Filter que ha lanzado el evento getRecords
+      
       var objFilter = Object.assign({}, filter)
       objFilter.idActivo = (objFilter.idActivo && objFilter.idActivo !== null ? objFilter.idActivo.join() : null) // paso de array a concatenacion de strings (join)
+      objFilter.codOtraEmpresa = (objFilter.codOtraEmpresa && objFilter.codOtraEmpresa !== null ? objFilter.codOtraEmpresa.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.tipoActivo = (objFilter.tipoActivo && objFilter.tipoActivo !== null ? objFilter.tipoActivo.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.estadoActivo = (objFilter.estadoActivo && objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.tipoProducto = (objFilter.tipoProducto && objFilter.tipoProducto !== null ? objFilter.tipoProducto.join() : null) // paso de array a concatenacion de strings (join)
+      
+      console.log('objFilter', objFilter)
       return this.$axios.get('movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: objFilter })
         .then(response => {
-          this.registrosSeleccionados = response.data
-          // this.registrosSeleccionados.splice(0, 0, { id: -1, tipoActivo: 'CAP.RIESGO', nombre: '' })
-          this.generarArbol(this.registrosSeleccionados)
+
+          return this.$axios.get('movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: objFilter })
+            .then(response => {
+
+              this.registrosSeleccionados = response.data
+              // this.registrosSeleccionados.splice(0, 0, { id: -1, tipoActivo: 'CAP.RIESGO', nombre: '' })
+              this.generarArbol(this.registrosSeleccionados)
+
+           })
+            .catch(error => {
+              this.$q.dialog({ title: 'Error', message: error })
+            })
         })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })
