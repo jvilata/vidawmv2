@@ -92,6 +92,7 @@ export default {
     }
   },
   methods: {
+    //si quisieramos imprimir el nombre del fondo en cada data label: return opt.w.globals.seriesNames[opt.dataPointIndex] + ': ' + val + 'x '
     cargarDatosGraficos () {
       if(this.filterR.kpi === "Net IRR") {
         this.chartOptions = {
@@ -113,7 +114,6 @@ export default {
             formatter: function (val, opt) {
               if (val == 0) { return '' }
               else return val + 'x '
-                //return opt.w.globals.seriesNames[opt.dataPointIndex] + ': ' + val + 'x '
             }
           }
         }
