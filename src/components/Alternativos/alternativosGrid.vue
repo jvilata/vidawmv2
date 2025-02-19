@@ -50,6 +50,7 @@
         <q-tr :props="props" :key="`m_${props.row.id}`" @mouseover="rowId=`m_${props.row.id}`">
           <q-td>
             {{ props.row.descripcion }}
+            <q-tooltip v-if="props.row.tooltip"> {{ props.row.tooltip }} </q-tooltip>
           </q-td>
 
           <q-td
@@ -164,7 +165,8 @@ export default {
       obj = {
         id: Math.floor((Math.random() * 999999) + 999999),
         tipoRegistro: 1, // 1: fila detalle, 2: fila cabecera
-        descripcion: 'Compro.Inic.'
+        descripcion: 'Compro.Inic.',
+        tooltip:'Cantidad inicialmente comprometida'
       }
       arr.push(obj) // 10
 
@@ -178,28 +180,32 @@ export default {
       obj = {
         id: Math.floor((Math.random() * 999999) + 999999),
         tipoRegistro: 1, // 1: fila detalle, 2: fila cabecera
-        descripcion: 'Comprometido'
+        descripcion: 'Comprometido',
+        tooltip:'Compras + Comprometido Est.'
       }
       arr.push(obj) // 1
 
       obj = {
         id: Math.floor((Math.random() * 999999) + 999999),
         tipoRegistro: 1, // 1: fila detalle, 2: fila cabecera
-        descripcion: 'Comp.Acum.'
+        descripcion: 'Comp.Acum.',
+        tooltip:'Acumulado: (Compras + Comprometido Est.)'
       }
       arr.push(obj) // 2
 
       obj = {
         id: Math.floor((Math.random() * 999999) + 999999),
         tipoRegistro: 1, // 1: fila detalle, 2: fila cabecera
-        descripcion: 'Distribuido'
+        descripcion: 'Distribuido',
+        tooltip:'Ventas + Cobros + Distribuciones Est.'
       }
       arr.push(obj) // 3
 
       obj = {
         id: Math.floor((Math.random() * 999999) + 999999),
         tipoRegistro: 1, // 1: fila detalle, 2: fila cabecera
-        descripcion: 'Distrib.Acum.'
+        descripcion: 'Distrib.Acum.',
+        tooltip:'Acumulado: (Ventas + Cobros + Distribuciones Est.)'
       }
       arr.push(obj) // 4
 
@@ -227,14 +233,16 @@ export default {
       obj = {
         id: Math.floor((Math.random() * 999999) + 999999),
         tipoRegistro: 1, // 1: fila detalle, 2: fila cabecera
-        descripcion: 'Saldo Vivo'
+        descripcion: 'Saldo Vivo',
+        tooltip:'Salvo vivo: Desembolsado - Distribuciones [al final se verá la plusvalía generada]'
       }
       arr.push(obj) // 8
 
       obj = {
         id: Math.floor((Math.random() * 999999) + 999999),
         tipoRegistro: 1, // 1: fila detalle, 2: fila cabecera
-        descripcion: 'Capital at Risk'
+        descripcion: 'Capital at Risk',
+        tooltip:'Capital desembolsado - Distribuciones + Próximos desembolsos'
       }
       arr.push(obj) // 9
 
@@ -331,6 +339,7 @@ export default {
       if (acumComprom === 0) arr[7]['ejer' + strEjer] = 0 // multiplo 31/12
       else arr[7]['ejer' + strEjer] = (arr[6]['ejer' + strEjer] + acumDistrib) / acumComprom // (row.valoracion + row.comprometido + acumDistrib) / acumComprom
       this.registrosSeleccionados = arr
+      console.log ('regs', this.registrosSeleccionados)
     },
     getRecords (filter) {
       // hago la busqueda de registros segun condiciones del formulario Filter que ha lanzado el evento getRecords
@@ -342,7 +351,7 @@ export default {
       objFilter.estadoActivo = (objFilter.estadoActivo && objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.tipoProducto = (objFilter.tipoProducto && objFilter.tipoProducto !== null ? objFilter.tipoProducto.join() : null) // paso de array a concatenacion de strings (join)
       
-      console.log('objFilter', objFilter)
+      
       return this.$axios.get('movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: objFilter })
         .then(response => {
 
