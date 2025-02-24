@@ -339,7 +339,6 @@ export default {
       if (acumComprom === 0) arr[7]['ejer' + strEjer] = 0 // multiplo 31/12
       else arr[7]['ejer' + strEjer] = (arr[6]['ejer' + strEjer] + acumDistrib) / acumComprom // (row.valoracion + row.comprometido + acumDistrib) / acumComprom
       this.registrosSeleccionados = arr
-      console.log ('regs', this.registrosSeleccionados)
     },
     getRecords (filter) {
       // hago la busqueda de registros segun condiciones del formulario Filter que ha lanzado el evento getRecords

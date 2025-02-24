@@ -10,8 +10,9 @@
         row-key="id"
         :rows="registrosSeleccionados"
         :columns="columns"
-        table-style="max-height: 66vh; max-width: 93vw"
+        table-style="max-height: 66vh; max-width: 96vw"
         wrap-cells
+        style="table-layout: auto; width: 100%"
       >
   
         <template v-slot:header="props">
@@ -60,7 +61,10 @@
               <div v-if="['revenueCurrent' ].includes(col.name)" :style="((parseFloat(props.row['revenueCurrent']) >= parseFloat(props.row['revenueIni'])) ? ((props.row['revenueCurrent'] == props.row['revenueIni']) ?  'background-color: orange; color: white' : 'background-color: green; color: white') : 'background-color: red; color: white')">{{ col.value }}</div>
               <div v-if="!['ebitdaCurrentAbs','revenueCurrent', 'fundName', 'nombre' ].includes(col.name)">{{ col.value }}</div>
             </div>
-            <q-popup-edit v-if="this.trackRecord && !['fundName'].includes(col.name)"
+            <div :style="col.style" v-if="['verDoc'].includes(col.name) && props.row['url'] ">
+                <q-btn icon="open_in_browser" color="primary" style='width:50px' @click="verDocumento(props.row)"/>
+            </div>
+            <q-popup-edit v-if="this.trackRecord && !['fundName', 'verDoc'].includes(col.name)"
                 v-model="props.row[col.name]"
                 v-slot="scope"
                 max-height="600px"
@@ -70,12 +74,17 @@
 
                 <q-input v-if="['fundName'].includes(col.name)" readonly v-model="scope.value"></q-input>
                 <q-input v-if="['nombre', 'ownership', 'ebitdaCurrent','ebitdaCurrentAbs', 'revenueCurrent', 'debtCurrent','grossmult', 'investedCapital', 'revenueIni', 'ebitdaIniAbs', 'ebitdaIni', 'debtEbitdaIni'].includes(col.name)" v-model="scope.value"/>
-                <q-input v-if="['comentario'].includes(col.name)"
-                  type="textarea"
-                  v-model="scope.value"
-                  autofocus counter
-                  @keyup.enter.stop
-                  style="width: 400px;"/>
+                
+                  <q-input v-if="['comentario'].includes(col.name)"
+                    type="textarea"
+                    v-model="scope.value"
+                    autogrow/>
+
+                    <q-input v-if="['url'].includes(col.name)"
+                    type="textarea"
+                    v-model="scope.value"
+                    autogrow/>
+              
                 <q-select v-if="['geografia'].includes(col.name)"
                     outlined
                     clearable
@@ -173,7 +182,7 @@
   
   <script>
   import { mapState, mapActions } from 'vuex'
-  import { date } from 'quasar'
+  import { date, openURL } from 'quasar'
   import wgDate from 'components/General/wgDate.vue'
   import { headerFormData } from 'boot/axios.js'
   export default {
@@ -187,6 +196,7 @@
         columns: [
           //{ name: 'id', label: 'ID', align: 'left', field: 'id', sortable: true },
           { name: 'nombre', align: 'left', label: 'Portfolio Company Name', field: 'nombre', sortable: true, style: 'width: 200px; whiteSpace: normal' },
+          { name: 'verDoc', align: 'left', label: 'WEB', field: 'verDoc', style: 'min-width: 50px;' },
           { name: 'fundName', align: 'left', label: 'Fund Name', field: 'fundName', sortable: true, style: 'width: 150px; whiteSpace: normal' },
           { name: 'geografia', label: 'Geografía', align: 'left', field: 'geografia', sortable: true, style: 'width: 150px; whiteSpace: normal' },
           { name: 'sector', label: 'General Sector', align: 'left', field: 'sector', sortable: true, style: 'width: 150px' },
@@ -213,7 +223,8 @@
               return (obj !== undefined ? obj.desc : val)
             }
            },
-          { name: 'comentario', label: 'Observations', align: 'left', field: 'comentario', sortable: true, style: 'width: 300px; whiteSpace: normal' }
+          { name: 'comentario', label: 'Observations', align: 'left', field: 'comentario', sortable: true, style: 'min-width: 200px; max-width: 500px; white-space: normal; word-break: break-word;', headerStyle: 'max-width: 500px;' },
+          { name: 'url', label: 'URL', align: 'left', field: 'url', sortable: true, style: 'min-width: 200px; max-width: 500px; white-space: normal', headerStyle: 'max-width: 500px;' },
           //A medida que inserto campos los añado también en el metodo addRecord
         ],
         pagination: { rowsPerPage: 0 }
@@ -230,7 +241,7 @@
       getRecords (filter) { //filter es lo que recojo de modelValue
         // hago la busqueda de registros segun condiciones del formulario Filter que ha lanzado el evento getRecords
         var objFilter = Object.assign({}, filter)
-        console.log('objF', objFilter) //plan =='above' // plan =='below'
+        //console.log('objF', objFilter) //plan =='above' // plan =='below'
         
         // objFilter.estadoActivo = (objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
         return this.$axios.get('activos/bd_portfolio_companies.php/findPortfolioCompaniesFilter', { params: objFilter })
@@ -284,7 +295,8 @@
           revenueIni: 0,
           ebitdaIniAbs: '',
           debtEbitdaIni: '',
-          crossTransaction: '0'
+          crossTransaction: '0',
+          url: ''
         }
        
         var formData = new FormData()
@@ -345,11 +357,21 @@
               this.$q.dialog({ title: 'Error', message: error })
             })
         })
+      },
+      verDocumento (record) {
+      if (record.url !== '' && record.url !== null) { // se podría comprobar que record.tipoOperacion==='NOMINA' porque si es pago no suele haber doc
+        var strUrl = record.url
+        if (window.cordova === undefined) { // desktop
+          openURL(strUrl)
+        } else { // estamos en un disp movil
+          window.cordova.InAppBrowser.open(strUrl, '_system') // openURL
+        }
       }
+    }
     },
     mounted () {
       this.trackRecordR = this.trackRecord
-      console.log('value en grid', this.value) //aparece param plan
+      
 
       if (Object.keys(this.value).length > 0) this.getRecords(this.value)
       this.loadGeografias(this.user.codEmpresa)

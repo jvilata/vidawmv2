@@ -152,7 +152,6 @@
         })
       },
       getRecords () {
-        console.log('FILTER', this.filterR)
         this.$emit('getRecords', this.filterR) // lo captura portfolioMain
       },
       formatDate (pdate) {

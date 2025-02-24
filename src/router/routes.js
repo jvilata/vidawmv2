@@ -113,7 +113,8 @@ const routes = [
             component: () => import('src/components/Portfolio/portfolioMain.vue'),
             props: true,
             children: [
-              { path: 'portfolioGrid', name: 'portfolioGrid', component: () => import('components/Portfolio/portfolioGrid.vue'), props: true }
+              { path: 'portfolioGrid', name: 'portfolioGrid', component: () => import('components/Portfolio/portfolioGrid.vue'), props: true },
+              { path: 'portfolioGraph', name: 'portfolioGraph', component: () => import('components/Portfolio/portfolioGraph.vue'), props: true }
             ]
           },
           {

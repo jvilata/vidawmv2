@@ -262,7 +262,6 @@ export default {
   },
   mounted () {
     Object.assign(this.value, this.tabs[this.id].meta.value)
-    console.log('value EMITIDA', this.value)
     this.getRecord()
   },
   unmounted () {

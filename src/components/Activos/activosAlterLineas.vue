@@ -387,6 +387,8 @@ export default {
       //this.$emit('refrescar')
     },
     updateRecord (record) {
+      record.ts = date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
+      
       var tmp = {}
       var v = (record.idActivo == this.value.id ? "1" : "0")
       Object.assign(tmp, record)

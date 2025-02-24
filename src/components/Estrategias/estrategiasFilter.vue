@@ -6,8 +6,8 @@
       </q-card-section>
   
       <q-form @submit="getRecords" class="q-gutter-y-xs">
-        <q-input outlined clearable label="Id" stack-label v-model="filterR.id" />
-        <q-input outlined clearable label="Nombre" stack-label v-model="filterR.nombre" />
+        
+        <q-input outlined clearable label="Nombre Estrategia" stack-label v-model="filterR.nombre" />
         <q-select
           outlined
           clearable
@@ -25,6 +25,20 @@
           fill-input
           input-debounce="0"
       />
+      <q-select
+        outlined
+        clearable
+        label="Cod.empresa"
+        stack-label
+        v-model="filterR.codOtraEmpresa"
+        :options="listaEmpresas"
+        option-value="codElemento"
+        option-label="valor1"
+        multiple
+        use-chips
+        emit-value
+        map-options
+      />
         <q-select
           outlined
           clearable
@@ -36,6 +50,18 @@
           option-label="codElemento"
           emit-value
         />
+        <q-select
+          label="Computa"
+          stack-label
+          outlined
+          clearable
+          v-model="filterR.computa"
+          :options="listaSINO"
+          option-value="id"
+          option-label="desc"
+          emit-value
+          map-options
+      />
         <q-card-actions align="right">
           <q-btn  flat type="submit" label="Buscar" color="primary"/>
           <q-btn  flat label="Cancel" color="primary" @click="$emit('hide')"/><!-- lo captura accionesMain -->
@@ -57,7 +83,7 @@
       }
     },
     computed: {
-      ...mapState('tablasAux', ['listaSINO', 'listaUsers', 'listaTipoAcc', 'listaTiposActivo', 'listaMeses', 'listaTiposProducto', 'listaEstadosActivo', 'listaTipoOperacion']),
+      ...mapState('tablasAux', ['listaEmpresas', 'listaSINO', 'listaUsers', 'listaTipoAcc', 'listaTiposActivo', 'listaMeses', 'listaTiposProducto', 'listaEstadosActivo', 'listaTipoOperacion']),
       ...mapState('entidades', ['listaEntidadesActivos'])
     },
     methods: {
@@ -68,12 +94,12 @@
         this.listaEntidadesActivosFilter = this.listaEntidadesActivos.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
       })
     },
-      getRecords () {
-        this.$emit('getRecords', this.filterR) // lo captura estrategiasMain
-      },
-      formatDate (pdate) {
-        return date.formatDate(pdate, 'DD-MM-YYYY')
-      }
+    getRecords () {
+      this.$emit('getRecords', this.filterR) // lo captura estrategiasMain
+    },
+    formatDate (pdate) {
+      return date.formatDate(pdate, 'DD-MM-YYYY')
+    }
     },
     mounted () {
       this.filterR = Object.assign({}, this.modelValue) // asignamos valor del parametro por si viene de otro tab

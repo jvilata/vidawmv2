@@ -320,11 +320,13 @@ export default {
     },
     //mejora para quitar metricas de la tabla activos
     updateRecord (record) {
-      
+      record.ts = date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
       var tmp = {}
 
       Object.assign(tmp, record)
-          
+      
+      //tmp.ts = date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
+
       return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(tmp))
         .then(response => {
           Object.assign(tmp, record)

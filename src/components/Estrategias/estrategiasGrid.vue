@@ -168,9 +168,11 @@
         var objFilter = Object.assign({}, filter)
         
         // objFilter.estadoActivo = (objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
+        objFilter.codOtraEmpresa = (objFilter.codOtraEmpresa && objFilter.codOtraEmpresa !== null ? objFilter.codOtraEmpresa.join() : null) // paso de array a concatenacion de strings (join)
         return this.$axios.get('estrategias/bd_estrategias.php/findEstrategiasFilter', { params: objFilter })
           .then(response => {
             this.registrosSeleccionados = response.data
+            console.log('regs', this.registrosSeleccionados)
           })
           .catch(error => {
             this.$q.dialog({ title: 'Error', message: error })

@@ -71,7 +71,7 @@ export default {
     }
   },
   mounted () {
-      this.filterRecord = { codEmpresa: this.user.codEmpresa }
+      this.filterRecord = { codEmpresa: this.user.codEmpresa, computa: '1' }
       this.getRecords(this.filterRecord)
   },
   unmounted () {
