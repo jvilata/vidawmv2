@@ -63,7 +63,7 @@ const routes = [
           },
           { path: 'Facturas/:id', 
             name: 'Facturas', 
-            component: () => import('components/Facturas/FacturasMain.vue'), 
+            component: () => import('components/Facturas/facturasMain.vue'), 
             props: true,
             children: [
               { path: 'facturasMainGeneral', name: 'facturasMainGeneral', component: () => import('components/Facturas/facturasMainGeneral.vue'), props: true },
@@ -78,6 +78,20 @@ const routes = [
             children: [
               { path: 'facturasForm', name: 'facturasForm', component: () => import('components/Facturas/facturasForm.vue'), props: true },
               { path: 'facturasGridMovimientos', name: 'facturasGridMovimientos', component: () => import('components/Movimientos/movimientosGrid.vue'), props: true }
+            ]
+          },
+          { path: 'FacturasAEAT', 
+            name: 'FacturasAEAT', 
+            component: () => import('components/FacturasAEAT/facturasMainAEAT.vue'), 
+            props: true
+           },
+           {
+            path: 'facturasFormMainAEAT/:id',
+            name: 'facturasFormMainAEAT',
+            component: () => import('components/FacturasAEAT/facturasFormMainAEAT.vue'),
+            props: true,
+            children: [
+              { path: 'facturasFormAEAT', name: 'facturasFormAEAT', component: () => import('components/FacturasAEAT/facturasFormAEAT.vue'), props: true }
             ]
           },
           { path: 'valoraciones', name: 'valoraciones', component: () => import('components/Valoraciones/valoracionesMain.vue'), props: true },

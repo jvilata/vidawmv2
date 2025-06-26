@@ -58,7 +58,7 @@
                     @click="ejecutarOpcion(opcion)"
                     >
                     <q-item-section avatar>
-                      <q-icon :name="opcion.icon" />
+                      <q-icon :name="opcion.icon" color="black" />
                     </q-item-section>
                     <q-item-section>{{opcion.title}}</q-item-section>
                     <q-item-section avatar v-if="opcion.children.length>0">
@@ -74,8 +74,9 @@
                             @click="ejecutarOpcion(opcion1)"
                             >
                             <q-item-section avatar>
-                              <q-icon :name="opcion1.icon" />
+                              <q-icon  :name="opcion1.icon"/>
                             </q-item-section>
+                            
                             <q-item-section>{{opcion1.title}}</q-item-section>
                           </q-item>
                         </q-list>
@@ -141,12 +142,19 @@
                     <q-item-section>Duplicar</q-item-section>
                   </q-item>
                   <q-separator />
+                  <q-item clickable v-if="`${props.row.tipoFactura}`===`EMITIDA` && `${props.row.estadoFactura}`=== `PENDIENTE`" @click="enviarAEAT(props.row)">
+                    <q-item-section avatar>
+                      <q-icon name="send" />
+                    </q-item-section>
+                    <q-item-section>Enviar AEAT</q-item-section>
+                  </q-item>
                   <q-item clickable @click="enviarEmail(props.row)">
                     <q-item-section avatar>
                       <q-icon name="email" />
                     </q-item-section>
                     <q-item-section>Enviar por email</q-item-section>
                   </q-item>
+                  <q-separator />
                   <q-item clickable @click="generarPago(props.row)">
                     <q-item-section avatar>
                       <q-icon name="brightness_5" />
@@ -220,6 +228,8 @@ import { headerFormData } from 'boot/axios.js'
 import { date, openURL } from 'quasar'
 import { openBlobFile } from 'components/General/cordova.js'
 import sendMail from 'components/SendMail/sendMail.vue'
+import { useQuasar } from 'quasar'
+
 
 export default {
   props: ['modelValue', 'id', 'fromFacturasMain'], // en 'value' tenemos el filtro
@@ -264,7 +274,9 @@ export default {
           function: '',
           children: [
             { name: 'cargarFacturas', title: 'Cargar Facturas', icon: 'backup', function: 'cargarFacturas', children: [] },
-            { name: 'cargarFacturas', title: 'Enviar Facturas', icon: 'email', function: 'enviarFacturas', children: [] }
+            { name: 'cargarFacturas', title: 'Enviar Facturas', icon: 'email', function: 'enviarFacturas', children: [] },
+            { name: 'enviarAEAT', title: 'Enviar AEAT', icon: 'send', function: 'enviarAEATGrupo', children: [] }
+
           ]
         }
       ]
@@ -295,6 +307,7 @@ export default {
       var record = {
         codEmpresa: this.user.codEmpresa,
         tipoFactura: 'EMITIDA',
+        tipoFacturaEmitida: 'F1', //Por defecto - F1: completa
         idCliente: 0,
         archivoDrive: '',
         estadoFactura: 'PENDIENTE',
@@ -308,7 +321,8 @@ export default {
         totalIva: 0,
         totalFactura: 0,
         user: this.user.user.email,
-        ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
+        ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+        EmitidaPorTerceroODestinatario: 'SELF'
       }
       return this.$axios.post('facturas/bd_facturas.php/findFacturasFilter/', record)
         .then(response => {
@@ -393,7 +407,8 @@ export default {
         })
     },
     enviarEmail (selected) {
-      this.recordSendMail = {
+      if(selected.estadoFactura == "ENVIADA AEAT") {
+        this.recordSendMail = {
         destino: (selected.emailEntidad === '' ? this.entidadSelf.email : selected.emailEntidad),
         destinoCopia: this.entidadSelf.email, // jvilata@
         asunto: 'Factura de ' + this.user.nomEmpresa + ' número: ' + selected.nroFactura,
@@ -403,6 +418,83 @@ export default {
         url: 'onedrive/downloadFactura.php?empresa=' + this.user.nomEmpresa + '&nombrePDF=' + selected.archivoDrive + '&carpeta=' + selected.carpeta
       }
       this.visibleSendMail = true
+      }
+      if (selected.estadoFactura == "PENDIENTE") {
+        this.$q.dialog({
+            title: 'ATENCIÓN',
+            message: 'Antes de enviarse al destinatario, debe de enviarse a la AEAT'
+          }).onOk(() => {
+          // console.log('OK')
+        })
+      }
+      
+    },
+    enviarAEAT (selected) {
+     
+      //Enviar a la agencia tributaria --> URL PRUEBAS
+      this.recordSendMail = {
+        destino: this.entidadSelf.email, // 'rus@prifiscal.es'
+        asunto: 'PRUEBA ENVIO AEAT',
+        texto: 'RECORDATORIO: hay que hacer el envío a la URL de la AEAT'
+      } 
+      this.visibleSendMail = true
+
+      //SI respuesta AEAT OK: llamo a metodo copiarFacturasAEAT que me almacena en tabla facturasaeat y me cambia el estadoFactura a ENVIADA AEAT
+      this.copiarFacturasAEAT(selected)
+
+     /* var formData = new FormData()
+      for (var key in selected) {
+        formData.append(key, selected[key])
+      }
+    return this.$axios.post('facturas/bd_facturas.php/cambioEstadoFacturaAEAT', formData, headerFormData)
+          .then(response => {
+          this.$q.dialog({ title: 'Confirmar', message: 'Se ha cambiado el estado de la factura a "ENVIADA AEAT"' })
+          
+        })
+        .catch(error => {
+          this.$q.dialog({ title: 'Error', message: error })
+        })
+     //             this.copiarFacturasAEAT(selected)
+      */
+
+    },
+    copiarFacturasAEAT(selected) {
+      //Metodo para copiar datos en tabla: facturasaeat, y así que los campos que se visualicen desde el componente FACTURAS AEAT, sean los de la tabla AEAT
+      var formData = new FormData()
+      for (var key in selected) {
+        formData.append(key, selected[key])
+      }
+      
+      return this.$axios.post('facturasAEAT/bd_facturasAEAT.php/guardarBD', formData, headerFormData)
+        .then(response => {
+          if (response.data.failure === 1) {
+            console.log('response error', response)
+            this.$q.dialog({
+              title: 'Error',
+              message: response.data.message
+            });
+          } else {
+            return this.$axios.post('facturas/bd_facturas.php/cambioEstadoFacturaAEAT', formData, headerFormData)
+              .then(response => {
+                this.$q.dialog({ title: 'Confirmar', message: 'Se ha cambiado el estado de la factura a "ENVIADA AEAT"' })
+                this.$q.dialog({ title: 'Confirmar', message: 'La factura se ha enviado a la AEAT, y por eso se ha almacenado en la tabla Facturas AEAT' });
+
+              })
+              .catch(error => {
+                  console.log('response', error)
+                  this.$q.dialog({ title: 'Error', message: error })
+              })
+
+
+
+          }
+        })
+        .catch(error => {
+          console.log(error)
+          this.$q.dialog({ title: 'Error', message: error })
+        })
+      
+
     },
     generarPago (selected) {
       this.$axios.get('facturas/bd_facturas.php/generarPagoCobroFactura', { params: { id: selected.id } })
@@ -430,17 +522,45 @@ export default {
       }
     },
     enviarFacturas () {
-      this.recordSendMail = {
-        destino: this.entidadAsesor.email, // 'rus@prifiscal.es'
-        destinoCopia: this.entidadSelf.email, // 'jvilata@edicom.es',
-        asunto: 'Te adjunto facturas de ' + this.user.nomEmpresa,
-        texto: 'Hola,<br>Le adjuntamos facturas de la empresa:' + this.user.nomEmpresa + ' en este enlace de OnDrive:%enlace%' +
-          '<br>Atentamente,<br>' + this.entidadSelf.nombre + '<br>' +
-          (this.entidadSelf.logo !== '' ? '<img src="http://vidawm.com/privado/img/' + this.entidadSelf.logo + '"  width="100">' : ''),
-        url: 'onedrive/moverElementosCarpeta.php?codEmpresa=' + this.user.codEmpresa + '&empresa=' + this.user.nomEmpresa +
-          '&tipo=FACTURAS&carpeta=FACTURAS&estado='
+      var enviadoAEAT = true
+      this.registrosSeleccionados.forEach(element => {
+        if (element.tipoFactura == "EMITIDA" && element.estadoFactura == "PENDIENTE") {
+          enviadoAEAT = false
+        }else if (((element.tipoFactura == "EMITIDA" && element.estadoFactura == "ENVIADA AEAT") || (element.tipoFactura == "RCIBIDA" && element.estadoFactura == "PENDIENT") )) {
+          console.log('hay alguna factura recibida, o emitida y enviada')
+        }
+      })
+      if (enviadoAEAT) {
+        this.recordSendMail = {
+          destino: this.entidadAsesor.email, // 'rus@prifiscal.es'
+          destinoCopia: this.entidadSelf.email, // 'jvilata@edicom.es',
+          asunto: 'Te adjunto facturas de ' + this.user.nomEmpresa,
+          texto: 'Hola,<br>Le adjuntamos facturas de la empresa:' + this.user.nomEmpresa + ' en este enlace de OnDrive:%enlace%' +
+            '<br>Atentamente,<br>' + this.entidadSelf.nombre + '<br>' +
+            (this.entidadSelf.logo !== '' ? '<img src="http://vidawm.com/privado/img/' + this.entidadSelf.logo + '"  width="100">' : ''),
+          url: 'onedrive/moverElementosCarpeta.php?codEmpresa=' + this.user.codEmpresa + '&empresa=' + this.user.nomEmpresa +
+            '&tipo=FACTURAS&carpeta=FACTURAS&estado='
+        }
+        this.visibleSendMail = true
+      } else {
+          this.$q.dialog({
+            title: 'ATENCIÓN',
+            message: 'No se han enviado las facturas porque hay algunas EMITIDAS, que todavía no se han enviado a la AEAT'
+          }).onOk(() => {
+          // console.log('OK')
+        })
       }
-      this.visibleSendMail = true
+    },
+    enviarAEATGrupo () {
+      //Como tndremos varios envíos (si hay más de una) - haremos una cnexión a la AEAT por factura que tenemos que enviar - 
+      // así obtendremos un mensaje de respuesta por factura
+      this.registrosSeleccionados.forEach(element => {
+        if (element.tipoFactura == "EMITIDA" && element.estadoFactura == "PENDIENTE") {
+          //Enviar a la agencia tributaria --> URL PRUEBAS
+          this.enviarAEAT(element)
+        } 
+      })
+      
     }
   },
   components: {

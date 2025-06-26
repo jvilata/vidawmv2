@@ -140,7 +140,6 @@ export default {
     },
     saveChanges (record) {
       if (this.hasChanges) {
-       
         Object.assign(this.recordToSubmit, record)
         Object.assign(this.recordToSubmit, this.valueTotales) // se pierden los valores de totales por lo que viene de cabecera
         this.updateRecord()

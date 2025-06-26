@@ -3,7 +3,7 @@
   <q-card class="q-pt-none q-pl-xs q-pr-xs">
       <div class="row">
         <q-select
-          class="col-xs-6 col-sm-3"
+          class="col-xs-12 col-sm-2"
           outlined
           label="Tipo Factura"
           stack-label
@@ -13,11 +13,12 @@
           option-label="codElemento"
           emit-value
         />
-        <q-input class="col-xs-6 col-sm-2" outlined label="Nro Factura" stack-label v-model="recordToSubmit.nroFactura" />
+        <q-input class="col-xs-4 col-sm-2" outlined label="Nro Factura" stack-label v-model="recordToSubmit.nroFactura" />
         <q-select
-          class="col-xs-7 col-sm-5"
+          v-if="(recordToSubmit.EmitidaPorTerceroODestinatario === 'Tercero' || recordToSubmit.EmitidaPorTerceroODestinatario === 'T')"
+          class="col-xs-8 col-sm-3"
           outlined
-          label="Cliente/Prov."
+          label="Cliente / Proveedor."
           stack-label
           v-model="recordToSubmit.idCliente"
           :options="listaEntidadesFilter"
@@ -31,7 +32,26 @@
           fill-input
           input-debounce="0"
         />
-        <q-input class="col-xs-5 col-sm-2" outlined label="Fecha" stack-label :model-value="formatDate(recordToSubmit.fecha)" @update:model-value="val => recordToSubmit.fecha=val" >
+        <q-select
+          v-else 
+          class="col-xs-8 col-sm-5"
+          outlined
+          label="Cliente / Proveedor."
+          stack-label
+          v-model="recordToSubmit.idCliente"
+          :options="listaEntidadesFilter"
+          option-value="id"
+          option-label="nombre"
+          emit-value
+          map-options
+          @filter="filterEntidades"
+          use-input
+          hide-selected
+          fill-input
+          input-debounce="0"
+        />
+        <q-input v-if="recordToSubmit.tipoFactura == 'EMITIDA'"
+          class="col-xs-12 col-sm-2" outlined label="Fecha Expedición" stack-label :model-value="formatDate(recordToSubmit.fecha)" @update:model-value="val => recordToSubmit.fecha=val" >
           <template v-slot:append>
               <q-icon name="event" class="cursos-pointer">
                 <q-popup-proxy >
@@ -40,8 +60,88 @@
               </q-icon>
           </template>
         </q-input>
-      </div>
-      <div class="row">
+        <q-input v-if="recordToSubmit.tipoFactura != 'EMITIDA'"
+          class="col-xs-12 col-sm-3" outlined label="Fecha Expedición" stack-label :model-value="formatDate(recordToSubmit.fecha)" @update:model-value="val => recordToSubmit.fecha=val" >
+          <template v-slot:append>
+              <q-icon name="event" class="cursos-pointer">
+                <q-popup-proxy >
+                  <wgDate v-model="recordToSubmit.fecha"/>
+                </q-popup-proxy>
+              </q-icon>
+          </template>
+        </q-input>
+        <q-select
+          v-if="recordToSubmit.tipoFactura == 'EMITIDA'"
+          class="col-xs-12 col-sm-1"
+          outlined
+          label="Emisor:"
+          stack-label
+          v-model="recordToSubmit.EmitidaPorTerceroODestinatario"
+          :options="listaEmitidaPor"
+          emit-value
+        />
+        <q-select
+          v-if="(recordToSubmit.EmitidaPorTerceroODestinatario === 'Tercero' || recordToSubmit.EmitidaPorTerceroODestinatario === 'T')"
+          class="col-xs-8 col-sm-2"
+          outlined
+          label="Emitida por Tercero:"
+          stack-label
+          v-model="recordToSubmit.TerceroEmisorIDEntidad"
+          :options="listaEntidadesFilter"
+          option-value="id"
+          option-label="nombre"
+          emit-value
+          map-options
+          @filter="filterEntidades"
+          use-input
+          hide-selected
+          fill-input
+          input-debounce="0"
+        />
+        <q-select
+          v-if="recordToSubmit.tipoFactura == 'EMITIDA'"
+          class="col-xs-12 col-sm-2"
+          outlined
+          label="Factura Emitida"
+          stack-label
+          v-model="recordToSubmit.tipoFacturaEmitida"
+          :options="listaTipoFacturaEmitida"
+          option-value="codElemento"
+          option-label="valor1"
+          map-options
+          emit-value
+        />
+        <q-select
+          v-if="recordToSubmit.tipoFactura == 'EMITIDA' && recordToSubmit.tipoFacturaEmitida !== 'F1'"
+          class="col-xs-12 col-sm-4"
+          outlined
+          label="Tipo Fact Rectificativa"
+          stack-label
+          v-model="recordToSubmit.TipoRectificativa"
+          :options="listaTipoRectificativa"
+          option-value="codElemento"
+          option-label="valor1"
+          map-options
+          emit-value
+        />
+        <q-select
+          v-if="recordToSubmit.tipoFactura == 'EMITIDA' && recordToSubmit.tipoFacturaEmitida !== 'F1'"
+          class="col-xs-12 col-sm-4"
+          outlined
+          label="Nro Fact Rectificativa."
+          stack-label
+          v-model="recordToSubmit.Rect_NumSerieFactura"
+          :options="listaFactEmitidasFilter"
+          option-value="nroFactura"
+          option-label="nroFactura"
+          emit-value
+          map-options
+          @filter="filterFactEmitidas"
+          use-input
+          hide-selected
+          fill-input
+          input-debounce="0"
+        />
         <q-input class="col-xs-10 col-sm-5" outlined stack-label v-model="recordToSubmit.archivoDrive" label="Archivo Drive"/>
         <q-btn @click="abrirURL" class="col-xs-2 col-sm-1 bg-primary text-white" dense icon="open_in_browser"/>
         <q-select
@@ -55,7 +155,7 @@
           option-label="codElemento"
           emit-value
         />
-        <q-input class="col-xs-7 col-sm-4" outlined stack-label v-model="recordToSubmit.carpeta" label="Carpeta Drive"/>
+        <q-input class="col-xs-7 col-sm-2" outlined stack-label v-model="recordToSubmit.carpeta" label="Carpeta Drive"/>
       </div>
       <div class="row">
         <q-input class="col-xs-6 col-sm-3" outlined readonly stack-label v-model="recordToSubmit.base" label="Base"/>
@@ -68,7 +168,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import { date, openURL } from 'quasar'
 import wgDate from 'components/General/wgDate.vue'
 export default {
@@ -88,23 +188,40 @@ export default {
         totalIva: '',
         totalFactura: ''
       },
+      listaFactEmitidasFilter: [],
       listaEntidadesFilter: this.listaEntidades,
-      listaActivosFilter: []
+      listaActivosFilter: [],
+      listaEmitidaPor: ['SELF', 'Destinatario', 'Tercero']
     }
   },
   computed: {
-    ...mapState('tablasAux', ['listaSINO', 'listaUsers', 'listaMeses', 'listaEstadosFactura', 'listaTiposFactura']),
-    ...mapState('entidades', ['listaEntidades']),
+    ...mapState('tablasAux', ['listaEstadosFactura', 'listaTiposFactura', 'listaTipoFacturaEmitida', 'listaTipoRectificativa']),
+    ...mapState('entidades', ['listaEntidades', 'listaNumFactEmitidas']),
     ...mapState('activos', ['listaActivos']),
     ...mapState('login', ['user'])
   },
   methods: {
+     ...mapActions('entidades', ['loadNumFactEmitidas']),
     filterEntidades (val, update, abort) {
       update(() => {
         const needle = val.toLowerCase()
         this.listaEntidadesFilter = this.listaEntidades.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
       })
     },
+    filterFactEmitidas (val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase()
+        // Asegúrate de que this.listaNumFactEmitidas sea un array antes de intentar filtrar
+        // Aunque el watcher ya se encargará de esto, es una buena práctica de seguridad.
+        if (Array.isArray(this.listaNumFactEmitidas)) {
+          this.listaFactEmitidasFilter = this.listaNumFactEmitidas.filter(v => v.nroFactura.toLowerCase().indexOf(needle) > -1)
+        } else {
+          this.listaFactEmitidasFilter = []; // Si no es array, resetea a vacío
+        }
+      })
+    },
+
+
     filterActivos (val, update, abort) {
       update(() => {
         const needle = val.toLowerCase()
@@ -137,7 +254,12 @@ export default {
     wgDate: wgDate
   },
   mounted () {
+    //this.$store.dispatch('entidades/loadNumFactEmitidas');
+    this.loadNumFactEmitidas(this.user.codEmpresa)
+
     this.listaEntidadesFilter = this.listaEntidades
+    this.listaFactEmitidasFilter = this.listaNumFactEmitidas
+    //console.log(this.listaNumFactEmitidas)
     this.recordToSubmit = Object.assign({}, this.value) // asignamos valor del parametro por si viene de otro tab
   },
   watch: {
@@ -146,10 +268,19 @@ export default {
         this.$emit('hasChanges', { hasChanges: true, colorBotonSave: 'red' })
       },
       deep: true
-    }
+    },
+    listaNumFactEmitidas: {
+      handler(newVal) {
+        // Cuando listaNumFactEmitidas en el store cambia (es decir, cuando los datos llegan)
+        // actualiza listaFactEmitidasFilter.
+        this.listaFactEmitidasFilter = newVal;
+      },
+      immediate: true // Asegura que el handler se ejecute una vez al montar el componente
+    },
   },
   unmounted () {
     // guardamos valor en tabs por si despus queremos recuperarlo
+    
     this.$emit('saveChanges', this.recordToSubmit)
   }
 }

@@ -20,6 +20,8 @@ const state = {
   listaEstadosActivo: [],
   listaTipoOPeracion: [],
   listaTiposFactura: [],
+  listaTipoFacturaEmitida: [],
+  listaTipoRectificativa: [],
   listaEstadosFactura: [],
   listaTipoEntidad: [],
   listaEmpresas: [],
@@ -91,6 +93,12 @@ const mutations = {
   loadDivisasPortfolio (state, lista) {
     state.listaDivisasPortfolio = lista
   },
+  loadTipoFacturaEmitida (state, lista) {
+    state.listaTipoFacturaEmitida = lista
+  },
+  loadTipoRectificativa (state, lista) {
+    state.listaTipoRectificativa = lista
+  }
 }
 // actions: accesibles desde componentes a traves de ...mapActions('tablaAux', ['loadTablasAux'])
 // actualmente se esta llamando desde components/mainTabs.vue, es decir, cuando se pasa la validacion de usuario
@@ -110,6 +118,10 @@ const actions = {
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 14, mutation: 'loadStatusAlt' })
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 15, mutation: 'loadResumenTiposProducto' })
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 16, mutation: 'loadDivisasPortfolio' })
+    this.dispatch('tablasAux/loadTablaAux', { codTabla: 17, mutation: 'loadTipoFacturaEmitida' })
+    this.dispatch('tablasAux/loadTablaAux', { codTabla: 18, mutation: 'loadTipoRectificativa' })
+
+
     this.dispatch('tablasAux/loadUsers')
     this.dispatch('tablasAux/loadListaMeses')
   },

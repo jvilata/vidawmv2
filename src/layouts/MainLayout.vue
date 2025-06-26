@@ -172,6 +172,15 @@ export default {
           }
         },
         {
+          title: 'Facturas - SIF AEAT',
+          rol: '0',
+          icon: 'description',
+          link: {
+            name: 'FacturasAEAT',
+            label: 'Facturas ENVIADAS AEAT'
+          }
+        },
+        {
           title: 'Pagos',
           rol: '1',
           icon: 'payments',
