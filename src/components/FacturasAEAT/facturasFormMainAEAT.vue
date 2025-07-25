@@ -31,7 +31,7 @@
       return {
         ltab: '',
         value: {},
-        title: 'Facturas',
+        title: 'Facturas AEAT',
         numRentab: 0,
         numMov: 0,
         numFacturas: 0,

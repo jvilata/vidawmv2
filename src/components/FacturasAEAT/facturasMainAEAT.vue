@@ -69,7 +69,6 @@ export default {
     ...mapActions('entidades', ['loadEntidades']),
     ...mapActions('activos', ['loadActivos']),
     getRecords (filter) {
-
       Object.assign(this.filterRecord, filter)
       this.refreshKey++
       this.expanded = false
@@ -80,7 +79,7 @@ export default {
     if (this.listaActivos.length <= 0) this.loadActivos(this.user.codEmpresa) // carga store listaActivos
     // es la primera vez que entro, cargo valores po defecto
       // Object.assign(this.filterRecord, { codEmpresa: this.user.codEmpresa, estadoFactura: 'PENDIENTE' })
-      this.getRecords({ codEmpresa: this.user.codEmpresa, estadoFactura: 'ENVIADA AEAT', tipoFactura: 'EMITIDA' })
+      this.getRecords({ codEmpresa: this.user.codEmpresa })
     
   },
   unmounted () {

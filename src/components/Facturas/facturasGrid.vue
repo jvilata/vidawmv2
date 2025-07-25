@@ -93,6 +93,7 @@
             :props="props"
           >
             {{ col.label }}
+            <q-tooltip v-if="col.tooltip"> {{ col.tooltip }} </q-tooltip>
           </q-th>
         </q-tr>
       </template>
@@ -142,7 +143,7 @@
                     <q-item-section>Duplicar</q-item-section>
                   </q-item>
                   <q-separator />
-                  <q-item clickable v-if="`${props.row.tipoFactura}`===`EMITIDA` && `${props.row.estadoFactura}`=== `PENDIENTE`" @click="enviarAEAT(props.row)">
+                  <q-item clickable v-if="`${props.row.tipoFactura}`===`EMITIDA` && `${props.row.estadoFactura}`=== `PENDIENTE` || `${props.row.estadoFactura}`=== `GENERADA AEAT`" @click="enviarAEAT(props.row)">
                     <q-item-section avatar>
                       <q-icon name="send" />
                     </q-item-section>
@@ -258,7 +259,7 @@ export default {
           format: val => (val > 0 ? 'SI' : '')
         },
         { name: 'tipoFactura', align: 'right', label: 'Tipo', field: 'tipoFactura', sortable: true },
-        { name: 'estadoFactura', align: 'left', label: 'Estado Factura', field: 'estadoFactura', sortable: true },
+        { name: 'estadoFactura', align: 'left', label: 'Estado Factura', tooltip:'Estados de Facturas Emitidas: PENDIENTE , GENERADA AEAT , ENVIADA AEAT // Las facturas estarán ENVIADAS, cuando se hayan enviado a contabilidad', field: 'estadoFactura', sortable: true },
         { name: 'archivoDrive', align: 'left', label: 'archivoDrive', field: 'archivoDrive', sortable: true, style: 'width: 130px; whiteSpace: normal' },
         { name: 'id', label: 'Id', align: 'left', field: 'id', sortable: true },
         { name: 'idCliente', align: 'left', label: 'idEntidad', field: 'idCliente', sortable: true },
@@ -295,6 +296,9 @@ export default {
       if (this.fromFacturasMain === undefined) {
         Object.assign(objFilter, { codEmpresa: this.user.codEmpresa, tipoObjeto: (this.value.tipoForm === 'ENTIDADES' ? 'E' : 'A'), idObjeto: this.value.id })
       } else Object.assign(objFilter, this.value) // viene de facturasMain
+
+      objFilter.estadoFactura = (objFilter.estadoFactura && objFilter.estadoFactura !== null ? objFilter.estadoFactura.join() : null) // paso de array a concatenacion de strings (join)
+
       return this.$axios.get('facturas/bd_facturas.php/findFacturasFilter', { params: objFilter }, headerFormData)
         .then(response => {
           this.registrosSeleccionados = response.data
@@ -308,6 +312,7 @@ export default {
         codEmpresa: this.user.codEmpresa,
         tipoFactura: 'EMITIDA',
         tipoFacturaEmitida: 'F1', //Por defecto - F1: completa
+        tipoRegistroEmitida: 'RegistroAlta',
         idCliente: 0,
         archivoDrive: '',
         estadoFactura: 'PENDIENTE',
@@ -432,17 +437,12 @@ export default {
     enviarAEAT (selected) {
      
       //Enviar a la agencia tributaria --> URL PRUEBAS
-      this.recordSendMail = {
-        destino: this.entidadSelf.email, // 'rus@prifiscal.es'
-        asunto: 'PRUEBA ENVIO AEAT',
-        texto: 'RECORDATORIO: hay que hacer el envío a la URL de la AEAT'
-      } 
-      this.visibleSendMail = true
+      
 
       //SI respuesta AEAT OK: llamo a metodo copiarFacturasAEAT que me almacena en tabla facturasaeat y me cambia el estadoFactura a ENVIADA AEAT
       this.copiarFacturasAEAT(selected)
 
-     /* var formData = new FormData()
+      /* var formData = new FormData()
       for (var key in selected) {
         formData.append(key, selected[key])
       }
@@ -465,32 +465,57 @@ export default {
         formData.append(key, selected[key])
       }
       
+    
+      
+    //  formData.append("estadoFact", 'GENERADO AEAT')
+
       return this.$axios.post('facturasAEAT/bd_facturasAEAT.php/guardarBD', formData, headerFormData)
         .then(response => {
+          
           if (response.data.failure === 1) {
-            console.log('response error', response)
+            
             this.$q.dialog({
               title: 'Error',
               message: response.data.message
             });
           } else {
-            return this.$axios.post('facturas/bd_facturas.php/cambioEstadoFacturaAEAT', formData, headerFormData)
-              .then(response => {
-                this.$q.dialog({ title: 'Confirmar', message: 'Se ha cambiado el estado de la factura a "ENVIADA AEAT"' })
-                this.$q.dialog({ title: 'Confirmar', message: 'La factura se ha enviado a la AEAT, y por eso se ha almacenado en la tabla Facturas AEAT' });
+            var res = response.data //aqui tengo el lastId insertado en facturasAEAT
+            
+              var formData1 = new FormData()
+                formData1.append('id', res.id) //aqui tengo el lastId insertado en facturasAEAT
+                formData1.append('estadoFactura', selected.estadoFactura)
+            //Aqui envío a la AEAT
+            return this.$axios.post('SIF/verifactu2.php/preparoVerifactu', formData1, headerFormData)
+                    .then(response => {
+                      
+                      
+                      this.$q.dialog({ title: 'Response', message: JSON.stringify(response.data) })
+                      formData.append("respAEAT", JSON.stringify(response.data))
+                      //almacenamos respuesta AEAT en cab_facturas
 
-              })
-              .catch(error => {
-                  console.log('response', error)
-                  this.$q.dialog({ title: 'Error', message: error })
-              })
+                      //Si resp OK -> cambiamos estado 
+                      return this.$axios.post('facturasAEAT/bd_facturasAEAT.php/almacenoRespAEAT', formData, headerFormData)
+                        .then(response => {
+                          //this.$q.dialog({ title: 'Confirmar', message: 'Se ha cambiado el estado de la factura a "ENVIADA AEAT"' })
+                          //this.$q.dialog({ title: 'Confirmar', message: 'La factura se ha enviado a la AEAT, y por eso se ha almacenado en la tabla Facturas AEAT' });
+                          
+                        
+                        })
+                        .catch(error => {
+                            this.$q.dialog({ title: 'Error', message: error })
+                        })
 
-
-
+                    })
+                    .catch(error => {
+                        console.log('response', error)
+                        this.$q.dialog({ title: 'Error', message: error })
+                    })      
+              
           }
         })
         .catch(error => {
-          console.log(error)
+          
+          console.log('por aqui', error)
           this.$q.dialog({ title: 'Error', message: error })
         })
       
@@ -521,13 +546,15 @@ export default {
         window.cordova.InAppBrowser.open(strUrl, '_system') // openURL
       }
     },
-    enviarFacturas () {
-      var enviadoAEAT = true
+    enviarFacturas () { //ENVÍO CONTABILIDAD
+      var enviadoAEAT = false
       this.registrosSeleccionados.forEach(element => {
         if (element.tipoFactura == "EMITIDA" && element.estadoFactura == "PENDIENTE") {
-          enviadoAEAT = false
-        }else if (((element.tipoFactura == "EMITIDA" && element.estadoFactura == "ENVIADA AEAT") || (element.tipoFactura == "RCIBIDA" && element.estadoFactura == "PENDIENT") )) {
+          enviadoAEAT = true
+          this.enviarAEAT(element)
+        }else if (((element.tipoFactura == "EMITIDA" && (element.estadoFactura == "ENVIADA AEAT" || (element.estadoFactura == "GENERADA AEAT"))) || (element.tipoFactura == "RECIBIDA" && element.estadoFactura == "PENDIENTE") )) {
           console.log('hay alguna factura recibida, o emitida y enviada')
+          enviadoAEAT = true
         }
       })
       if (enviadoAEAT) {
@@ -542,13 +569,6 @@ export default {
             '&tipo=FACTURAS&carpeta=FACTURAS&estado='
         }
         this.visibleSendMail = true
-      } else {
-          this.$q.dialog({
-            title: 'ATENCIÓN',
-            message: 'No se han enviado las facturas porque hay algunas EMITIDAS, que todavía no se han enviado a la AEAT'
-          }).onOk(() => {
-          // console.log('OK')
-        })
       }
     },
     enviarAEATGrupo () {

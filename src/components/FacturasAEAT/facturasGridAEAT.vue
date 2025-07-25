@@ -41,46 +41,20 @@
         <template v-slot:header="props">
           <!-- CABECERA DE LA TABLA -->
           <q-tr :props="props">
-            <q-th>
-              <q-btn icon="more_vert"  class="q-ma-xs" color="primary" dense>
-                <q-menu ref="menu1">
-                  <q-list dense>
-                    
-                    <q-item
-                      v-for="(opcion, index) in listaOpciones"
-                      :key="index"
-                      clickable
-                      @click="ejecutarOpcion(opcion)"
-                      >
-                      <q-item-section avatar>
-                        <q-icon :name="opcion.icon" color="black" />
-                      </q-item-section>
-                      <q-item-section>{{opcion.title}}</q-item-section>
-                      <q-item-section avatar v-if="opcion.children.length>0">
-                        <q-icon name="keyboard_arrow_right" />
-                      </q-item-section>
-                        <q-menu v-if="opcion.children.length>0" anchor="top right" self="top left">
-                          <q-list dense>
-                            <q-item
-                              v-for="(opcion1, index1) in opcion.children"
-                              :key="index1"
-                              clickable
-                              v-close-popup
-                              @click="ejecutarOpcion(opcion1)"
-                              >
-                              <q-item-section avatar>
-                                <q-icon  :name="opcion1.icon"/>
-                              </q-item-section>
-                              
-                              <q-item-section>{{opcion1.title}}</q-item-section>
-                            </q-item>
-                          </q-list>
-                      </q-menu>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-btn>
-            </q-th>
+            <q-th >
+            <q-btn icon="more_vert"  class="q-ma-xs" color="primary" dense>
+              <q-menu ref="menu1">
+                <q-list dense>
+                  <q-item key="new1" clickable v-close-popup @click="exportarExcel" >
+                    <q-item-section avatar>
+                      <q-icon name="download" />
+                    </q-item-section>
+                    <q-item-section>Exportar Excel</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
+          </q-th>
   
             <q-th
               v-for="col in props.cols"
@@ -96,9 +70,9 @@
           <q-tr :props="props" :key="`m_${props.row.id}`" @mouseover="rowId=`m_${props.row.id}`">
             <q-td>
               <!-- columna de acciones: editar, borrar, etc -->
-              <div style="width: 80px">
+              <div v-if="props.row.contestacionAEAT !== 'OK'" style="width: 40px" >
               <!--edit icon . Decomentamos si necesitamos accion especifica de edicion -->
-              <q-btn flat v-if="rowId===`m_${props.row.id}`"
+            <!--  <q-btn flat v-if="rowId===`m_${props.row.id}`"
                 @click.stop="editRecord(props.row, props.row.id)"
                 round
                 dense
@@ -106,7 +80,7 @@
                 color="primary"
                 icon="edit">
                 <q-tooltip>Editar</q-tooltip>
-              </q-btn>
+              </q-btn> -->
               <q-btn flat v-if="rowId===`m_${props.row.id}`"
                 round
                 dense
@@ -115,11 +89,11 @@
                 <q-tooltip anchor="top middle">Más Opciones</q-tooltip>
                 <q-menu>
                   <q-list dense style="min-width: 100px">
-                    <q-item clickable @click="imprimir(props.row)">
+                    <q-item clickable @click="enviarRequerimiento(props.row)">
                       <q-item-section avatar>
-                        <q-icon name="print" />
+                        <q-icon name="send" />
                       </q-item-section>
-                      <q-item-section>Imprimir</q-item-section>
+                      <q-item-section>Enviar Requerimiento AEAT</q-item-section>
                     </q-item>
                   </q-list>
                 </q-menu>
@@ -139,35 +113,8 @@
           </q-tr>
         </template>
   
-        <template v-slot:no-data>
-          <div class="absolute-bottom q-mb-sm" style="left: 45vw">
-            <q-btn
-              @click.stop="addRecord"
-              round
-              dense
-              color="primary"
-              size="20px"
-              icon="add">
-              <q-tooltip>Añadir Registro</q-tooltip>
-            </q-btn>
-          </div>
-          <div>
-            No hay registros, pulse el botón + para añadir
-          </div>
-        </template>
   
         <template v-slot:bottom>
-          <div class="absolute-bottom q-mb-sm" style="left: 45vw">
-            <q-btn
-              @click.stop="addRecord"
-              round
-              dense
-              color="primary"
-              size="20px"
-              icon="add">
-              <q-tooltip>Añadir Registro</q-tooltip>
-            </q-btn>
-          </div>
           <div>
             {{ registrosSeleccionados.length }} Filas
           </div>
@@ -175,9 +122,6 @@
   
       </q-table>
   
-      <q-dialog v-model="visibleSendMail"  >
-        <sendMail :value="recordSendMail" @close="visibleSendMail=false"/>
-      </q-dialog>
     </q-item>
     </div>
   </template>
@@ -187,7 +131,6 @@
   import { headerFormData } from 'boot/axios.js'
   import { date, openURL } from 'quasar'
   import { openBlobFile } from 'components/General/cordova.js'
-  import sendMail from 'components/SendMail/sendMail.vue'
   
   export default {
     props: ['modelValue', 'id', 'fromFacturasMain'], // en 'value' tenemos el filtro
@@ -196,48 +139,21 @@
         rowId: '',
         value: {},
         registrosSeleccionados: [],
-        recordSendMail: {},
-        visibleSendMail: false,
         columns: [
-          { name: 'nomEntidad', align: 'left', label: 'Nombre', field: 'nomEntidad', sortable: true, style: 'width: 170px; whiteSpace: normal' },
-          { name: 'fecha', align: 'left', label: 'Fecha', field: 'fecha', sortable: true, format: val => date.formatDate(date.extractDate(val, 'YYYY-MM-DD HH:mm:ss'), 'DD-MM-YYYY'), style: 'width: 70px;' },
-          { name: 'nroFactura', align: 'left', label: 'NºFactura', field: 'nroFactura', sortable: true },
-          { name: 'base', align: 'left', label: 'Base', field: 'base', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-          { name: 'totalIva', align: 'left', label: 'Total Iva', field: 'totalIva', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-          { name: 'totalFactura', align: 'left', label: 'Total Factura', field: 'totalFactura', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-          { name: 'por_retencion', align: 'left', label: '%Ret', field: 'por_retencion', sortable: true },
-          { name: 'retencion', align: 'left', label: 'Retencion', field: 'retencion', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-          {
-            name: 'nummov',
-            align: 'left',
-            label: 'Cobr/Pag',
-            field: 'nummov',
-            sortable: true,
-            format: val => (val > 0 ? 'SI' : '')
-          },
-          { name: 'tipoFactura', align: 'right', label: 'Tipo', field: 'tipoFactura', sortable: true },
-          { name: 'estadoFactura', align: 'left', label: 'Estado Factura', field: 'estadoFactura', sortable: true },
-          { name: 'archivoDrive', align: 'left', label: 'archivoDrive', field: 'archivoDrive', sortable: true, style: 'width: 130px; whiteSpace: normal' },
-          { name: 'id', label: 'Id', align: 'left', field: 'id', sortable: true },
-          { name: 'idCliente', align: 'left', label: 'idEntidad', field: 'idCliente', sortable: true },
-          { name: 'user', align: 'left', label: 'user', field: 'user', sortable: true },
-          { name: 'ts', align: 'left', label: 'ts', field: 'ts', sortable: true }
+          { name: 'id', align: 'left', label: 'id', field: 'id', sortable: true },
+          { name: 'RegistroFactura', align: 'left', label: 'Registro Factura', field: 'RegistroFactura', sortable: true },
+          { name: 'DestinatarioNombreRazon', align: 'left', label: 'Nombre Cliente', field: 'DestinatarioNombreRazon', sortable: true, style: 'width: 170px; whiteSpace: normal' },
+          { name: 'FechaHoraHusoGenRegistro', align: 'left', label: 'Fecha Envío AEAT', field: 'FechaHoraHusoGenRegistro', sortable: true, format: val => date.formatDate(date.extractDate(val, 'YYYY-MM-DD HH:mm:ss'), 'YYYY-MM-DD HH:mm:ss'), style: 'width: 100px;' },
+          { name: 'NumSerieFactura', align: 'left', label: 'NºFactura', field: 'NumSerieFactura', sortable: true },
+          { name: 'BaseImponible', align: 'left', label: 'Base', field: 'BaseImponible', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
+          { name: 'CuotaTotal', align: 'left', label: 'Total Iva', field: 'CuotaTotal', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
+          { name: 'ImporteTotal', align: 'left', label: 'Total Factura', field: 'ImporteTotal', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
+          { name: 'TipoFactura', align: 'left', label: 'Tipo Factura:', field: 'TipoFactura', sortable: true },
+          { name: 'RegistroAnterior_numSerieFactura', align: 'left', label: 'Nº Fac Registro Ant.', field: 'RegistroAnterior_numSerieFactura', sortable: true, style: 'width: 80px' },
+          { name: 'contestacionAEAT', align: 'left', label: 'Respuesta AEAT', field: 'contestacionAEAT', sortable: true, style: 'width: 80px' },
+          { name: 'NombreRazonEmisor', align: 'left', label: 'Empresa emisora:', field: 'NombreRazonEmisor', sortable: true }
         ],
-        pagination: { rowsPerPage: 0 },
-        listaOpciones: [
-          {
-            name: 'accionesDrive',
-            title: 'Acciones Drive',
-            icon: 'cloud',
-            function: '',
-            children: [
-              { name: 'cargarFacturas', title: 'Cargar Facturas', icon: 'backup', function: 'cargarFacturas', children: [] },
-              { name: 'cargarFacturas', title: 'Enviar Facturas', icon: 'email', function: 'enviarFacturas', children: [] },
-              { name: 'cargarFacturas', title: 'Enviar AEAT', icon: 'email', function: 'enviarFacturasAEAT', children: [] }
-  
-            ]
-          }
-        ]
+        pagination: { rowsPerPage: 0 }
       }
     },
     computed: {
@@ -253,7 +169,8 @@
         /*if (this.fromFacturasMainAEAT === undefined) {
           Object.assign(objFilter, { codEmpresa: this.user.codEmpresa, tipoObjeto: (this.value.tipoForm === 'ENTIDADES' ? 'E' : 'A'), idObjeto: this.value.id })
         } else*/ Object.assign(objFilter, this.value) // viene de facturasMain
-        return this.$axios.get('facturas/bd_facturas.php/findFacturasFilter', { params: objFilter }, headerFormData)
+
+        return this.$axios.get('facturasAEAT/bd_facturasAEAT.php/findFacturasFilter', { params: objFilter }, headerFormData)
           .then(response => {
             this.registrosSeleccionados = response.data
           })
@@ -261,177 +178,64 @@
             this.$q.dialog({ title: 'Error', message: error })
           })
       },
-      addRecord () {
-        var record = {
-          codEmpresa: this.user.codEmpresa,
-          tipoFactura: 'EMITIDA',
-          idCliente: 0,
-          archivoDrive: '',
-          estadoFactura: 'PENDIENTE',
-          comentarios: '',
-          carpeta: '',
-          nroFactura: '-1',
-          fecha: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss'),
-          base: 0,
-          por_retencion: 0,
-          retencion: 0,
-          totalIva: 0,
-          totalFactura: 0,
-          user: this.user.user.email,
-          ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
-        }
-        return this.$axios.post('facturas/bd_facturas.php/findFacturasFilter/', record)
-          .then(response => {
-            record.id = response.data.id
-            return this.$axios.get(`facturas/bd_facturas.php/findFacturasFilter/${record.id}`)
-              .then(response => {
-                record = response.data[0]
-                this.registrosSeleccionados.push(record)
-                this.editRecord(record, record.id)
-              })
-              .catch(error => {
-                this.$q.dialog({ title: 'Error', message: error })
-              })
-          })
-          .catch(error => {
-            this.$q.dialog({ title: 'Error', message: error })
-          })
-      },
-      deleteRecord (id) {
-        this.$q.dialog({
-          title: 'Confirmar',
-          message: '¿ Borrar esta fila ?',
-          ok: true,
-          cancel: true,
-          persistent: true
-        }).onOk(() => {
-          return this.$axios.delete(`facturas/bd_facturas.php/findFacturasFilter/${id}`)
-            .then(response => {
-              var index = this.registrosSeleccionados.findIndex(function (record) { // busco elemento del array con este id
-                if (record.id === id) return true
-              })
-              this.registrosSeleccionados.splice(index, 1) // lo elimino del array
-            })
-            .catch(error => {
-              this.$q.dialog({ title: 'Error', message: error })
-            })
-        })
-      },
-      editRecord (rowChanges, id) { // no lo uso aqui pero lod ejo como demo
+       editRecord (rowChanges, id) { // no lo uso aqui pero lod ejo como demo
         this.addTab(['facturasFormMainAEAT', 'Factura AEAT-' + rowChanges.id, rowChanges, rowChanges.id])
       },
-      ejecutarOpcion (opcion) {
-        if (opcion.children.length === 0) {
-          this[opcion.function](this.selectedRowID)
-          this.$refs.menu1.hide()
-        }
+      enviarRequerimiento (selected) {
+        // Aquí se tendrá que implementar el codigo para enviar el requerimiento a la AEAT (modificación de datos)
+
       },
-      imprimir (selected) {
-        var paramRecord = {
-          id: selected.id,
-          aDisco: 0
-        }
-        var formData = new FormData()
-        for (var key in paramRecord) {
-          formData.append(key, paramRecord[key])
-        }
-        this.$axios.post('facturas/pdf_invoice.php/', formData, { responseType: 'blob' })
-          .then(function (response) {
-            if (window.cordova === undefined) { // desktop
-              const url = window.URL.createObjectURL(new Blob([response.data], { type: response.data.type }))
-              const link = document.createElement('a')
-              link.href = url
-              link.target = '_blank'
-              document.body.appendChild(link)
-              // window.open('', 'view') // abre nueva ventana para que no sustituya a la actual
-              link.click()
-            } else { // estamos en un disp movil
-              const blobPdf = response.data // new Blob([response.data], { type: response.data.type })
-              openBlobFile(selected.archivoDrive, blobPdf, response.data.type)
-            }
-          }).catch(error => {
-            this.$q.dialog({ title: 'Error', message: error })
-          })
-      },
-      duplicar (selected) {
-        this.$axios.get('facturas/bd_facturas.php/copiarFactura', { params: { id: selected.id } })
-          .then(response => {
-            this.getRecords()
-          })
-          .catch(error => {
-            this.$q.dialog({ title: 'Error', message: error })
-          })
-      },
-      enviarEmail (selected) {
-        this.recordSendMail = {
-          destino: (selected.emailEntidad === '' ? this.entidadSelf.email : selected.emailEntidad),
-          destinoCopia: this.entidadSelf.email, // jvilata@
-          asunto: 'Factura de ' + this.user.nomEmpresa + ' número: ' + selected.nroFactura,
-          texto: 'Hola,<br>Le adjuntamos factura ' + selected.nroFactura + ' por los servicios prestados de la empresa:' +
-            this.user.nomEmpresa + '<br>Atentamente,<br>' + this.entidadSelf.nombre + '<br>' +
-            (this.entidadSelf.logo !== '' ? '<img src="http://vidawm.com/privado/img/' + this.entidadSelf.logo + '"  width="100">' : ''),
-          url: 'onedrive/downloadFactura.php?empresa=' + this.user.nomEmpresa + '&nombrePDF=' + selected.archivoDrive + '&carpeta=' + selected.carpeta
-        }
-        this.visibleSendMail = true
-      },
-      enviarAEAT (selected) {
-        this.recordSendMail = {
-          destino: this.entidadSelf.email,
-          asunto: 'AEAT - Prueba Envío',
-          texto: 'Hola, esto es una PRUEBA'
-        }
-        this.visibleSendMail = true
-      },
-      generarPago (selected) {
-        this.$axios.get('facturas/bd_facturas.php/generarPagoCobroFactura', { params: { id: selected.id } })
-          .then(response => {
-            this.$q.dialog({ title: 'Confirmar', message: 'Se ha generado movimiento' })
-          })
-          .catch(error => {
-            this.$q.dialog({ title: 'Error', message: error })
-          })
-      },
-      cargarFacturas () {
-        var host = this.$axios.defaults.baseURL // 'https://vidawm.com/privado/php/'
-        var strUrl = host + 'onedrive/recorrerCarpeta.php?codEmpresa=' + this.user.codEmpresa + '&empresa=' +
-            this.user.nomEmpresa + '&tipo=FACTURAS&carpeta=FACTURAS&estado='
-        if (window.cordova === undefined) { // desktop
-          /* const link = document.createElement('a')
-          link.href = host + 'onedrive/recorrerCarpeta.php?codEmpresa=' + this.user.codEmpresa + '&empresa=' +
-            this.user.nomEmpresa + '&tipo=FACTURAS&carpeta=FACTURAS&estado='
-          link.target = '_blank'
-          document.body.appendChild(link)
-          link.click() */
-          openURL(strUrl)
-        } else { // dispositivo movil
-          window.cordova.InAppBrowser.open(strUrl, '_system') // openURL
-        }
-      },
-      enviarFacturas () {
-        this.recordSendMail = {
-          destino: this.entidadAsesor.email, // 'rus@prifiscal.es'
-          destinoCopia: this.entidadSelf.email, // 'jvilata@edicom.es',
-          asunto: 'Te adjunto facturas de ' + this.user.nomEmpresa,
-          texto: 'Hola,<br>Le adjuntamos facturas de la empresa:' + this.user.nomEmpresa + ' en este enlace de OnDrive:%enlace%' +
-            '<br>Atentamente,<br>' + this.entidadSelf.nombre + '<br>' +
-            (this.entidadSelf.logo !== '' ? '<img src="http://vidawm.com/privado/img/' + this.entidadSelf.logo + '"  width="100">' : ''),
-          url: 'onedrive/moverElementosCarpeta.php?codEmpresa=' + this.user.codEmpresa + '&empresa=' + this.user.nomEmpresa +
-            '&tipo=FACTURAS&carpeta=FACTURAS&estado='
-        }
-        this.visibleSendMail = true
-      },
-      enviarFacturasAEAT () {
-        //Enviar a la agencia tributaria --> URL PRUEBAS
-        this.recordSendMail = {
-          destino: this.entidadSelf.email, // 'rus@prifiscal.es'
-          asunto: 'PRUEBA ENVIO AEAT',
-          texto: 'RECORDATORIO: hay que hacer el envío a la URL de la AEAT'
-        }
-        this.visibleSendMail = true
+      exportarExcel () {
+        //Primero construyo la SQL
+        //string que será todo lo que se incluya en el 'WHERE'
+        
+        var objFilter = {}
+        Object.assign(objFilter, this.value) // en objFilter, tengo los datos por los que he filtrado
+
+        // 
+
+        var str = ' id is not null and codEmpresa=\'' + this.user.codEmpresa + '\''
+      if (objFilter.idCliente) str += ' and DestinatarioNIF = (select cif from entidades where entidades.id =\'' + objFilter.idCliente + '\')'
+      if (objFilter.NumSerieFactura) str += ' and NumSerieFactura = \'' + objFilter.NumSerieFactura + '\''
+      if (objFilter.fechainicial) str += ' and (FechaExpedicionFactura  >= \'' + objFilter.fechainicial + '\')'
+      if (objFilter.fechafinal) str += ' and (FechaExpedicionFactura  <= \'' + objFilter.fechafinal + '\')'
+
+
+      var sql = 'select * from facturasaeat where ' + str + ' order by id'
+      
+      var paramRecord = {
+        SQL: sql,
+        string_con: '',
+        nompdf: 'facturasAEAT.csv'
       }
-    },
-    components: {
-      sendMail: sendMail
+      var formData = new FormData()
+      for (var key in paramRecord) {
+        formData.append(key, paramRecord[key])
+      }
+      this.$axios.post('lib/exportExcel.php', formData, { responseType: 'blob' })
+        .then(function (response) {
+          var nomFile = 'facturasAEAT_' + date.formatDate(new Date(), 'YYYYMMDDHHmmss') + '.csv'
+          if (window.cordova === undefined) { // desktop
+            const url = window.URL.createObjectURL(new Blob([response.data], { type: response.data.type }))
+            const link = document.createElement('a')
+            link.href = url
+            link.download = nomFile
+            // link.target = '_blank'
+            document.body.appendChild(link)
+            // window.open('', 'view') // abre nueva ventana para que no sustituya a la actual
+            link.click()
+            document.body.removeChild(link)
+          } else { // estamos en un disp movil            console.log('hola3')
+            const blobPdf = response.data // new Blob([response.data], { type: response.data.type })
+            openBlobFile(nomFile, blobPdf, response.data.type)
+          }
+        }).catch(error => {
+          this.$q.dialog({ title: 'Error', message: error })
+        })
+    }
+
+
+
     },
     mounted () {
       this.value = this.modelValue

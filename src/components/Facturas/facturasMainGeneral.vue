@@ -34,7 +34,12 @@
         />
       </q-dialog>
 
-      <!-- formulario tabla de resultados de busqueda -->
+    <!--  <q-banner class="q-mx-md q-pt-xs  bg-indigo-1 text-grey-8">
+        Estados de Facturas Emitidas: PENDIENTE , GENERADA AEAT , ENVIADA AEAT <br>
+        Las facturas estarán ENVIADAS, cuando se hayan enviado a contabilidad
+       
+      </q-banner>
+       -->
       <facturasGrid
         v-model="filterRecord"
         fromFacturasMain=true
@@ -82,7 +87,8 @@ export default {
       this.getRecords(this.filterRecord) // refresco la lista por si se han hecho cambios
     } else { // es la primera vez que entro, cargo valores po defecto
       // Object.assign(this.filterRecord, { codEmpresa: this.user.codEmpresa, estadoFactura: 'PENDIENTE' })
-      this.getRecords({ codEmpresa: this.user.codEmpresa, estadoFactura: 'PENDIENTE' })
+      var objFilterMounted = { codEmpresa: this.user.codEmpresa, estadoFactura: ['PENDIENTE', 'GENERADA AEAT', 'ENVIADA AEAT'] }
+      this.getRecords(objFilterMounted)
     }
   },
   unmounted () {

@@ -109,29 +109,53 @@
           }
           ],
           listaGrossComp: [
+
+          /**
+           if (mult < 1.0) categories[0]++;
+            else if (mult == 1.0) categories[1]++;
+            else if (mult > 1.0 && mult <= 1.25) categories[2]++;
+            else if (mult > 1.25 && mult <= 1.50) categories[3]++;
+            else if (mult > 1.50 && mult <= 1.75) categories[4]++;
+            else if (mult > 1.75 && mult <= 2.0) categories[5]++;
+            else if (mult > 2.0 && mult <= 2.5) categories[6]++;
+            else if (mult > 2.5 && mult <= 3.0) categories[7]++;
+            else categories[8]++;
+           */
           {
-            label: 'Gross mult. < 1x',
+            label: 'Gross mult. < 1.0x',
             value: '0'
           },
           {
-            label: 'Gross mult. = 1x',
+            label: 'Gross mult. = 1.0x',
             value: '1'
           },
           {
-            label: 'Gross mult. [1.1x - 1.5x]',
+            label: 'Gross mult. [1.01x - 1.25x]',
+            value: '1.2'
+          },
+          {
+            label: 'Gross mult. [1.26x - 1.5x]',
             value: '1.5'
           },
           {
-            label: 'Gross mult. [1.5x - 2x]',
+            label: 'Gross mult. [1.51x - 1.75x]',
+            value: '1.7'
+          },
+          {
+            label: 'Gross mult. [1.76x - 2.0x]',
             value: '2'
           },
           {
-            label: 'Gross mult. [2x - 3x]',
+            label: 'Gross mult. [2.01x - 2.5x]',
             value: '2.5'
           },
           {
-            label: 'Gross mult. > 3x',
+            label: 'Gross mult. [2.51x - 3.0x]',
             value: '3'
+          },
+          {
+            label: 'Gross mult. > 3.0x',
+            value: '3.5'
           }
           ],
         listaEstrategiasFilter: []

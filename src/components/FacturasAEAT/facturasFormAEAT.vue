@@ -7,7 +7,6 @@
               <!-- cabecera de formulario. Botón de busqueda y cierre de tab -->
               <q-item-section avatar>
                 <div class="row">
-                  <q-btn icon="save"  class="q-ma-xs" :color="colorBotonSave" dense @click="refresh++"/>
                   <q-btn icon="more_vert"  class="q-ma-xs" color="primary" dense>
                     <q-menu ref="menu1">
                       <q-list dense>
@@ -55,7 +54,7 @@
           default-opened
           header-class="bg-orange-1 text-grey-8"
         >
-        <facturasFormCabecera :value="recordToSubmit" :key="refresh" @hasChanges="value=>cambiaDatos(value)" @saveChanges="saveChanges" @calculartotalesfac="calculaTotalesFac"/>
+        <facturasFormCabeceraAEAT :value="recordToSubmit" :key="refresh" />
         </q-expansion-item>
         <q-separator />
         <q-expansion-item
@@ -81,7 +80,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import facturasFormCabecera from 'components/Facturas/facturasFormCabecera.vue'
+import facturasFormCabeceraAEAT from 'components/FacturasAEAT/facturasFormCabeceraAEAT.vue'
 import facturasFormLineas from 'components/Facturas/facturasFormLineas.vue'
 import { openBlobFile } from 'components/General/cordova.js'
 import sendMail from 'components/SendMail/sendMail.vue'
@@ -109,9 +108,7 @@ export default {
       valueTotales: {},
       listaOpciones: [
         { name: 'imprimir', title: 'Imprimir', icon: 'print', function: 'imprimirPreview' },
-        { name: 'duplicar', title: 'Duplicar', icon: 'file_copy', function: 'duplicar' },
         { name: 'enviarEmail', title: 'Enviar por email', icon: 'email', function: 'enviarEmail' },
-        { name: 'generarPago', title: 'Generar Pago', icon: 'brightness_5', function: 'generarPago' },
         { name: 'imprimirOneDrive', title: 'Imprimir a OneDrive', icon: 'backup', function: 'imprimirOneDrive' }
       ]
     }
@@ -122,13 +119,11 @@ export default {
     ...mapState('entidades', ['entidadSelf', 'entidadAsesor'])
   },
   methods: {
-    cambiaDatos (record) {
-      this.hasChanges = record.hasChanges
-      this.colorBotonSave = record.colorBotonSave
-    },
-    getRecord () {
+    
+    /*getRecord () {
       this.$axios.get(`facturas/bd_facturas.php/findFacturasFilter/${this.value.id}`, { params: { id: this.value.id } })
         .then(response => {
+          console.log('record', response.data[0])
           Object.assign(this.recordToSubmit, response.data[0])
           Object.assign(this.valueTotales, response.data[0])
           setTimeout(() => { this.primeraVez = false; this.colorBotonSave = 'primary'; this.hasChanges = false }, 100) // dejo pasar un poco porque en el render se modifica el registro
@@ -138,39 +133,23 @@ export default {
           this.$q.dialog({ title: 'Error', message: error })
         })
     },
-    saveChanges (record) {
-      if (this.hasChanges) {
-        Object.assign(this.recordToSubmit, record)
-        Object.assign(this.recordToSubmit, this.valueTotales) // se pierden los valores de totales por lo que viene de cabecera
-        this.updateRecord()
-      }
+    */
+
+    /*getRecord () {
+        var objFilter = {}
+       Object.assign(objFilter, this.value) // viene de facturasMain
+
+        return this.$axios.get('facturasAEAT/bd_facturasAEAT.php/findFacturasFilter', { params: objFilter }, headerFormData)
+          .then(response => {
+            this.registrosSeleccionados = response.data
+          })
+          .catch(error => {
+            this.$q.dialog({ title: 'Error', message: error })
+          })
     },
-    updateRecord () {
-      return this.$axios.post(`facturas/bd_facturas.php/findFacturasFilter/${this.recordToSubmit.id}`, this.recordToSubmit)
-        .then(response => {
-          return this.$axios.post(`facturas/bd_facturas.php/findFacturasFilter/${this.recordToSubmit.id}`, this.recordToSubmit)
-            .then(response=> {
-              this.colorBotonSave = 'primary'
-              this.hasChanges = false
-              this.$q.notify('Se ha actualizado registro')
-              this.valueTotales = {} // inicializamos estado
-            })
-        })
-        .catch(error => {
-          this.$q.dialog({ title: 'Error', message: error })
-        })
-    },
-    calculaTotalesFac (totales) { // cuando se guardan cambios en una linea de detalle
-      if (this.recordToSubmit.por_retencion === '' || this.recordToSubmit.por_retencion === null) this.recordToSubmit.por_retencion = '0'
-      if (!totales.por_retencion) totales.por_retencion = this.recordToSubmit.por_retencion
-      totales.base = Math.round(parseFloat(totales.base) * 100.0) / 100
-      totales.totalIva = Math.round(parseFloat(totales.totalIva) * 100.0) / 100
-      totales.retencion = Math.round(parseFloat(totales.base) * (parseFloat(totales.por_retencion) / 100.0) * 100.0) / 100
-      totales.totalFactura = Math.round((parseFloat(totales.base) + parseFloat(totales.totalIva) - parseFloat(totales.retencion)) * 100.0) / 100
-      Object.assign(this.valueTotales, totales) // para que no se pierdan los valores en el saveChanges
-      Object.assign(this.recordToSubmit, totales)
-      this.refresh++ // refresca datos cabecera
-    },
+    */
+    
+    
     // funciones de menu de factura
     ejecutarOpcion (opcion) {
       this[opcion.function](this.value)
@@ -179,21 +158,7 @@ export default {
     imprimirPreview (selected) {
       this.imprimir(selected, 0)
     },
-    imprimirOneDrive (selected) {
-      // var strUrl = 'facturas/pdf_invoice.php/'
-      // newPostWindow(strUrl, 'id', selected.id, 'aDisco', 1, '', '')
-      this.imprimir(selected, 2) // da mas control que la version newPostWindow
-        .then(result => {
-          var strUrl = 'https://vidawm.com' + result.data.success
-          if (window.cordova === undefined) { // desktop
-            openURL(strUrl)
-          } else { // estamos en un disp movil
-            window.cordova.InAppBrowser.open(strUrl, '_system') // openURL
-          }
-          this.getRecord()
-        })
-        .catch(error => console.log(error))
-    },
+    
     imprimir (selected, aDisco) { // aDisco: 0 -> preview; aDisco: 2 -> imprime en onedrive
       return new Promise((resolve, reject) => {
         var paramRecord = {
@@ -228,15 +193,7 @@ export default {
           })
       })
     },
-    duplicar (selected) {
-      this.$axios.get('facturas/bd_facturas.php/copiarFactura', { params: { id: selected.id } })
-        .then(response => {
-          this.$q.notify('Factura copiada')
-        })
-        .catch(error => {
-          this.$q.dialog({ title: 'Error', message: error })
-        })
-    },
+    
     enviarEmail (selected) {
       this.recordSendMail = {
         destino: (selected.emailEntidad === '' ? this.entidadSelf.email : selected.emailEntidad),
@@ -248,21 +205,12 @@ export default {
         url: 'onedrive/downloadFactura.php?empresa=' + this.user.nomEmpresa + '&nombrePDF=' + selected.archivoDrive + '&carpeta=' + selected.carpeta
       }
       this.visibleSendMail = true
-    },
-    generarPago (selected) {
-      this.$axios.get('facturas/bd_facturas.php/generarPagoCobroFactura', { params: { id: selected.id } })
-        .then(response => {
-          this.$q.dialog({ title: 'Confirmar', message: 'Se ha generado movimiento' })
-          this.$emit('getCounters')
-        })
-        .catch(error => {
-          this.$q.dialog({ title: 'Error', message: error })
-        })
     }
   },
   mounted () {
     Object.assign(this.value, this.tabs[this.id].meta.value)
-    this.getRecord()
+    //this.getRecord()
+    console.log('value', this.value)
   },
   unmounted () {
     if (!this.primeraVez && this.hasChanges) {
@@ -271,7 +219,7 @@ export default {
     }
   },
   components: {
-    facturasFormCabecera: facturasFormCabecera,
+    facturasFormCabeceraAEAT: facturasFormCabeceraAEAT,
     facturasFormLineas: facturasFormLineas,
     sendMail: sendMail
   }

@@ -22,6 +22,7 @@ const state = {
   listaTiposFactura: [],
   listaTipoFacturaEmitida: [],
   listaTipoRectificativa: [],
+  listaRegistro: [],
   listaEstadosFactura: [],
   listaTipoEntidad: [],
   listaEmpresas: [],
@@ -98,6 +99,9 @@ const mutations = {
   },
   loadTipoRectificativa (state, lista) {
     state.listaTipoRectificativa = lista
+  },
+  loadlistaRegistro (state, lista) {
+    state.listaRegistro = lista
   }
 }
 // actions: accesibles desde componentes a traves de ...mapActions('tablaAux', ['loadTablasAux'])
@@ -120,7 +124,7 @@ const actions = {
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 16, mutation: 'loadDivisasPortfolio' })
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 17, mutation: 'loadTipoFacturaEmitida' })
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 18, mutation: 'loadTipoRectificativa' })
-
+    this.dispatch('tablasAux/loadTablaAux', { codTabla: 19, mutation: 'loadlistaRegistro' })
 
     this.dispatch('tablasAux/loadUsers')
     this.dispatch('tablasAux/loadListaMeses')

@@ -342,7 +342,6 @@ export default {
       
       //CAPITAL AL RISK: Capital desembolsado - Distribuciones + Próximos desembolsos, ES DECIR: Total capital comprometido - Distribuciones acum.
       // mini bucle para recorrer de nuevo las distribuciones y que se calcule el capital al risk, ya tenemos el total comprometido en acumComprom
-      console.log('total desembolsado', acumComprom)
       numEjer=0
       acumDistrib=0
       var distribucionRow=0

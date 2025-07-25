@@ -52,10 +52,12 @@
         outlined
         clearable
         v-model="filterR.estadoFactura"
+        multiple
         :options="listaEstadosFactura"
         option-value="codElemento"
         option-label="codElemento"
         emit-value
+        use-chips
       />
       <q-select
         outlined

@@ -147,6 +147,7 @@ export default {
       }
     },
     updateRecord () {
+      console.log('record save', this.recordToSubmit)
       return this.$axios.post(`facturas/bd_facturas.php/findFacturasFilter/${this.recordToSubmit.id}`, this.recordToSubmit)
         .then(response => {
           return this.$axios.post(`facturas/bd_facturas.php/findFacturasFilter/${this.recordToSubmit.id}`, this.recordToSubmit)
@@ -160,6 +161,7 @@ export default {
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })
         })
+
     },
     calculaTotalesFac (totales) { // cuando se guardan cambios en una linea de detalle
       if (this.recordToSubmit.por_retencion === '' || this.recordToSubmit.por_retencion === null) this.recordToSubmit.por_retencion = '0'

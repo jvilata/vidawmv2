@@ -241,7 +241,6 @@
       getRecords (filter) { //filter es lo que recojo de modelValue
         // hago la busqueda de registros segun condiciones del formulario Filter que ha lanzado el evento getRecords
         var objFilter = Object.assign({}, filter)
-        //console.log('objF', objFilter) //plan =='above' // plan =='below'
         
         // objFilter.estadoActivo = (objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
         return this.$axios.get('activos/bd_portfolio_companies.php/findPortfolioCompaniesFilter', { params: objFilter })

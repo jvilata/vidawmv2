@@ -6,11 +6,11 @@
     </q-card-section>
 
     <q-form @submit="getRecords" class="q-gutter-y-xs">
-      <q-input outlined clearable label="Nro Factura" stack-label v-model="filterR.nroFactura" />
+      <q-input outlined clearable label="Nro Factura" stack-label v-model="filterR.NumSerieFactura" />
       <q-select
         outlined
         clearable
-        label="Cliente/Prov."
+        label="Cliente"
         stack-label
         v-model="filterR.idCliente"
         :options="listaEntidadesFilter"
@@ -24,25 +24,9 @@
         fill-input
         input-debounce="0"
       />
-      <q-input outlined clearable label="Fecha Desde" stack-label v-model="filterR.fechainicial" type="date" />
-      <q-input outlined clearable label="Fecha Hasta" stack-label v-model="filterR.fechafinal" type="date" />
-     <q-select
-        outlined
-        clearable
-        label="Activo"
-        stack-label
-        v-model="filterR.idActivo"
-        :options="listaActivosFilter"
-        option-value="id"
-        option-label="nombre"
-        emit-value
-        map-options
-        @filter="filterActivos"
-        use-input
-        hide-selected
-        fill-input
-        input-debounce="0"
-      />
+      <q-input outlined clearable label="Fecha Exp. Desde" stack-label v-model="filterR.fechainicial" type="date" />
+      <q-input outlined clearable label="Fecha Exp. Hasta" stack-label v-model="filterR.fechafinal" type="date" />
+     
       <q-input outlined label="Tipo Factura: EMITIDA" readonly/>
       <q-input outlined label="Estado Factura: ENVIADA AEAT" readonly/>
       <q-card-actions align="right">
