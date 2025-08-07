@@ -13,10 +13,41 @@
           option-label="codElemento"
           emit-value
         />
-        <q-input class="col-xs-4 col-sm-2" outlined label="Nro Factura" stack-label v-model="recordToSubmit.nroFactura" />
+        <q-select
+          v-if="recordToSubmit.tipoFactura == 'EMITIDA'"
+          class="col-xs-12 col-sm-2"
+          outlined
+          label="Tipo Registro"
+          stack-label
+          v-model="recordToSubmit.tipoRegistroEmitida"
+          :options="listaRegistro"
+          option-value="codElemento"
+          option-label="valor1"
+          map-options
+          emit-value
+        />
+        <q-input v-if="((recordToSubmit.tipoFactura !== 'EMITIDA') || (recordToSubmit.tipoFactura == 'EMITIDA' && recordToSubmit.tipoRegistroEmitida !== 'RegistroAnulacion'))" class="col-xs-4 col-sm-1" outlined label="Nro Factura" stack-label v-model="recordToSubmit.nroFactura" />
+        <q-select
+          v-if="recordToSubmit.tipoFactura == 'EMITIDA' && recordToSubmit.tipoRegistroEmitida !== 'RegistroAlta'"
+          class="col-xs-12 col-sm-2"
+          outlined
+          label="Nro Factura Anular"
+          stack-label
+          v-model="recordToSubmit.nroFactura"
+          :options="listaFactEmitidasFilter"
+          option-value="nroFactura"
+          option-label="nroFactura"
+          emit-value
+          map-options
+          @filter="filterFactEmitidas"
+          use-input
+          hide-selected
+          fill-input
+          input-debounce="0"
+        />
         <q-select
           v-if="(recordToSubmit.EmitidaPorTerceroODestinatario === 'Tercero' || recordToSubmit.EmitidaPorTerceroODestinatario === 'T')"
-          class="col-xs-8 col-sm-3"
+          class="col-xs-8 col-sm-2"
           :style="nifSelectStyle" 
           outlined
           label="Cliente / Proveedor."
@@ -36,7 +67,7 @@
         />
         <q-select
           v-else 
-          class="col-xs-8 col-sm-5"
+          class="col-xs-8 col-sm-4"
           :style="nifSelectStyle"
           outlined
           label="Cliente / Proveedor."
@@ -75,7 +106,7 @@
           </template>
         </q-input>
         <q-select
-          v-if="recordToSubmit.tipoFactura == 'EMITIDA'"
+          v-if="recordToSubmit.tipoFactura == 'EMITIDA' && recordToSubmit.tipoRegistroEmitida !== 'RegistroAnulacion'"
           class="col-xs-12 col-sm-1"
           outlined
           label="Emisor:"
@@ -103,7 +134,7 @@
           input-debounce="0"
         />
         <q-select
-          v-if="recordToSubmit.tipoFactura == 'EMITIDA'"
+          v-if="recordToSubmit.tipoFactura == 'EMITIDA' && recordToSubmit.tipoRegistroEmitida !== 'RegistroAnulacion'"
           class="col-xs-12 col-sm-2"
           outlined
           label="Factura Emitida"
@@ -128,7 +159,7 @@
           v-if="recordToSubmit.tipoFactura == 'EMITIDA' && recordToSubmit.tipoFacturaEmitida !== 'F1'"
           class="col-xs-12 col-sm-2"
           outlined
-          label="Nro Fact Rectificativa."
+          label="Nro Fact Rectificativa"
           stack-label
           v-model="recordToSubmit.Rect_NumSerieFactura"
           :options="listaFactEmitidasFilter"
@@ -142,9 +173,10 @@
           fill-input
           input-debounce="0"
         />
-        <q-input class="col-xs-10 col-sm-3" outlined stack-label v-model="recordToSubmit.archivoDrive" label="Archivo Drive"/>
-        <q-btn @click="abrirURL" class="col-xs-2 col-sm-1 bg-primary text-white" dense icon="open_in_browser"/>
+        <q-input v-if= "recordToSubmit.tipoRegistroEmitida !== 'RegistroAnulacion'" class="col-xs-10 col-sm-4" outlined stack-label v-model="recordToSubmit.archivoDrive" label="Archivo Drive"/>
+        <q-btn v-if= "recordToSubmit.tipoRegistroEmitida !== 'RegistroAnulacion'" @click="abrirURL" class="col-xs-2 col-sm-1 bg-primary text-white" dense icon="open_in_browser"/>
         <q-select
+          
           class="col-xs-5 col-sm-2"
           label="Estado Factura"
           stack-label
@@ -155,22 +187,9 @@
           option-label="codElemento"
           emit-value
         />
-        <q-input class="col-xs-7 col-sm-2" outlined stack-label v-model="recordToSubmit.carpeta" label="Carpeta Drive"/>
-        <q-select
-          v-if="recordToSubmit.tipoFactura == 'EMITIDA'"
-          class="col-xs-12 col-sm-2"
-          outlined
-          label="Tipo Registro"
-          stack-label
-          v-model="recordToSubmit.tipoRegistroEmitida"
-          :options="listaRegistro"
-          option-value="codElemento"
-          option-label="valor1"
-          map-options
-          emit-value
-        />
+        <q-input v-if= "recordToSubmit.tipoRegistroEmitida !== 'RegistroAnulacion'" class="col-xs-7 col-sm-3" outlined stack-label v-model="recordToSubmit.carpeta" label="Carpeta Drive"/>
       </div>
-      <div class="row">
+      <div v-if= "recordToSubmit.tipoRegistroEmitida !== 'RegistroAnulacion'" class="row">
         <q-input class="col-xs-6 col-sm-3" outlined readonly stack-label v-model="recordToSubmit.base" label="Base"/>
         <q-input class="col-xs-2 col-sm-2" outlined stack-label v-model="recordToSubmit.por_retencion" label="%Retención" @blur="$emit('calculartotalesfac', recordToSubmit)"/>
         <q-input class="col-xs-4 col-sm-2" outlined readonly stack-label v-model="recordToSubmit.retencion" label="Retención"/>

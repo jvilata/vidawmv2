@@ -92,8 +92,19 @@
             :key="col.name"
             :props="props"
           >
+            <q-popup-proxy v-if="col.name == 'estadoFactura'">
+              <q-icon name="info" class="cursor-pointer text-primary" />
+              <q-card class="q-pa-md" style="max-width: 300px">
+                <div class="text-subtitle2">Estados de Facturas EMITIDAS</div>
+                <div>1. PENDIENTE <br>
+                  2. GENERADA AEAT: Una vez ya se ha enviado a la AEAT, pero ha dado un error parcial <br>
+                  3. ENVIADA AEAT: aceptada sin errores por la AEAT <br>
+                  4. ENVIADA: Enviada a contabilidad <br>
+                  No podrán enviarse a contabilidad las facturas EMITIDAS si no se han enviado primero a la AEAT</div>
+              </q-card>
+            </q-popup-proxy>
             {{ col.label }}
-            <q-tooltip v-if="col.tooltip"> {{ col.tooltip }} </q-tooltip>
+            
           </q-th>
         </q-tr>
       </template>
@@ -259,7 +270,7 @@ export default {
           format: val => (val > 0 ? 'SI' : '')
         },
         { name: 'tipoFactura', align: 'right', label: 'Tipo', field: 'tipoFactura', sortable: true },
-        { name: 'estadoFactura', align: 'left', label: 'Estado Factura', tooltip:'Estados de Facturas Emitidas: PENDIENTE , GENERADA AEAT , ENVIADA AEAT // Las facturas estarán ENVIADAS, cuando se hayan enviado a contabilidad', field: 'estadoFactura', sortable: true },
+        { name: 'estadoFactura', align: 'left', label: 'Estado Factura', field: 'estadoFactura', sortable: true },
         { name: 'archivoDrive', align: 'left', label: 'archivoDrive', field: 'archivoDrive', sortable: true, style: 'width: 130px; whiteSpace: normal' },
         { name: 'id', label: 'Id', align: 'left', field: 'id', sortable: true },
         { name: 'idCliente', align: 'left', label: 'idEntidad', field: 'idCliente', sortable: true },
