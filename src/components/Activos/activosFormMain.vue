@@ -33,6 +33,9 @@
               <q-badge v-if="tab.link.name==='activosAccionesGrid' && numAcciones>0" color="red" text-color="white" floating >
               {{ numAcciones }}
               </q-badge>
+              <q-badge v-if="tab.link.name==='activosPortfolioCompanies' && numPortfolioComp>0" color="red" text-color="white" floating >
+              {{ numPortfolioComp }}
+              </q-badge>
             </q-route-tab>
           </q-tabs>
   </div>
@@ -53,6 +56,7 @@ export default {
       numDoc: 0,
       numFacturas: 0,
       numAcciones: 0,
+      numPortfolioComp: 0,
       menuItems: [
         {
           title: 'General',
@@ -113,6 +117,7 @@ export default {
       this.getNumClas()
       this.getFacturas()
       this.getAcciones()
+      this.getPortfolioCompanies()
     },
     getNumRentab () {
       var objFilter = { idActivo: this.value.id }
@@ -174,6 +179,40 @@ export default {
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })
         })
+    },
+    getPortfolioCompanies () {
+      // hago la busqueda de registros segun condiciones del formulario Filter que ha lanzado el evento getRecords
+      
+      //quiero recuperar track record:
+      var objFilter1 = { 
+          idActivo: this.value.id, //quito idEstrategia
+      }
+      
+      return this.$axios.get('activos/bd_portfolio_companies.php/findActTrackRecord', { params: objFilter1 })
+        .then(response => {
+          //recuperamos id track record 
+          if (response.data.length > 0) { 
+            var objCopy = Object.assign({}, response.data[0])
+           
+            var objFilter = {
+              idAct_trackrecord: objCopy.id, //en id se almacena el id track record (varias filas)
+              idEstrategia: objCopy.idEstrategia,
+              fundName: objCopy.fundName
+            }
+
+            return this.$axios.get('activos/bd_portfolio_companies.php/findPortfolioCompaniesFilter', { params: objFilter })
+              .then(response => {
+                this.numPortfolioComp = (response.data.length)
+              })
+              .catch(error => {
+                this.$q.dialog({ title: 'Error', message: error })
+              })
+          }
+        })
+        .catch(error => {
+          this.$q.dialog({ title: 'Error', message: error })
+        })  
+        
     }
   },
   mounted () {

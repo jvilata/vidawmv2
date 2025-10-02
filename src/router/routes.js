@@ -21,6 +21,12 @@ const routes = [
           { path: 'Pagos', name: 'Pagos', component: () => import('components/Movimientos/pagosMain.vue'), props: true },
           { path: 'Activos', name: 'Activos', component: () => import('components/Activos/activosMain.vue'), props: true },
           {
+            path: 'calendarioMain',
+            name: 'calendarioMain',
+            component: () => import('components/Calendario/calendarioMain.vue'),
+            props: true
+          },
+          {
             path: 'ActivosFormMain/:id',
             name: 'activosFormMain',
             component: () => import('components/Activos/activosFormMain.vue'),

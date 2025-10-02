@@ -190,6 +190,7 @@ export default {
       for (var key in record) {
         formData.append(key, record[key])
       }
+
       return this.$axios.post('activos/bd_activos.php/guardarBD', formData, headerFormData)
         .then(response => {
           record.id = response.data.id

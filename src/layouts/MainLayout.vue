@@ -180,32 +180,15 @@ export default {
             label: 'Facturas ENVIADAS AEAT'
           }
         },
-        {
-          title: 'Pagos',
-          rol: '1',
-          icon: 'payments',
+      /*  {
+          title: 'Planificación Cartera',
+          icon: 'today',
           link: {
-            name: 'Pagos',
-            label: 'Pagos'
+            name: 'calendarioMain',
+            label: 'Calendario'
           }
         },
-        {
-          title: 'Entidades',
-          rol: '0',
-          icon: 'business',
-          link: {
-            name: 'Entidades',
-            label: 'Entidades'
-          }
-        },
-        {
-          title: 'Estrategias',
-          icon: 'workspace_premium',
-          link: {
-            name: 'estrategiasMain',
-            label: 'Estrategias'
-          }
-        },
+       */ 
         {
           title: 'Portfolio Companies',
           icon: 'add_business',
@@ -249,7 +232,34 @@ export default {
             name: 'notasMain',
             label: 'Notas de Gasto'
           }
-        },/*
+        },
+        {
+          title: 'Pagos',
+          rol: '1',
+          icon: 'payments',
+          link: {
+            name: 'Pagos',
+            label: 'Pagos'
+          }
+        },
+        {
+          title: 'Entidades',
+          rol: '0',
+          icon: 'business',
+          link: {
+            name: 'Entidades',
+            label: 'Entidades'
+          }
+        },
+        {
+          title: 'Estrategias',
+          icon: 'workspace_premium',
+          link: {
+            name: 'estrategiasMain',
+            label: 'Estrategias'
+          }
+        },
+        /*
         {
           title: 'Donaciones',
           rol: '0',
@@ -300,11 +310,12 @@ export default {
     ...mapState('login', ['user']),
     menuItemsFilter () {
       var arr = []
-      //console.log(this.tmpUser, this,this.menuItems)
+
+
       this.menuItems.forEach(element => {
-        if ((this.tmpUser.pers.userRol === '2' && element.title === 'Fichajes') || // solo fichaje
-          (this.tmpUser.pers.userRol === '1') || // admin
-          (this.tmpUser.pers.userRol === '0' && element.rol === '0')) {
+        if ((this.tmpUser.pers.userRol == '2' && element.title == 'Fichajes') || // solo fichaje
+          (this.tmpUser.pers.userRol == '1') || // admin
+          (this.tmpUser.pers.userRol == '0' && element.rol == '0')) {
           arr.push(element)
         }
       })

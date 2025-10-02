@@ -70,7 +70,7 @@
           <q-tr :props="props" :key="`m_${props.row.id}`" @mouseover="rowId=`m_${props.row.id}`">
             <q-td>
               <!-- columna de acciones: editar, borrar, etc -->
-              <div v-if="props.row.contestacionAEAT !== 'OK'" style="width: 40px" >
+              <div v-if="props.row.contestacionAEAT" style="width: 40px" >
               <!--edit icon . Decomentamos si necesitamos accion especifica de edicion -->
             <!--  <q-btn flat v-if="rowId===`m_${props.row.id}`"
                 @click.stop="editRecord(props.row, props.row.id)"
@@ -173,6 +173,26 @@
         return this.$axios.get('facturasAEAT/bd_facturasAEAT.php/findFacturasFilter', { params: objFilter }, headerFormData)
           .then(response => {
             this.registrosSeleccionados = response.data
+            
+            if (this.registrosSeleccionados.length > 0) {
+              console.log('aqui',this.registrosSeleccionados)
+              this.registrosSeleccionados.forEach(element => {
+                if (element.contestacionAEAT !== null){
+                  let str = element.contestacionAEAT
+                  // parseamos a objeto
+                  try{
+                    let obj = JSON.parse(str)
+                    element.contestacionAEAT = obj.textoValidacion
+                  }catch(err) {
+                    this.$q.dialog({ title: 'Error'})
+                  }
+                  
+                  
+                }
+              })
+            }
+
+
           })
           .catch(error => {
             this.$q.dialog({ title: 'Error', message: error })

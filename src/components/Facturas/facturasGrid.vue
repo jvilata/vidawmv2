@@ -310,7 +310,9 @@ export default {
 
       objFilter.estadoFactura = (objFilter.estadoFactura && objFilter.estadoFactura !== null ? objFilter.estadoFactura.join() : null) // paso de array a concatenacion de strings (join)
 
-      return this.$axios.get('facturas/bd_facturas.php/findFacturasFilter', { params: objFilter }, headerFormData)
+     
+
+      return this.$axios.get('facturas/bd_facturas.php/findFacturasFilter', { params: objFilter })
         .then(response => {
           this.registrosSeleccionados = response.data
         })
@@ -423,7 +425,7 @@ export default {
         })
     },
     enviarEmail (selected) {
-      if(selected.estadoFactura == "ENVIADA AEAT") {
+      if(selected.estadoFactura == "ENVIADA AEAT" || selected.estadoFactura == "GENERADA AEAT") {
         this.recordSendMail = {
         destino: (selected.emailEntidad === '' ? this.entidadSelf.email : selected.emailEntidad),
         destinoCopia: this.entidadSelf.email, // jvilata@
@@ -447,7 +449,7 @@ export default {
     },
     enviarAEAT (selected) {
      
-      //Enviar a la agencia tributaria --> URL PRUEBAS
+      //Enviar a la agencia tributaria
       
 
       //SI respuesta AEAT OK: llamo a metodo copiarFacturasAEAT que me almacena en tabla facturasaeat y me cambia el estadoFactura a ENVIADA AEAT
@@ -500,7 +502,8 @@ export default {
                     .then(response => {
                       
                       
-                      this.$q.dialog({ title: 'Response', message: JSON.stringify(response.data) })
+                      this.$q.dialog({ title: 'Response', message: JSON.stringify(response.data.textoValidacion) })
+                      
                       formData.append("respAEAT", JSON.stringify(response.data))
                       //almacenamos respuesta AEAT en cab_facturas
 
@@ -518,7 +521,7 @@ export default {
 
                     })
                     .catch(error => {
-                        console.log('response', error)
+                       
                         this.$q.dialog({ title: 'Error', message: error })
                     })      
               
@@ -526,7 +529,7 @@ export default {
         })
         .catch(error => {
           
-          console.log('por aqui', error)
+          
           this.$q.dialog({ title: 'Error', message: error })
         })
       
@@ -564,7 +567,6 @@ export default {
           enviadoAEAT = true
           this.enviarAEAT(element)
         }else if (((element.tipoFactura == "EMITIDA" && (element.estadoFactura == "ENVIADA AEAT" || (element.estadoFactura == "GENERADA AEAT"))) || (element.tipoFactura == "RECIBIDA" && element.estadoFactura == "PENDIENTE") )) {
-          console.log('hay alguna factura recibida, o emitida y enviada')
           enviadoAEAT = true
         }
       })

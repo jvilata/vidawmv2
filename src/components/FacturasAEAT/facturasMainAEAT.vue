@@ -15,6 +15,28 @@
             <small>{{ Object.keys(filterRecord).length > 1 ? filterRecord : 'Pulse para definir filtro' }}</small>
           </q-item-label>
         </q-item-section>
+        <q-item-section side >
+          
+          <q-btn  
+            @click.stop="openForm()"  
+            icon-right="help"
+            label="Declaración Responsable"
+          />
+
+          <q-btn flat no-caps @click.stop="openForm()">              
+            <div class="q-mr-sm">
+              Nombre: SIF VIDAWM |
+            </div>
+            <div class="q-mr-sm" >
+              Código identificador: AA |
+            </div>
+            <div >
+              Versión: 1
+            </div>
+          </q-btn>
+          
+        </q-item-section>
+        
         <q-item-section side>
           <q-btn
           @click="$emit('close')"
@@ -45,6 +67,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import { openURL } from 'quasar'
 import facturasFilterAEAT from 'components/FacturasAEAT/facturasFilterAEAT.vue'
 import facturasGridAEAT from 'components/FacturasAEAT/facturasGridAEAT.vue'
 export default {
@@ -72,6 +95,16 @@ export default {
       Object.assign(this.filterRecord, filter)
       this.refreshKey++
       this.expanded = false
+    },
+    openForm () {
+      
+        var strUrl = 'https://vidawm.com/sif-vidawm/'
+        if (window.cordova === undefined) { // desktop
+          openURL(strUrl)
+        } else { // estamos en un disp movil
+          window.cordova.InAppBrowser.open(strUrl, '_system') // openURL
+        }
+      
     }
   },
   mounted () {

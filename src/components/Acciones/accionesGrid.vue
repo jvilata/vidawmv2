@@ -184,6 +184,7 @@ import { mapState, mapActions } from 'vuex'
 import { date } from 'quasar'
 import wgDate from 'components/General/wgDate.vue'
 import { newPostWindow } from 'components/General/libGeneral.js'
+import { headerFormData, axiosInstance } from 'boot/axios.js'
 export default {
   props: ['modelValue', 'idActivo', 'idEntidad'], // en 'value' tenemos el filtro, en idActivo en caso de que vengamos de ActivosFormMain
   data () {
@@ -299,7 +300,9 @@ export default {
       })
     },
     generarAccion (record) {
-      if (record.tipoAccion === 'FACTURAR') this.generarFactura(record)
+      
+
+      if (record.tipoAccion === 'FACTURAR') this.generarFactura(record)     
       else if (record.tipoAccion === 'LIQUIDAR') this.generarLiquidacion(record)
       else if (record.tipoAccion === 'G.NOMINAS') this.generarNominas(record)
       else this.$q.dialog({ title: 'Aviso', message: record.tipoAccion })

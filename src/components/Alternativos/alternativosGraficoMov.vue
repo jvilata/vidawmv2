@@ -106,23 +106,23 @@ export default {
         type: 'column',
         data: []
       }
-      var objVentas = {
+      var objVentasCobros = {
         name: 'DISTRIBUCIONES',
         type: 'column',
         data: []
       }
       this.series.push(objValor)
       this.series.push(objCompras)
-      this.series.push(objVentas)
+      this.series.push(objVentasCobros)
       var valAnt = 0.0
       this.registrosProyeccionAlternativos.forEach(row => {
         row.valoracion = parseFloat(row.valoracion)
         if (row.valoracion === 0) row.valoracion = valAnt
         row.comprometido = parseFloat(row.comprometido) + parseFloat(row.compra)
-        row.distribucion = parseFloat(row.distribucion) + parseFloat(row.venta)
+        row.distribucion = parseFloat(row.distribucion) + parseFloat(row.venta) + parseFloat(row.cobro)
         objValor.data.push(row.valoracion)
         objCompras.data.push(-row.comprometido)
-        objVentas.data.push(row.distribucion)
+        objVentasCobros.data.push(row.distribucion)
         valAnt = row.valoracion
       })
     }

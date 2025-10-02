@@ -113,6 +113,13 @@
             v-model="recordToSubmit.iban" 
             label="IBAN"/>
         </div>
+        <div class="row q-mb-sm" v-if="recordToSubmit.tipoActivo ==='RENTA VBLE'"  >
+          <q-input 
+          class="col-xs-12 col-sm-12" 
+            outlined 
+            v-model="recordToSubmit.isin" 
+            label="ISIN"/>
+        </div>
         <div class="row q-mb-sm">
           <q-select
               class="col-xs-12 col-sm-6"
@@ -183,6 +190,7 @@ export default {
         estadoActivo: '',
         tipoProducto: '',
         iban: '',
+        isin: '',
         moneda: '',
         idEntidad: 0,
         computa: '',

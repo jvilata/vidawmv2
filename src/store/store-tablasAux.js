@@ -16,6 +16,7 @@ const state = {
   listaTiposProducto: [],
   listaGeografias: [],
   listaSectores: [],
+  listaSubSectores: [],
   listaResumenTiposProducto: [],
   listaEstadosActivo: [],
   listaTipoOPeracion: [],
@@ -63,6 +64,9 @@ const mutations = {
   },
   loadSectores (state, tiposAcc) {
     state.listaSectores = tiposAcc
+  },
+  loadSubSectores (state, tiposAcc) {
+    state.listaSubSectores = tiposAcc
   },
   loadResumenTiposProducto (state, tiposAcc) {
     state.listaResumenTiposProducto = tiposAcc
@@ -172,6 +176,19 @@ const actions = {
       })
       .catch(error => {
         this.dispatch('mensajeLog/addMensaje', 'loadSectores' + error, { root: true })
+      })
+  },
+   loadSubSectores ({ commit }, codEmpresa) {
+    axiosInstance.get(`tablaAuxiliar/bd_tablaAuxiliar.php/filterSubSectoresTabAux?codEmpresa=${codEmpresa}`, {}, { withCredentials: true })
+      .then((response) => {
+        if (response.data.length === 0) {
+          this.dispatch('mensajeLog/addMensaje', 'loadSubSectores' + 'No existen datos', { root: true })
+        } else {
+          commit('loadSubSectores', response.data)
+        }
+      })
+      .catch(error => {
+        this.dispatch('mensajeLog/addMensaje', 'loadSubSectores' + error, { root: true })
       })
   },
   loadTablaAux ({ commit }, tabAux) { // tabAux: { codTabla: x, mutation: 'mutation' }

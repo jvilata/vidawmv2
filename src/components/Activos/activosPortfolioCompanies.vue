@@ -25,13 +25,13 @@
               </q-item>
         </q-card-section>
       </q-card>
-      <q-scroll-area style="height: calc(100vh - 210px); ">
+     
         <portfolioGrid
         :value="filterRecord"
         :key="refreshKey"
         :trackRecord="trackRecord"
         />
-      </q-scroll-area>
+      
     </div>
   </template>
   
@@ -114,7 +114,7 @@
       }
     },
     mounted () {
-      //console.log('id en portfolio form, id', this.id)
+     
 
       //Object.assign(this.value, this.tabs[this.id].meta.value)
 
@@ -155,7 +155,30 @@
   }
   </script>
   
-  <style>
-  
-  </style>
+  <style lang="sass" scoped>
+.portfolio-grid-scroll
+  :deep(<inner-selector>) .activosGrid-header-table
+    min-width: 1200px
+    .q-table__top,
+    .q-table__bottom,
+    thead tr:first-child th
+      background-color: $indigo-1
+    thead tr th
+      position: sticky
+      z-index: 1
+    thead tr:first-child th
+      top: 0
+    &.q-table--loading thead tr:last-child th
+      top: 48px
+    tbody td:nth-child(1)
+      position: sticky
+      left: 0
+      z-index: 2
+      background: white
+    thead tr th:nth-child(1)
+      position: sticky
+      left: 0
+      z-index: 3
+      background-color: $indigo-1
+</style>
   
