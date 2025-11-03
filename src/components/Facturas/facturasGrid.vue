@@ -505,6 +505,9 @@ export default {
                       this.$q.dialog({ title: 'Response', message: JSON.stringify(response.data.textoValidacion) })
                       
                       formData.append("respAEAT", JSON.stringify(response.data))
+                      console.log('textoValid', JSON.stringify(response.data.textoValidacion).slice(1,-1))
+                      formData.append("estadoAEAT", JSON.stringify(response.data.textoValidacion).slice(1,-1))
+                      formData.append('idAeat', res.id)
                       //almacenamos respuesta AEAT en cab_facturas
 
                       //Si resp OK -> cambiamos estado 

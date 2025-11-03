@@ -143,7 +143,7 @@
           { name: 'id', align: 'left', label: 'id', field: 'id', sortable: true },
           { name: 'RegistroFactura', align: 'left', label: 'Registro Factura', field: 'RegistroFactura', sortable: true },
           { name: 'DestinatarioNombreRazon', align: 'left', label: 'Nombre Cliente', field: 'DestinatarioNombreRazon', sortable: true, style: 'width: 170px; whiteSpace: normal' },
-          { name: 'FechaHoraHusoGenRegistro', align: 'left', label: 'Fecha Envío AEAT', field: 'FechaHoraHusoGenRegistro', sortable: true, format: val => date.formatDate(date.extractDate(val, 'YYYY-MM-DD HH:mm:ss'), 'YYYY-MM-DD HH:mm:ss'), style: 'width: 100px;' },
+          { name: 'FechaHoraHusoGenRegistro', align: 'left', label: 'Fecha Envío AEAT', field: 'FechaHoraHusoGenRegistro', sortable: true, style: 'width: 100px;' },
           { name: 'NumSerieFactura', align: 'left', label: 'NºFactura', field: 'NumSerieFactura', sortable: true },
           { name: 'BaseImponible', align: 'left', label: 'Base', field: 'BaseImponible', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
           { name: 'CuotaTotal', align: 'left', label: 'Total Iva', field: 'CuotaTotal', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },

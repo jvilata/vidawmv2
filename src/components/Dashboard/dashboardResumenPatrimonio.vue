@@ -12,8 +12,13 @@ export default {
       chartOptionsdonut: {
         labels: [],
         legend: {
-          show: false,
-          position: 'bottom'
+          show: true,
+          position: 'bottom',
+          formatter: function (seriesName, opts) {
+             const percent = opts.w.globals.seriesPercent[opts.seriesIndex]
+             // Utilizamos numeralInstance para formatear el porcentaje
+              return seriesName + ' (' + numeralInstance(parseFloat(percent) / 100).format('0.00%') + ')'
+           }
         },
         theme: {
           palette: 'palette3'
