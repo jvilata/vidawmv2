@@ -256,6 +256,7 @@
       ...mapActions('tablasAux', ['loadGeografias', 'loadSectores', 'loadSubSectores']),
 
       getRecords (filter) { //filter es lo que recojo de modelValue
+        
         // hago la busqueda de registros segun condiciones del formulario Filter que ha lanzado el evento getRecords
         var objFilter = Object.assign({}, filter)
         

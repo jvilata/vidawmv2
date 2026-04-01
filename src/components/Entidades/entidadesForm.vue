@@ -129,7 +129,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import { axiosInstance } from 'boot/axios.js'
+import { axiosInstance, headerFormData } from 'boot/axios.js'
 import { openURL } from 'quasar'
 export default {
   props: ['id'],
@@ -183,9 +183,9 @@ export default {
   methods: {
     ...mapActions('entidades', ['loadEntidades']),
     updateRecord () {
-      return this.$axios.put(`entidades/bd_entidades.php/findEntidadesFilter/${this.recordToSubmit.id}`, this.recordToSubmit)
+      return this.$axios.put(`entidades/bd_entidades.php/findEntidadesFilter/${this.recordToSubmit.id}`, this.recordToSubmit, headerFormData)
         .then(response => {
-          return this.$axios.put(`entidades/bd_entidades.php/findEntidadesFilter/${this.recordToSubmit.id}`, this.recordToSubmit)
+          return this.$axios.put(`entidades/bd_entidades.php/findEntidadesFilter/${this.recordToSubmit.id}`, this.recordToSubmit, headerFormData)
             .then(response => {
               this.colorBotonSave = 'primary'
               this.hasChanges = false

@@ -425,7 +425,7 @@ export default {
         })
     },
     enviarEmail (selected) {
-      if(selected.estadoFactura == "ENVIADA AEAT" || selected.estadoFactura == "GENERADA AEAT") {
+      if(selected.estadoFactura == "ENVIADA AEAT" || selected.estadoFactura == "GENERADA AEAT" || (selected.tipoFactura == 'RECIBIDA' && selected.estadoFactura == "PENDIENTE")) {
         this.recordSendMail = {
         destino: (selected.emailEntidad === '' ? this.entidadSelf.email : selected.emailEntidad),
         destinoCopia: this.entidadSelf.email, // jvilata@
@@ -437,7 +437,7 @@ export default {
       }
       this.visibleSendMail = true
       }
-      if (selected.estadoFactura == "PENDIENTE") {
+      if (selected.estadoFactura == "PENDIENTE" && selected.tipoFactura == 'EMITIDA') {
         this.$q.dialog({
             title: 'ATENCIÓN',
             message: 'Antes de enviarse al destinatario, debe de enviarse a la AEAT'
@@ -505,7 +505,6 @@ export default {
                       this.$q.dialog({ title: 'Response', message: JSON.stringify(response.data.textoValidacion) })
                       
                       formData.append("respAEAT", JSON.stringify(response.data))
-                      console.log('textoValid', JSON.stringify(response.data.textoValidacion).slice(1,-1))
                       formData.append("estadoAEAT", JSON.stringify(response.data.textoValidacion).slice(1,-1))
                       formData.append('idAeat', res.id)
                       //almacenamos respuesta AEAT en cab_facturas

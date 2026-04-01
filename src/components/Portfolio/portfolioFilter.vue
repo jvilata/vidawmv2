@@ -57,6 +57,22 @@
       <q-select
         outlined
         clearable
+        label="Sub-Sector"
+        stack-label
+        v-model="filterR.subsector"
+        :options="listaSubSectores"
+        option-value="codElemento"
+        option-label="codElemento"
+        use-input
+        multiple
+        use-chips
+        emit-value
+      />
+       <q-input outlined clearable label="Fecha Desde" stack-label v-model="filterR.fechainicial" type="date" />
+      <q-input outlined clearable label="Fecha Hasta" stack-label v-model="filterR.fechafinal" type="date" />
+      <q-select
+        outlined
+        clearable
         label="Below / Above Plan"
         stack-label
         v-model="filterR.plan"
@@ -162,7 +178,7 @@
       }
     },
     computed: {
-      ...mapState('tablasAux', ['listaGeografias', 'listaSectores', 'listaSINO', 'listaUsers', 'listaTipoAcc', 'listaTiposActivo', 'listaMeses', 'listaTiposProducto', 'listaEstadosActivo', 'listaTipoOperacion']),
+      ...mapState('tablasAux', ['listaGeografias', 'listaSectores', 'listaSubSectores', 'listaSINO', 'listaUsers', 'listaTipoAcc', 'listaTiposActivo', 'listaMeses', 'listaTiposProducto', 'listaEstadosActivo', 'listaTipoOperacion']),
       ...mapState('activos', ['listaEstrategias']),
       ...mapState('login', ['user'])
     },

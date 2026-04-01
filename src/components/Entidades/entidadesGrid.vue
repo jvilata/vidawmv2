@@ -120,6 +120,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import { headerFormData } from 'boot/axios.js'
 import { date } from 'quasar'
 export default {
   props: ['value'], // en 'value' tenemos la tabla de datos del grid
@@ -154,7 +155,7 @@ export default {
       // hago la busqueda de registros segun condiciones del formulario Filter que ha lanzado el evento getRecords
       var objFilter = Object.assign({}, filter)
       // objFilter.estadoActivo = (objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
-      return this.$axios.get('entidades/bd_entidades.php/findEntidadesFilter', { params: objFilter })
+      return this.$axios.get('entidades/bd_entidades.php/findEntidadesFilter', { params: objFilter }, headerFormData )
         .then(response => {
           this.registrosSeleccionados = response.data
           this.expanded = false
@@ -171,7 +172,7 @@ export default {
         user: this.user.user.email,
         ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
       }
-      return this.$axios.post('entidades/bd_entidades.php/findEntidadesFilter', record)
+      return this.$axios.post('entidades/bd_entidades.php/findEntidadesFilter', record, headerFormData)
         .then(response => {
           record.id = response.data.id
           this.registrosSeleccionados.push(record)
@@ -189,7 +190,7 @@ export default {
         cancel: true,
         persistent: true
       }).onOk(() => {
-        return this.$axios.delete(`entidades/bd_entidades.php/findEntidadesFilter/${id}`)
+        return this.$axios.delete(`entidades/bd_entidades.php/findEntidadesFilter/${id}`, headerFormData)
           .then(response => {
             var index = this.registrosSeleccionados.findIndex(function (record) { // busco elemento del array con este id
               if (record.id === id) return true

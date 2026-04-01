@@ -181,6 +181,7 @@ export default {
       proyCompRFija: [],
       proyCompCapRiesgo: [],
       proyCompInmuebles: [],
+      proyCompInmueblesRenta: [],
       proyCompParticipacion: [],
       registrosPanelDatos: [],
       totRealCompY0: 0,
@@ -271,12 +272,12 @@ export default {
       element.comprometidototY0 += parseFloat(rfija.comprometido) // + parseFloat(rfija.compra)
       element.comprometidototY1 += parseFloat(rfija.comprometido) // + parseFloat(rfija.compra)
       if (parseInt(rfija.ejercicio) === (parseInt(ejercicioY0))) {
-        element.comprometidoY0 = parseFloat(rfija.comprometido) // + parseFloat(rfija.compra)
-        element.distribuidoY0 = parseFloat(rfija.distribucion)
+        element.comprometidoY0 += parseFloat(rfija.comprometido) // + parseFloat(rfija.compra) mv: añado += antes solo ponia =
+        element.distribuidoY0 += parseFloat(rfija.distribucion) //mv: añado += antes solo ponia =
         element.comprometidototY0 -= 0
       } else if (parseInt(rfija.ejercicio) === (parseInt(ejercicioY0) + 1)) {
-        element.comprometidoY1 = parseFloat(rfija.comprometido) //  + parseFloat(rfija.compra)
-        element.distribuidoY1 = parseFloat(rfija.distribucion)
+        element.comprometidoY1 += parseFloat(rfija.comprometido) //  + parseFloat(rfija.compra) mv: añado += antes solo ponia =
+        element.distribuidoY1 += parseFloat(rfija.distribucion) //mv: añado += antes solo ponia =
         element.comprometidototY1 -= (element.comprometidoY0)
       }
     },
@@ -290,7 +291,7 @@ export default {
       this.$axios.get('activos/bd_activos.php/cActivosInversion/', { params: obj1 })
         .then(response => {
           this.registrosSeleccionados = response.data
-          
+          //console.log('regsSelecc', this.registrosSeleccionados) //aqui ya llega a 0
           Object.assign(obj1, {
             anyoDesde: ejercicioY0,
             estadoActivo: '1,4',
@@ -308,11 +309,16 @@ export default {
                   this.$axios.get('movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: obj1 })
                     .then(response => {
                       this.proyCompInmuebles = response.data
+                      obj1.tipoActivo = 'INMUEB.RENTA'
+                      this.$axios.get('movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: obj1 })
+                        .then(response => {
+                          this.proyCompInmueblesRenta = response.data
                       obj1.tipoActivo = 'PARTICIPACION'
                       this.$axios.get('movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: obj1 })
                         .then(response => {
                           this.proyCompParticipacion = response.data
                           // PONER CODIGO AQUI -----------------
+                         // console.log('regs selecc', this.registrosSeleccionados)
                           this.registrosSeleccionados.forEach(element => {
                             element.comprometidototY0 = 0
                             element.comprometidototY1 = 0
@@ -328,6 +334,10 @@ export default {
                               })
                             } else if (element.tipoActivo === 'INM.EN CONSTR') {
                               this.proyCompInmuebles.forEach(rfija => {
+                                this.acumulaTotales(ejercicioY0, element, rfija)
+                              })
+                            } else if (element.tipoActivo === 'INMUEB.RENTA') {
+                              this.proyCompInmueblesRenta.forEach(rfija => {
                                 this.acumulaTotales(ejercicioY0, element, rfija)
                               })
                             } else if (element.tipoActivo === 'PARTICIPACION') {
@@ -347,7 +357,7 @@ export default {
                                   this.acumulaTotales(ejercicioY0, element, rfija)
                                 })
                             }
-
+                            console.log('element', element)
                             element.realcomprometidoY0 = parseFloat(element.patrimonio) + element.comprometidototY0
                             this.totRealCompY0 += element.realcomprometidoY0
                             // AQUI
@@ -417,6 +427,7 @@ export default {
 
                           // calcular totales Y
                           this.totPatrimonioY0 = 0
+                          console.log('regs 1,', this.registrosSeleccionados)
                           this.registrosSeleccionados.forEach(element => {
                             this.totPatrimonioY0 += element.patrimonioY0
                             element.realcomprometidoY1 = element.patrimonioY0 + element.comprometidototY1
@@ -488,6 +499,7 @@ export default {
                           this.registrosSeleccionados = tmp
                         })
                     })
+                    })
                 })
             })
         })
@@ -514,12 +526,20 @@ export default {
       var rtaVblePatr = ''
 
       regSelec.forEach(r => {
-        //CAJA, RTA VBLE, RTA FIJA, ALTERN.R FIJA, CAP.RIESGO, INM.EN CONSTR, INMUEB  RENTA, PARTICIPACION, PRESTAMO (NO AÑADIMOS NI DEUDA NI DIVIDENDO)
+        //CAJA, RTA VBLE, RTA FIJA, ALTERN.R FIJA, CAP.RIESGO, INM.EN CONSTR, INMUEB.RENTA, PARTICIPACION, PRESTAMO (NO AÑADIMOS NI DEUDA NI DIVIDENDO)
         //serie: 'activosLiquidos'
-        if (r.tipoActivo === 'ALTERN.R FIJA') this.liquidez[1].valor += parseFloat(r.patrimonio)
+        if (r.tipoActivo === 'ALTERN.R FIJA') {
+          
+          this.liquidez[1].valor += parseFloat(r.patrimonio)
+
+        }
         if (r.tipoActivo === 'CAP.RIESGO') this.liquidez[1].valor += parseFloat(r.patrimonio)
-        if (r.tipoActivo === 'INM.EN CONSTR') this.liquidez[1].valor += parseFloat(r.patrimonio)
-        if (r.tipoActivo === 'INMUEB  RENTA') this.liquidez[1].valor += parseFloat(r.patrimonio)
+        if (r.tipoActivo === 'INM.EN CONSTR') {
+         // console.log('inmueb', r) aqui ya llega comprometidoY0 a 0
+          this.liquidez[1].valor += parseFloat(r.patrimonio)
+
+        }
+        if (r.tipoActivo === 'INMUEB.RENTA') this.liquidez[1].valor += parseFloat(r.patrimonio)
         if (r.tipoActivo === 'PARTICIPACION') this.liquidez[1].valor += parseFloat(r.patrimonio)
         if (r.tipoActivo === 'PRESTAMO') this.liquidez[1].valor += parseFloat(r.patrimonio)
 

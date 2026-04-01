@@ -18,6 +18,7 @@ const state = {
   listaSectores: [],
   listaSubSectores: [],
   listaResumenTiposProducto: [],
+  listaFiltroPortfolio: [],
   listaEstadosActivo: [],
   listaTipoOPeracion: [],
   listaTiposFactura: [],
@@ -70,6 +71,9 @@ const mutations = {
   },
   loadResumenTiposProducto (state, tiposAcc) {
     state.listaResumenTiposProducto = tiposAcc
+  },
+  loadFiltroPortfolio (state, tiposAcc) {
+    state.listaFiltroPortfolio = tiposAcc
   },
   listaTiposFactura (state, tiposAcc) {
     state.listaTiposFactura = tiposAcc
@@ -129,6 +133,7 @@ const actions = {
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 17, mutation: 'loadTipoFacturaEmitida' })
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 18, mutation: 'loadTipoRectificativa' })
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 19, mutation: 'loadlistaRegistro' })
+    this.dispatch('tablasAux/loadTablaAux', { codTabla: 20, mutation: 'loadFiltroPortfolio' })
 
     this.dispatch('tablasAux/loadUsers')
     this.dispatch('tablasAux/loadListaMeses')

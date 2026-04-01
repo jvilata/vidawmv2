@@ -153,7 +153,7 @@ export default {
       rowId: '',
       columns: [
         { name: 'asunto', align: 'left', label: 'Asunto Documento', field: 'asunto', sortable: true, style: 'width: 300px; whiteSpace: normal' },
-        { name: 'url', align: 'left', label: 'URL', field: 'url', sortable: true, style: 'width: 300px; whiteSpace: normal' },
+        { name: 'url', align: 'left', label: 'URL', field: 'url', sortable: true, style: `min-width: 200px; max-width: 300px; white-space: normal; word-break: break-all; overflow-wrap: anywhere; `, headerStyle: 'max-width: 300px;' },
         { name: 'verDoc', align: 'left', label: 'Ver Doc.', field: 'verDoc' },
         { label: 'Tipo Obj', field: 'tipoObjeto', name: 'tipoObjeto' },
         { label: 'Id Obj.', field: 'idObjeto', name: 'idObjeto' },

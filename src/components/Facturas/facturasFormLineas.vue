@@ -146,7 +146,7 @@ export default {
     ...mapActions('tabs', ['addTab']),
     getRecords () {
       var objFilter = { idcabFactura: this.value.id }
-      return this.$axios.get('facturas/bd_facturas.php/findLinFacturasFilter', { params: objFilter })
+      return this.$axios.get('facturas/bd_facturas.php/findLinFacturasFilter', { params: objFilter }, headerFormData)
         .then(response => {
           this.registrosSeleccionados = response.data
         })
@@ -206,7 +206,11 @@ export default {
       this.$emit('calculaTotalesFac', obj)
     },
     updateRecord (recordToSubmit) {
+
+      
+
       Object.assign(recordToSubmit, { user: this.user.user.email, ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss') })
+      
       return this.$axios.put(`facturas/bd_facturas.php/findLinFacturasFilter/${recordToSubmit.id}`, recordToSubmit, headerFormData)
         .then(response => {
           return this.$axios.put(`facturas/bd_facturas.php/findLinFacturasFilter/${recordToSubmit.id}`, recordToSubmit, headerFormData)

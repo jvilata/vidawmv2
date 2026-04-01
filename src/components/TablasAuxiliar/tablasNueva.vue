@@ -36,6 +36,8 @@ export default {
       this.addTablaAux(this.record)
         .then((result) => {
           this.record.id = result.data.id
+          this.$q.dialog({ title: 'ATENCIÓN', message: 'Si añades algún registro de sector o geografía: habrá que modificar el componente portfolioGraph.vue para añadir los nuevos registros' })
+
           this.$emit('hide', this.record)
         })
         .catch(error => {

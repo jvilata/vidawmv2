@@ -158,7 +158,7 @@
             <q-input class="col-11" outlined v-model="recordToSubmit.urlinfo" label="URL Info"/>
             <q-btn @click="openWindow(recordToSubmit.urlinfo)" class="col-1 bg-primary text-white" dense icon="open_in_browser"/>
           </div>
-          <q-input class="row q-mb-sm" outlined v-model="recordToSubmit.comentarios" label="comentarios"
+          <q-input class="row q-mb-sm" outlined v-model="recordToSubmit.comentarios" label="Notas reuniones"
             type="textarea"
             counter
             @keyup.enter.stop/>
