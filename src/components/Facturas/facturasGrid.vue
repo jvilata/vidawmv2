@@ -451,8 +451,8 @@ export default {
      
       //Enviar a la agencia tributaria
       
-
       //SI respuesta AEAT OK: llamo a metodo copiarFacturasAEAT que me almacena en tabla facturasaeat y me cambia el estadoFactura a ENVIADA AEAT
+     
       this.copiarFacturasAEAT(selected)
 
       /* var formData = new FormData()
@@ -498,6 +498,8 @@ export default {
                 formData1.append('id', res.id) //aqui tengo el lastId insertado en facturasAEAT
                 formData1.append('estadoFactura', selected.estadoFactura)
             //Aqui envío a la AEAT
+        
+          
             return this.$axios.post('SIF/verifactu2.php/preparoVerifactu', formData1, headerFormData)
                     .then(response => {
                       
@@ -525,7 +527,7 @@ export default {
                     .catch(error => {
                        
                         this.$q.dialog({ title: 'Error', message: error })
-                    })      
+                    })    
               
           }
         })

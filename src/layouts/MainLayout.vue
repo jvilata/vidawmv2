@@ -198,6 +198,29 @@ export default {
           }
         },
         {
+          title: 'Renta Variable',
+          icon: 'trending_up',
+          link: {
+            name: 'rentaVariable',
+            label: 'Renta Variable'
+          }
+        },
+        {
+          title: 'Inmuebles',
+          icon: 'location_city',
+          link: {
+            name: 'inmuebles',
+            label: 'Inmuebles'
+          }
+        },
+      {
+          title: 'Pipeline - Calendario',
+          icon: 'today',
+          rol: '1',
+          link: { name: 'pipelineMain', 
+          label: 'Pipeline - Calendario' }
+        },
+        {
           title: 'Otros',
           rol: '1',
           icon: 'chat',

@@ -99,8 +99,11 @@
 
     <q-dialog v-model="mostrarDialog">
       <facturasFormLinDetalle @close="mostrarDialog=false"
+        :key="registroEditado.id"
         v-model="registroEditado"
-        @saveRecord="saveRecord"/>
+        :operacionExenta="value.operacionExenta"
+        @saveRecord="saveRecord"
+        @updateOperacionExenta="updateOperacionExenta"/>
     </q-dialog>
   </q-item>
 </template>
@@ -168,7 +171,7 @@ export default {
         user: this.user.user.email,
         ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
       }
-      return this.$axios.post('facturas/bd_facturas.php/findLinFacturasFilter/', record, headerFormData)
+      return this.$axios.post('facturas/bd_facturas.php/findLinFacturasFilter/', record)
         .then(response => {
           record.id = response.data.id
           this.registrosSeleccionados.push(record)
@@ -206,20 +209,23 @@ export default {
       this.$emit('calculaTotalesFac', obj)
     },
     updateRecord (recordToSubmit) {
-
-      
-
       Object.assign(recordToSubmit, { user: this.user.user.email, ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss') })
-      
-      return this.$axios.put(`facturas/bd_facturas.php/findLinFacturasFilter/${recordToSubmit.id}`, recordToSubmit, headerFormData)
+
+      return this.$axios.put(`facturas/bd_facturas.php/findLinFacturasFilter/${recordToSubmit.id}`, recordToSubmit)
         .then(response => {
-          return this.$axios.put(`facturas/bd_facturas.php/findLinFacturasFilter/${recordToSubmit.id}`, recordToSubmit, headerFormData)
-            .then(response => {
-              this.calcularTotalesLineas()
-            })
+          this.calcularTotalesLineas()
         })
         .catch(error => {
-          this.$q.dialog({ title: 'Error', message: error })
+          this.$q.dialog({ title: 'Error', message: error.message || error })
+        })
+    },
+    updateOperacionExenta (valor) { // valor: 'SI' / 'NO' — se guarda en cabfacturas, no en linfacturas
+      return this.$axios.post('facturas/bd_facturas.php/actualizarOperacionExenta', { id: this.value.id, operacionExenta: valor })
+        .then(response => {
+          this.$emit('operacionExentaChanged', valor) // avisa al padre para que actualice su propio dato (no mutamos el prop 'value')
+        })
+        .catch(error => {
+          this.$q.dialog({ title: 'Error', message: error.message || error })
         })
     },
     saveRecord (record) {

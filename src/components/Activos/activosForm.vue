@@ -106,6 +106,13 @@
             type="textarea"
             counter
             @keyup.enter.stop />
+        <div class="row q-mb-sm" v-if="(recordToSubmit.tipoActivo ==='INMUEB.RENTA' || recordToSubmit.tipoActivo === 'INM.EN CONSTR')"  >
+          <q-input 
+          class="col-xs-12 col-sm-12" 
+            outlined 
+            v-model="recordToSubmit.direccion" 
+            label="Dirección"/>
+        </div>
         <div class="row q-mb-sm" v-if="recordToSubmit.tipoActivo ==='CAJA'"  >
           <q-input 
           class="col-xs-12 col-sm-12" 
@@ -186,6 +193,7 @@ export default {
         nombre: '',
         carpetaDrive: '',
         descripcion: '',
+        direccion: '',
         tipoActivo: '',
         estadoActivo: '',
         tipoProducto: '',

@@ -195,7 +195,7 @@ export default {
         // { name: 'id', label: 'Id', align: 'left', field: 'id', sortable: true },
         { name: 'descripcion', align: 'left', label: 'Descripcion', field: 'descripcion', sortable: true, style: 'width: 300px; whiteSpace: normal' },
         { name: 'fechaProx', align: 'left', label: 'fechaProx', field: 'fechaProx', sortable: true, format: val => date.formatDate(date.extractDate(val, 'YYYY-MM-DD HH:mm:ss'), 'DD-MM-YYYY'), style: 'width: 70px; whiteSpace: normal'},
-        { name: 'idUserQuienProx', align: 'left', label: 'idUserQuienProx', field: 'idUserQuienProx', sortable: true, format: val => (val ? val.split(',') : null), style: 'width: 150px; whiteSpace: normal' },
+        { name: 'idUserQuienProx', align: 'left', label: 'idUserQuienProx', field: 'idUserQuienProx', sortable: true, format: val => (val ? val.split(',').join(', ') : null), style: 'width: 150px; whiteSpace: normal' },
         { name: 'tipoAccion', align: 'left', label: 'tipoAccion', field: 'tipoAccion', sortable: true },
         {
           name: 'realizada',

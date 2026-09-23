@@ -66,7 +66,7 @@
           default-opened
           header-class="bg-orange-1 text-grey-8"
         >
-          <facturasFormLineas :key="refresh" :value="recordToSubmit" @calculaTotalesFac="calculaTotalesFac"/>
+          <facturasFormLineas :key="refresh" :value="recordToSubmit" @calculaTotalesFac="calculaTotalesFac" @operacionExentaChanged="operacionExentaChanged"/>
         </q-expansion-item>
       </q-list>
 
@@ -163,6 +163,10 @@ export default {
         })
 
     },
+    operacionExentaChanged (valor) { // valor: 'SI' / 'NO' — ya se ha guardado en BD desde facturasFormLineas
+      this.recordToSubmit.operacionExenta = valor
+    },
+
     calculaTotalesFac (totales) { // cuando se guardan cambios en una linea de detalle
       if (this.recordToSubmit.por_retencion === '' || this.recordToSubmit.por_retencion === null) this.recordToSubmit.por_retencion = '0'
       if (!totales.por_retencion) totales.por_retencion = this.recordToSubmit.por_retencion

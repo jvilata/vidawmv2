@@ -12,9 +12,11 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
+    "@vue-leaflet/vue-leaflet": "^0.10.1",
     "apexcharts": "^3.37.0",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "leaflet": "^1.9.4",
     "numeral": "^2.0.6",
     "quasar": "^2.0.0",
     "sass": "^1.77.6",
@@ -23,7 +25,8 @@
     "vue-numerals": "^4.0.6",
     "vue-router": "^4.0.0",
     "vue3-apexcharts": "^1.4.1",
-    "vuex": "^4.0.1"
+    "vuex": "^4.0.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",

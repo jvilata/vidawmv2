@@ -344,47 +344,42 @@ export default {
       })
     },
     //mejora para quitar metricas de la tabla activos
+    // Cuando el usuario marca "SI" en la columna "Activo actual",
+    // se copian los datos del track record seleccionado al activo (launch, size, status, etc.)
     updateSelecc (v, row) {
-      
-      if (v === "1") row.idActivo = this.value.id
-      else row.idActivo = 0
-      /*if (v === "1") {
+      if (v === '1') {
         row.idActivo = this.value.id
-        
-        //fuerzo copiado de esa fila de track record en su activo
-        var tmp = {        
-          id: row.idActivo,
+
+        // Construir objeto con los campos a copiar al activo
+        var tmp = {
+          id:          this.value.id,   // id del activo (no del track record)
           annualyield: row.annualCashYield,
-          dpi: row.dpi,
-          grossirr: row.grossIrr,
-          grossmult: row.grossMultiple,
-          netirr: row.netIrr,
-          netmult: row.netMultiple,
-          committed: row.pCommitted,
-          targetSize: row.size,
-          status: row.status,
-          launch: row.vintage
+          dpi:         row.dpi,
+          grossirr:    row.grossIrr,
+          grossmult:   row.grossMultiple,
+          netirr:      row.netIrr,
+          netmult:     row.netMultiple,
+          committed:   row.pCommitted,
+          targetSize:  row.size,
+          status:      row.status,
+          launch:      row.vintage       // ← aquí se copia el vintage como launch
         }
 
-        
-        return this.$axios.put(`activos/bd_activos.php/guardarMetricas/${tmp.id}`, JSON.stringify(tmp))
-        .then(response => {
-
-          return this.$axios.put(`activos/bd_activos.php/guardarMetricas/${tmp.id}`, JSON.stringify(tmp))
-          .then(response => {
-            this.$q.notify('Se ha seleccionado el activo actual')
+        // Persistir en tabla activos
+        return this.$axios.put(
+          `activos/bd_activos.php/guardarMetricas/${tmp.id}`,
+          JSON.stringify(tmp)
+        )
+          .then(() => {
+            this.$q.notify({ type: 'positive', message: 'Activo actual actualizado' })
+            this.$emit('refrescar')
           })
           .catch(error => {
-            this.$q.dialog({ title: 'Error', message: error })
+            this.$q.dialog({ title: 'Error', message: error.message || error })
           })
-        
-        })
-        .catch(error => {
-          this.$q.dialog({ title: 'Error', message: error })
-        })
-      } else row.idActivo = 0
-      */
-      //this.$emit('refrescar')
+      } else {
+        row.idActivo = 0
+      }
     },
     updateRecord (record) {
       record.ts = date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')

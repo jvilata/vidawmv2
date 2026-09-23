@@ -118,6 +118,24 @@
         </div>
       </template>
 
+      <!-- SLOT CUANDO LA TABLA ESTÁ VACÍA -->
+    <template v-slot:no-data>
+      <div class="full-width row flex-center q-mb-sm text-grey-7">
+        
+        <span>No hay datos.</span>
+        
+        <q-btn
+            @click.stop="addRecord"
+            round
+            dense
+            color="primary"
+            size="20px"
+            icon="add">
+            <q-tooltip>Añadir</q-tooltip>
+          </q-btn>
+      </div>
+    </template>
+
     </q-table>
   </q-item>
 </template>
@@ -261,6 +279,7 @@ export default {
       })
     },
     generarRentab () {
+      
       this.$q.dialog({
         title: 'Confirmar',
         message: '¿ Ejercicio a generar ?',

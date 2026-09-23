@@ -138,6 +138,24 @@ const routes = [
             ]
           },
           {
+            path: 'rentaVariable',
+            name: 'rentaVariable',
+            component: () => import('src/components/Portfolio/rentaVariableMain.vue'),
+            props: true
+          },
+          {
+            path: 'inmuebles',
+            name: 'inmuebles',
+            component: () => import('src/components/Portfolio/inmueblesMain.vue'),
+            props: true
+          },
+          {
+            path: 'pipelineMain',
+            name: 'pipelineMain',
+            component: () => import('components/Pipeline/pipelineCalendarioMain.vue'),
+            props: true
+          },
+          {
             path: 'PortfolioFormMain1/:id',
             name: 'portfolioFormMain1',
             component: () => import('components/Portfolio/portfolioFormMain.vue'),
