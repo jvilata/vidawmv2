@@ -73,7 +73,7 @@
               v-else
               icon="settings"
               label="Otros" >
-              <div v-for="link in otros" :key="link.title">
+              <div v-for="link in otrosFilter" :key="link.title">
                 <q-item clickable @click="openForm(link.link)" exact>
                   <q-item-section><!--Títulos del DRAWER -->
                     <q-item-label
@@ -207,6 +207,7 @@ export default {
         },
         {
           title: 'Inmuebles',
+          rol: '0',
           icon: 'location_city',
           link: {
             name: 'inmuebles',
@@ -222,7 +223,7 @@ export default {
         },
         {
           title: 'Otros',
-          rol: '1',
+          rol: '0',
           icon: 'chat',
           link: {
             name: 'otros',
@@ -250,6 +251,7 @@ export default {
         },
         {
           title: 'Notas de Gasto',
+          rol: '0',
           icon: 'euro_symbol',
           link: {
             name: 'notasMain',
@@ -258,7 +260,7 @@ export default {
         },
         {
           title: 'Pagos',
-          rol: '1',
+          rol: '0',
           icon: 'payments',
           link: {
             name: 'Pagos',
@@ -343,6 +345,18 @@ export default {
         }
       })
       //console.log('arr', arr)
+      return arr
+    },
+
+    otrosFilter () {
+      var arr = []
+      this.otros.forEach(element => {
+        if ((this.tmpUser.pers.userRol == '2' && element.title == 'Fichajes') || // solo fichaje
+          (this.tmpUser.pers.userRol == '1') || // admin
+          (this.tmpUser.pers.userRol == '0' && element.rol == '0')) {
+          arr.push(element)
+        }
+      })
       return arr
     }
   },
