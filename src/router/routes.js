@@ -21,6 +21,12 @@ const routes = [
           { path: 'Pagos', name: 'Pagos', component: () => import('components/Movimientos/pagosMain.vue'), props: true },
           { path: 'Activos', name: 'Activos', component: () => import('components/Activos/activosMain.vue'), props: true },
           {
+            path: 'calendarioMain',
+            name: 'calendarioMain',
+            component: () => import('components/Calendario/calendarioMain.vue'),
+            props: true
+          },
+          {
             path: 'ActivosFormMain/:id',
             name: 'activosFormMain',
             component: () => import('components/Activos/activosFormMain.vue'),
@@ -35,7 +41,16 @@ const routes = [
               { path: 'facturasGrid', name: 'facturasGrid', component: () => import('components/Facturas/facturasGrid.vue'), props: true },
               { path: 'activosEvolucionValor', name: 'activosEvolucionValor', component: () => import('components/Activos/activosEvolucionValor.vue'), props: true },
               { path: 'activosAccionesGrid', name: 'activosAccionesGrid', component: () => import('components/Activos/activosAccionesGrid.vue'), props: true },
-              { path: 'activosAlterCabecera', name: 'activosAlterCabecera', component: () => import('components/Activos/activosAlterCabecera.vue'), props: true }
+              { path: 'activosAlterCabecera', name: 'activosAlterCabecera', component: () => import('components/Activos/activosAlterCabecera.vue'), props: true },
+              {
+                path: 'activosPortfolioCompanies',
+                name: 'activosPortfolioCompanies',
+                component: () => import('components/Activos/activosPortfolioCompanies.vue'),
+                props: true,
+                children: [
+                  { path: 'portfolioForm', name: 'portfolioForm', component: () => import('components/Portfolio/portfolioForm.vue'), props: true }
+                ]
+              }
             ]
           },
           { path: 'Entidades', name: 'Entidades', component: () => import('components/Entidades/entidadesMain.vue'), props: true },
@@ -54,7 +69,7 @@ const routes = [
           },
           { path: 'Facturas/:id', 
             name: 'Facturas', 
-            component: () => import('components/Facturas/FacturasMain.vue'), 
+            component: () => import('components/Facturas/facturasMain.vue'), 
             props: true,
             children: [
               { path: 'facturasMainGeneral', name: 'facturasMainGeneral', component: () => import('components/Facturas/facturasMainGeneral.vue'), props: true },
@@ -71,6 +86,20 @@ const routes = [
               { path: 'facturasGridMovimientos', name: 'facturasGridMovimientos', component: () => import('components/Movimientos/movimientosGrid.vue'), props: true }
             ]
           },
+          { path: 'FacturasAEAT', 
+            name: 'FacturasAEAT', 
+            component: () => import('components/FacturasAEAT/facturasMainAEAT.vue'), 
+            props: true
+           },
+           {
+            path: 'facturasFormMainAEAT/:id',
+            name: 'facturasFormMainAEAT',
+            component: () => import('components/FacturasAEAT/facturasFormMainAEAT.vue'),
+            props: true,
+            children: [
+              { path: 'facturasFormAEAT', name: 'facturasFormAEAT', component: () => import('components/FacturasAEAT/facturasFormAEAT.vue'), props: true }
+            ]
+          },
           { path: 'valoraciones', name: 'valoraciones', component: () => import('components/Valoraciones/valoracionesMain.vue'), props: true },
           // { path: 'alternativos', name: 'alternativos', component: () => import('components/Alternativos/alternativosMain.vue'), props: true },
           {
@@ -81,6 +110,58 @@ const routes = [
             children: [
               { path: 'alternativosMain', name: 'alternativosMain', component: () => import('components/Alternativos/alternativosMain.vue'), props: true },
               { path: 'alternativosGridComp', name: 'alternativosGridComp', component: () => import('components/Alternativos/alternativosGridComp.vue'), props: true }
+            ]
+          },
+          {
+            path: 'estrategiasMain',
+            name: 'estrategiasMain',
+            component: () => import('src/components/Estrategias/estrategiasMain.vue'),
+            props: true
+          },
+          {
+            path: 'EstrategiasFormMain/:id',
+            name: 'estrategiasFormMain',
+            component: () => import('components/Estrategias/estrategiasFormMain.vue'),
+            props: true,
+            children: [
+              { path: 'estrategiasForm', name: 'estrategiasForm', component: () => import('components/Estrategias/estrategiasForm.vue'), props: true }
+            ]
+          },
+          {
+            path: 'portfolioMain',
+            name: 'portfolioMain',
+            component: () => import('src/components/Portfolio/portfolioMain.vue'),
+            props: true,
+            children: [
+              { path: 'portfolioGrid', name: 'portfolioGrid', component: () => import('components/Portfolio/portfolioGrid.vue'), props: true },
+              { path: 'portfolioGraph', name: 'portfolioGraph', component: () => import('components/Portfolio/portfolioGraph.vue'), props: true }
+            ]
+          },
+          {
+            path: 'rentaVariable',
+            name: 'rentaVariable',
+            component: () => import('src/components/Portfolio/rentaVariableMain.vue'),
+            props: true
+          },
+          {
+            path: 'inmuebles',
+            name: 'inmuebles',
+            component: () => import('src/components/Portfolio/inmueblesMain.vue'),
+            props: true
+          },
+          {
+            path: 'pipelineMain',
+            name: 'pipelineMain',
+            component: () => import('components/Pipeline/pipelineCalendarioMain.vue'),
+            props: true
+          },
+          {
+            path: 'PortfolioFormMain1/:id',
+            name: 'portfolioFormMain1',
+            component: () => import('components/Portfolio/portfolioFormMain.vue'),
+            props: true,
+            children: [
+              { path: 'portfolioForm', name: 'portfolioForm', component: () => import('components/Portfolio/portfolioForm.vue'), props: true }
             ]
           },
           {

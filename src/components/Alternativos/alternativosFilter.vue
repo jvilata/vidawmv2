@@ -65,6 +65,21 @@
         fill-input
         input-debounce="0"
       />
+      <q-select
+        outlined
+        clearable
+        label="Cod.empresa"
+        stack-label
+        v-model="filterR.codOtraEmpresa"
+        :options="listaEmpresas"
+        option-value="codElemento"
+        option-label="valor1"
+        multiple
+        use-chips
+        emit-value
+        map-options
+      />
+
       <!--q-input outlined clearable label="Nombre" stack-label v-model="filterR.nombre" /-->
       <q-input outlined clearable label="Año Desde" stack-label v-model="filterR.anyoDesde" />
       <!-- en q-select multiple los valores estan en un array, como en nuestro caso estan en un string separados por comas
@@ -112,14 +127,15 @@ export default {
     return {
       filterR: {
         idActivo: [],
-        tipoActivo: []
+        tipoActivo: [],
+        codOtraEmpresa: []
       },
       listaEntidadesFilter: [],
       listaActivosFilter: []
     }
   },
   computed: {
-    ...mapState('tablasAux', ['listaSINO', 'listaUsers', 'listaTipoAcc', 'listaTiposActivo', 'listaMeses', 'listaTiposProducto', 'listaEstadosActivo', 'listaTipoOperacion']),
+    ...mapState('tablasAux', ['listaEmpresas', 'listaSINO', 'listaUsers', 'listaTipoAcc', 'listaTiposActivo', 'listaMeses', 'listaTiposProducto', 'listaEstadosActivo', 'listaTipoOperacion']),
     ...mapState('entidades', ['listaEntidades']),
     ...mapState('activos', ['listaActivos']),
     ...mapState('login', ['user']) // importo state.user desde store-login

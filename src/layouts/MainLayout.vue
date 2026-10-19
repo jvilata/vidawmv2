@@ -172,31 +172,53 @@ export default {
           }
         },
         {
-          title: 'Pagos',
+          title: 'Facturas - SIF AEAT',
+          rol: '0',
+          icon: 'description',
+          link: {
+            name: 'FacturasAEAT',
+            label: 'Facturas ENVIADAS AEAT'
+          }
+        },
+      /*  {
+          title: 'Planificación Cartera',
+          icon: 'today',
+          link: {
+            name: 'calendarioMain',
+            label: 'Calendario'
+          }
+        },
+       */ 
+        {
+          title: 'Portfolio Companies',
+          icon: 'add_business',
+          link: {
+            name: 'portfolioMain',
+            label: 'Portfolio Companies'
+          }
+        },
+        {
+          title: 'Renta Variable',
+          icon: 'trending_up',
+          link: {
+            name: 'rentaVariable',
+            label: 'Renta Variable'
+          }
+        },
+        {
+          title: 'Inmuebles',
+          icon: 'location_city',
+          link: {
+            name: 'inmuebles',
+            label: 'Inmuebles'
+          }
+        },
+      {
+          title: 'Pipeline - Calendario',
+          icon: 'today',
           rol: '1',
-          icon: 'payments',
-          link: {
-            name: 'Pagos',
-            label: 'Pagos'
-          }
-        },
-        {
-          title: 'Entidades',
-          rol: '0',
-          icon: 'business',
-          link: {
-            name: 'Entidades',
-            label: 'Entidades'
-          }
-        },
-        {
-          title: 'Fichajes',
-          rol: '0',
-          icon: 'credit_card',
-          link: {
-            name: 'fichajesMain',
-            label: 'Fichajes'
-          }
+          link: { name: 'pipelineMain', 
+          label: 'Pipeline - Calendario' }
         },
         {
           title: 'Otros',
@@ -233,7 +255,34 @@ export default {
             name: 'notasMain',
             label: 'Notas de Gasto'
           }
-        },/*
+        },
+        {
+          title: 'Pagos',
+          rol: '1',
+          icon: 'payments',
+          link: {
+            name: 'Pagos',
+            label: 'Pagos'
+          }
+        },
+        {
+          title: 'Entidades',
+          rol: '0',
+          icon: 'business',
+          link: {
+            name: 'Entidades',
+            label: 'Entidades'
+          }
+        },
+        {
+          title: 'Estrategias',
+          icon: 'workspace_premium',
+          link: {
+            name: 'estrategiasMain',
+            label: 'Estrategias'
+          }
+        },
+        /*
         {
           title: 'Donaciones',
           rol: '0',
@@ -267,6 +316,15 @@ export default {
             name: 'userMain',
             label: 'Usuarios'
           }
+        },
+        {
+          title: 'Fichajes',
+          rol: '0',
+          icon: 'credit_card',
+          link: {
+            name: 'fichajesMain',
+            label: 'Fichajes'
+          }
         }
       ]
     }
@@ -275,11 +333,12 @@ export default {
     ...mapState('login', ['user']),
     menuItemsFilter () {
       var arr = []
-      //console.log(this.tmpUser, this,this.menuItems)
+
+
       this.menuItems.forEach(element => {
-        if ((this.tmpUser.pers.userRol === '2' && element.title === 'Fichajes') || // solo fichaje
-          (this.tmpUser.pers.userRol === '1') || // admin
-          (this.tmpUser.pers.userRol === '0' && element.rol === '0')) {
+        if ((this.tmpUser.pers.userRol == '2' && element.title == 'Fichajes') || // solo fichaje
+          (this.tmpUser.pers.userRol == '1') || // admin
+          (this.tmpUser.pers.userRol == '0' && element.rol == '0')) {
           arr.push(element)
         }
       })

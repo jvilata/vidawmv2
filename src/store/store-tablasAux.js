@@ -10,13 +10,21 @@ const state = {
   listaUsers: [], // [{id, codEmpresa, email, username, idPersonal}]
   listaSINO: [{ id: '1', desc: 'SI' }, { id: '0', desc: 'NO' }],
   listaMonedas: [], // ['EUROS', 'DOLAR'],
+  listaDivisasPortfolio: [], //'EUR / USD, OTHER (->EUR),
   listaTipoAcc: [],
   listaTiposActivo: [],
   listaTiposProducto: [],
+  listaGeografias: [],
+  listaSectores: [],
+  listaSubSectores: [],
   listaResumenTiposProducto: [],
+  listaFiltroPortfolio: [],
   listaEstadosActivo: [],
   listaTipoOPeracion: [],
   listaTiposFactura: [],
+  listaTipoFacturaEmitida: [],
+  listaTipoRectificativa: [],
+  listaRegistro: [],
   listaEstadosFactura: [],
   listaTipoEntidad: [],
   listaEmpresas: [],
@@ -52,8 +60,20 @@ const mutations = {
   loadTiposProducto (state, tiposAcc) {
     state.listaTiposProducto = tiposAcc
   },
+  loadGeografias (state, tiposAcc) {
+    state.listaGeografias = tiposAcc
+  },
+  loadSectores (state, tiposAcc) {
+    state.listaSectores = tiposAcc
+  },
+  loadSubSectores (state, tiposAcc) {
+    state.listaSubSectores = tiposAcc
+  },
   loadResumenTiposProducto (state, tiposAcc) {
     state.listaResumenTiposProducto = tiposAcc
+  },
+  loadFiltroPortfolio (state, tiposAcc) {
+    state.listaFiltroPortfolio = tiposAcc
   },
   listaTiposFactura (state, tiposAcc) {
     state.listaTiposFactura = tiposAcc
@@ -78,6 +98,18 @@ const mutations = {
   },
   loadMonedas (state, lista) {
     state.listaMonedas = lista
+  },
+  loadDivisasPortfolio (state, lista) {
+    state.listaDivisasPortfolio = lista
+  },
+  loadTipoFacturaEmitida (state, lista) {
+    state.listaTipoFacturaEmitida = lista
+  },
+  loadTipoRectificativa (state, lista) {
+    state.listaTipoRectificativa = lista
+  },
+  loadlistaRegistro (state, lista) {
+    state.listaRegistro = lista
   }
 }
 // actions: accesibles desde componentes a traves de ...mapActions('tablaAux', ['loadTablasAux'])
@@ -97,6 +129,12 @@ const actions = {
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 13, mutation: 'loadMonedas' })
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 14, mutation: 'loadStatusAlt' })
     this.dispatch('tablasAux/loadTablaAux', { codTabla: 15, mutation: 'loadResumenTiposProducto' })
+    this.dispatch('tablasAux/loadTablaAux', { codTabla: 16, mutation: 'loadDivisasPortfolio' })
+    this.dispatch('tablasAux/loadTablaAux', { codTabla: 17, mutation: 'loadTipoFacturaEmitida' })
+    this.dispatch('tablasAux/loadTablaAux', { codTabla: 18, mutation: 'loadTipoRectificativa' })
+    this.dispatch('tablasAux/loadTablaAux', { codTabla: 19, mutation: 'loadlistaRegistro' })
+    this.dispatch('tablasAux/loadTablaAux', { codTabla: 20, mutation: 'loadFiltroPortfolio' })
+
     this.dispatch('tablasAux/loadUsers')
     this.dispatch('tablasAux/loadListaMeses')
   },
@@ -117,6 +155,45 @@ const actions = {
       })
       .catch(error => {
         this.dispatch('mensajeLog/addMensaje', 'loadUsers' + error, { root: true })
+      })
+  },
+  loadGeografias ({ commit }, codEmpresa) {
+    axiosInstance.get(`tablaAuxiliar/bd_tablaAuxiliar.php/filterGeografiasTabAux?codEmpresa=${codEmpresa}`, {}, { withCredentials: true })
+      .then((response) => {
+        if (response.data.length === 0) {
+          this.dispatch('mensajeLog/addMensaje', 'loadGeografias' + 'No existen datos', { root: true })
+        } else {
+          commit('loadGeografias', response.data)
+        }
+      })
+      .catch(error => {
+        this.dispatch('mensajeLog/addMensaje', 'loadGeografias' + error, { root: true })
+      })
+  },
+  loadSectores ({ commit }, codEmpresa) {
+    axiosInstance.get(`tablaAuxiliar/bd_tablaAuxiliar.php/filterSectoresTabAux?codEmpresa=${codEmpresa}`, {}, { withCredentials: true })
+      .then((response) => {
+        if (response.data.length === 0) {
+          this.dispatch('mensajeLog/addMensaje', 'loadSectores' + 'No existen datos', { root: true })
+        } else {
+          commit('loadSectores', response.data)
+        }
+      })
+      .catch(error => {
+        this.dispatch('mensajeLog/addMensaje', 'loadSectores' + error, { root: true })
+      })
+  },
+   loadSubSectores ({ commit }, codEmpresa) {
+    axiosInstance.get(`tablaAuxiliar/bd_tablaAuxiliar.php/filterSubSectoresTabAux?codEmpresa=${codEmpresa}`, {}, { withCredentials: true })
+      .then((response) => {
+        if (response.data.length === 0) {
+          this.dispatch('mensajeLog/addMensaje', 'loadSubSectores' + 'No existen datos', { root: true })
+        } else {
+          commit('loadSubSectores', response.data)
+        }
+      })
+      .catch(error => {
+        this.dispatch('mensajeLog/addMensaje', 'loadSubSectores' + error, { root: true })
       })
   },
   loadTablaAux ({ commit }, tabAux) { // tabAux: { codTabla: x, mutation: 'mutation' }

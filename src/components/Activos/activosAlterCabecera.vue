@@ -50,28 +50,33 @@
           <q-input class="col-xs-6 col-sm-1" @blur="updateRec" outlined suffix="%" label="Hurdle Rate" stack-label v-model="recordToSubmit.hurdleRate" />
         </div>
         <div class="row q-pt-sm">
-          <q-input class="col-xs-6 col-sm-1" @blur="updateRec" outlined label="Launch (Vintage)" stack-label v-model="recordToSubmit.launch" />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined suffix="m" label="Target Size" stack-label v-model="recordToSubmit.targetSize" />
+          <q-input class="col-xs-6 col-sm-6" readonly outlined label="Operations Team (internal name)" stack-label v-model="recordEstrategia.operationsTeam" />
+          <q-input class="col-xs-6 col-sm-3" readonly outlined label="Investing Employees" stack-label v-model="recordEstrategia.investingEmployees" />
+          <q-input class="col-xs-6 col-sm-3" readonly outlined label="Operations Employees" stack-label v-model="recordEstrategia.operatingEmployees" />
+        </div>
+        <div class="row q-pt-sm">
+          <q-input class="col-xs-6 col-sm-1" @blur="updateRec" readonly outlined label="Launch (Vintage)" stack-label v-model="recordToSubmit.launch" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined suffix="m" label="Target Size" stack-label v-model="recordToSubmit.targetSize" />
           <q-select 
             class="col-xs-3 col-sm-2" 
             @blur="updateRec" 
             outlined 
-            label="Satus" 
+            label="Status" 
             stack-label 
-            clearable 
+            readonly  
             v-model="recordToSubmit.status"
             :options="listaStatusAlt"
             option-value="codElemento"
             option-label="codElemento"
             emit-value
               />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined suffix="%" label="%Committed" stack-label v-model="recordToSubmit.committed" />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined suffix="x" label="Gross Mult." stack-label v-model="recordToSubmit.grossmult" />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined suffix="%" label="Gross IRR" stack-label v-model="recordToSubmit.grossirr" />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined suffix="x" label="Net Mult." stack-label v-model="recordToSubmit.netmult" />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined suffix="%" label="Net IRR" stack-label v-model="recordToSubmit.netirr" />
-          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" outlined label="DPI" stack-label v-model="recordToSubmit.dpi" />
-          <q-input class="col-xs-6 col-sm-2" @blur="updateRec" outlined suffix="%" label="Annual Cash Yield" stack-label v-model="recordToSubmit.annualyield" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined suffix="%" label="%Committed" stack-label v-model="recordToSubmit.committed" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined suffix="x" label="Gross Mult." stack-label v-model="recordToSubmit.grossmult" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined suffix="%" label="Gross IRR" stack-label v-model="recordToSubmit.grossirr" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined suffix="x" label="Net Mult." stack-label v-model="recordToSubmit.netmult" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined suffix="%" label="Net IRR" stack-label v-model="recordToSubmit.netirr" />
+          <q-input class="col-xs-3 col-sm-1" @blur="updateRec" readonly outlined label="DPI" stack-label v-model="recordToSubmit.dpi" />
+          <q-input class="col-xs-6 col-sm-2" @blur="updateRec" readonly outlined suffix="%" label="Annual Cash Yield" stack-label v-model="recordToSubmit.annualyield" />
         </div>
       </q-expansion-item>
       <q-expansion-item
@@ -82,23 +87,62 @@
           default-opened
           header-class="bg-orange-1 text-grey-8"
         >
-        <activosAlterLineas :key="refresh" :model-value="value"/>
+        <div class="row q-pt-sm">
+          <q-select 
+              class="col-xs-4 col-sm-2" 
+              @blur="updateRec"
+              outlined 
+              clearable
+              label="Estrategias" 
+              stack-label 
+              v-model="recordToSubmit.idEstrategia"
+              emit-value
+              :options="listaEstrategiasComp"
+              option-value="id"
+              option-label="nombre"
+              map-options
+              @filter="filterEstrategias"
+              use-input
+              hide-selected
+              fill-input
+          />
+          <div class="row q-pa-xs">
+             <q-btn 
+              outline
+              rounded
+              @click.stop="addRecords"
+              label="Añadir"
+              color="primary"
+              size="15px">
+            </q-btn>
+              <q-dialog v-model="expanded"  >
+               
+                <estrategiasForm 
+                  @addRecords="addRecords"
+                  @hide="expanded = !expanded"
+                />
+              </q-dialog>
+          </div>
+        </div>
+        <activosAlterLineas :key="refresh" :model-value="value" @refrescar="getDatos()"/>
       </q-expansion-item>
   </q-card>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import { date } from 'quasar'
 import { headerFormData } from 'boot/axios.js'
 import wgDate from 'components/General/wgDate.vue'
 import activosAlterLineas from 'components/Activos/activosAlterLineas.vue'
+import estrategiasForm from 'src/components/Estrategias/estrategiasForm.vue'
 export default {
   props: ['id'], // value es el objeto con los campos de filtro que le pasa accionesMain con v-model
   data () {
     return {
       refresh: 0,
       value: {},
+      listaEstrategiasFilter: [],
       recordToSubmit: {
         minimumTicket: 0,
         duration: 0,
@@ -118,7 +162,14 @@ export default {
         netmult: 0,
         netirr: 0,
         dpi: 0,
-        annualyield: 0
+        annualyield: 0,
+        idEstrategia:''
+      },
+      recordEstrategia: {
+        idEstrategia: '',
+        operationsTeam: '',
+        investingEmployees: '',
+        operatingEmployees: ''
       }
     }
   },
@@ -126,10 +177,23 @@ export default {
     ...mapState('login', ['user']),
     ...mapState('tabs', ['tabs']),
     ...mapState('tablasAux', ['listaStatusAlt']),
+    ...mapState('activos', ['listaEstrategias']),
+    listaEstrategiasComp () {
+      if (this.listaEstrategiasFilter.length <= 0) return this.listaEstrategias
+      else return this.listaEstrategiasFilter
+    }
   },
   methods: {
+    ...mapActions('activos', ['loadEstrategias']),
+    ...mapActions('tabs', ['addTab']),
     formatDate (pdate) {
       return date.formatDate(pdate, 'DD-MM-YYYY')
+    },
+    filterEstrategias (val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase()
+        this.listaEstrategiasFilter = this.listaEstrategias.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
+      })
     },
     updateRec () {
       var formData = new FormData()
@@ -138,30 +202,161 @@ export default {
       }
       return this.$axios.post('activos/bd_activos.php/guardarBD', formData, headerFormData)
         .then(response => {
+          //refrescar tablón
+          this.refresh += 1;
+          Object.assign(this.value, this.recordToSubmit)
+          })
+        .catch(error => {
+          this.$q.dialog({ title: 'Error', message: error })
+        })
+    },
+    editRecord (rowChanges, id) { // no lo uso aqui pero lod ejo como demo
+        this.addTab(['estrategiasFormMain', 'Estrategias-' + rowChanges.id, rowChanges, rowChanges.id])
+      },
+    getDatos() {
+      var objFilter = {
+        id: this.value.id,
+        idEstrategia: this.value.idEstrategia
+      }
+      var objFilter2 = {
+        id: this.value.idEstrategia
+      }
+
+      this.$axios.get('activos/bd_activos.php/findActivosFilter', { params: objFilter })
+      .then(response => {
+        Object.assign(this.recordToSubmit, response.data[0])
+        Object.assign(this.value, response.data[0])
+       
+        
+        this.recordToSubmit.targetSize = 0 
+        this.recordToSubmit.launch= ''
+        this.recordToSubmit.status= ''
+        this.recordToSubmit.committed= 0
+        this.recordToSubmit.grossmult= 0
+        this.recordToSubmit.grossirr= 0
+        this.recordToSubmit.netmult= 0
+        this.recordToSubmit.netirr= 0
+        this.recordToSubmit.dpi= 0
+        this.recordToSubmit.annualyield= 0
+
+        //llamada a act_trackrecord
+        this.$axios.get('activos/bd_activos.php/findActivosTrack', { params: objFilter })
+        .then(response => {
+          if (response.data.length > 0) {
+            var exists = false
+            response.data.forEach(element => {
+              if (element.idActivo == objFilter.id){
+                exists = true
+                this.recordToSubmit.targetSize = element.size 
+                this.recordToSubmit.launch= element.vintage
+                this.recordToSubmit.status= element.status
+                this.recordToSubmit.committed= element.pCommitted
+                this.recordToSubmit.grossmult= element.grossMultiple
+                this.recordToSubmit.grossirr= element.grossIrr
+                this.recordToSubmit.netmult= element.netMultiple
+                this.recordToSubmit.netirr= element.netIrr
+                this.recordToSubmit.dpi= element.dpi
+                this.recordToSubmit.annualyield= element.annualCashYield
+                this.recordEstrategia.investingEmployees = element.investingEmployees
+                this.recordEstrategia.operatingEmployees = element.operatingEmployees
+                //this.refresh += 1;
+              }
+            }) 
+            /*if (!exists) { //no existe ninguna fila seleccionada a SI
+              this.recordToSubmit.targetSize = 0 
+              this.recordToSubmit.launch= ''
+              this.recordToSubmit.status= ''
+              this.recordToSubmit.committed= 0
+              this.recordToSubmit.grossmult= 0
+              this.recordToSubmit.grossirr= 0
+              this.recordToSubmit.netmult= 0
+              this.recordToSubmit.netirr= 0
+              this.recordToSubmit.dpi= 0
+              this.recordToSubmit.annualyield= 0
+            }*/
+          }// else // no existen filas d etrack record
+          
+          
+          if(objFilter2.id !== 0) {
+            this.$axios.get('estrategias/bd_estrategias.php/getOperationsEstrategias', { params: objFilter2 })
+            .then(response => { 
+                            
+              this.recordEstrategia.operationsTeam = response.data[0].operationsTeam
+            })
+            .catch(error => {
+            this.$q.dialog({ title: 'Error', message: error })
+            })
+          }
+
         })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })
         })
-    }
-  },
-  components: {
-    wgDate: wgDate,
-    activosAlterLineas: activosAlterLineas    
-  },
-  mounted () {
-    Object.assign(this.value, this.tabs[this.id].meta.value)
-    Object.assign(this.recordToSubmit, this.value)
-    var objFilter = {
-      id: this.value.id
-    }
-    this.refresh++ // para  que refresque las líneas
-    this.$axios.get('activos/bd_activos.php/findActivosFilter', { params: objFilter })
-      .then(response => {
-        Object.assign(this.recordToSubmit, response.data[0])
+
       })
       .catch(error => {
         this.$q.dialog({ title: 'Error', message: error })
       })
+    },
+    addRecords () {
+        this.$q.dialog({
+        title: 'Añadir Estrategia',
+        message: 'Desea añadir una nueva estrategia?',
+        ok: {
+          push: true
+        },
+        cancel: {
+          push: true,
+          color: 'negative'
+        },
+        persistent: true
+      }).onOk(() => {
+        //usuario pulsa OK
+        var record = {
+          id: -1,
+          nombre: 'Nueva Estrategia',
+          idEntidad: '',
+          codEmpresa: this.user.codEmpresa,
+          tipoActivo: 'CAP.RIESGO',
+          descripcion: '',
+          user: this.user.user.email,
+          ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
+        }
+        var formData = new FormData()
+        for (var key in record) {
+          formData.append(key, record[key])
+        }
+        
+        return this.$axios.post('estrategias/bd_estrategias.php/guardarBD', formData, headerFormData)
+          .then(response => {
+            record.id = response.data.id
+            // this.registrosSeleccionados.push(record)
+            this.editRecord(record, record.id)
+          })
+          .catch(error => {
+            this.$q.dialog({ title: 'Error', message: error })
+          })
+
+      }).onCancel(() => {
+         console.log('>>>> Cancel')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
+    }
+  },
+  components: {
+    wgDate: wgDate,
+    activosAlterLineas: activosAlterLineas,
+    estrategiasForm : estrategiasForm
+  },
+  mounted () {
+    this.loadEstrategias(this.user.codEmpresa)
+    Object.assign(this.value, this.tabs[this.id].meta.value)
+    Object.assign(this.recordToSubmit, this.value)
+    this.refresh++ // para  que refresque las líneas
+    
+    this.getDatos()
+    
   }
 }
 </script>

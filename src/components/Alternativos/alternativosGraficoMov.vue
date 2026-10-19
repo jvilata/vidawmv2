@@ -72,6 +72,8 @@ export default {
       objFilter.tipoActivo = (objFilter.tipoActivo && objFilter.tipoActivo !== null ? objFilter.tipoActivo.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.estadoActivo = (objFilter.estadoActivo && objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.tipoProducto = (objFilter.tipoProducto && objFilter.tipoProducto !== null ? objFilter.tipoProducto.join() : null) // paso de array a concatenacion de strings (join)
+      objFilter.codOtraEmpresa = (objFilter.codOtraEmpresa && objFilter.codOtraEmpresa !== null ? objFilter.codOtraEmpresa.join() : null) // paso de array a concatenacion de strings (join)
+
       return this.$axios.get('movimientos/bd_alternativos.php/findcProyeccionAlternativos', { params: objFilter })
         .then(response => {
           this.registrosProyeccionAlternativos = response.data
@@ -104,23 +106,23 @@ export default {
         type: 'column',
         data: []
       }
-      var objVentas = {
+      var objVentasCobros = {
         name: 'DISTRIBUCIONES',
         type: 'column',
         data: []
       }
       this.series.push(objValor)
       this.series.push(objCompras)
-      this.series.push(objVentas)
+      this.series.push(objVentasCobros)
       var valAnt = 0.0
       this.registrosProyeccionAlternativos.forEach(row => {
         row.valoracion = parseFloat(row.valoracion)
         if (row.valoracion === 0) row.valoracion = valAnt
         row.comprometido = parseFloat(row.comprometido) + parseFloat(row.compra)
-        row.distribucion = parseFloat(row.distribucion) + parseFloat(row.venta)
+        row.distribucion = parseFloat(row.distribucion) + parseFloat(row.venta) + parseFloat(row.cobro)
         objValor.data.push(row.valoracion)
         objCompras.data.push(-row.comprometido)
-        objVentas.data.push(row.distribucion)
+        objVentasCobros.data.push(row.distribucion)
         valAnt = row.valoracion
       })
     }

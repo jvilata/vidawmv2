@@ -82,9 +82,11 @@ export default {
     },
     getResumenPatrimonioM (objFilter) {
       // donut resumen patrimonio moendas
+      
       this.$axios.get('movimientos/bd_movimientos.php/findcresumenPatrimonioM/', { params: objFilter })
         .then(response => {
           this.registrosResumenPatrimonioM = response.data
+          
           this.refreshRec2 = this.refreshRec2 + 1 // para que refresque el componente
         })
         .catch(error => {

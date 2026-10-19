@@ -66,7 +66,7 @@
           default-opened
           header-class="bg-orange-1 text-grey-8"
         >
-          <facturasFormLineas :key="refresh" :value="recordToSubmit" @calculaTotalesFac="calculaTotalesFac"/>
+          <facturasFormLineas :key="refresh" :value="recordToSubmit" @calculaTotalesFac="calculaTotalesFac" @operacionExentaChanged="operacionExentaChanged"/>
         </q-expansion-item>
       </q-list>
 
@@ -140,12 +140,14 @@ export default {
     },
     saveChanges (record) {
       if (this.hasChanges) {
+       
         Object.assign(this.recordToSubmit, record)
         Object.assign(this.recordToSubmit, this.valueTotales) // se pierden los valores de totales por lo que viene de cabecera
         this.updateRecord()
       }
     },
     updateRecord () {
+      console.log('record save', this.recordToSubmit)
       return this.$axios.post(`facturas/bd_facturas.php/findFacturasFilter/${this.recordToSubmit.id}`, this.recordToSubmit)
         .then(response => {
           return this.$axios.post(`facturas/bd_facturas.php/findFacturasFilter/${this.recordToSubmit.id}`, this.recordToSubmit)
@@ -159,7 +161,12 @@ export default {
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })
         })
+
     },
+    operacionExentaChanged (valor) { // valor: 'SI' / 'NO' — ya se ha guardado en BD desde facturasFormLineas
+      this.recordToSubmit.operacionExenta = valor
+    },
+
     calculaTotalesFac (totales) { // cuando se guardan cambios en una linea de detalle
       if (this.recordToSubmit.por_retencion === '' || this.recordToSubmit.por_retencion === null) this.recordToSubmit.por_retencion = '0'
       if (!totales.por_retencion) totales.por_retencion = this.recordToSubmit.por_retencion
@@ -194,7 +201,7 @@ export default {
         })
         .catch(error => console.log(error))
     },
-    imprimir (selected, aDisco) { // aDisco: 0 -> preview; aDisco: 1 -> imprime en onedrive
+    imprimir (selected, aDisco) { // aDisco: 0 -> preview; aDisco: 2 -> imprime en onedrive
       return new Promise((resolve, reject) => {
         var paramRecord = {
           id: selected.id,
@@ -206,6 +213,7 @@ export default {
         }
         this.$axios.post('facturas/pdf_invoice.php/', formData, { responseType: (aDisco === 0 ? 'blob' : '') })
           .then(function (response) {
+            
             if (aDisco === 2) resolve(response)
             else {
               if (window.cordova === undefined) { // desktop

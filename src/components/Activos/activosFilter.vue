@@ -1,4 +1,4 @@
-  <!-- componente que se llama desde accionesMain y que presenta el formulario de filtro y el boton de busqueda -->
+<!-- componente que se llama desde accionesMain y que presenta el formulario de filtro y el boton de busqueda -->
   <template>
   <q-card style="width: 400px;" class="q-pr-xs q-gutter-xs">
     <q-card-section class="bg-primary text-white">
@@ -65,6 +65,18 @@
         outlined
         clearable
         v-model="filterR.computa"
+        :options="listaSINO"
+        option-value="id"
+        option-label="desc"
+        emit-value
+        map-options
+      />
+      <q-select
+        label="Importe > 0"
+        stack-label
+        outlined
+        clearable
+        v-model="filterR.importem0"
         :options="listaSINO"
         option-value="id"
         option-label="desc"

@@ -32,11 +32,20 @@
       </template>
 
       <template v-slot:body="props">
-        <q-tr :props="props" :key="`m_${props.row.id}`" @mouseover="rowId=`m_${props.row.id}`">
+        <q-tr :props="props" :key="`m_${props.row.id}`" @click="rowId=`m_${props.row.id}`" @mouseover="rowId=`m_${props.row.id}`" >
           <q-td>
             <!-- columna de acciones: editar, borrar, etc -->
-            <div style="max-width: 30px">
+            <div style="max-width: 80px">
             <!--edit icon . Decomentamos si necesitamos accion especifica de edicion -->
+            <q-btn flat v-if="rowId===`m_${props.row.id}`"
+              @click.stop="editRecord(props.row, props.row.id)"
+              round
+              dense
+              size="sm"
+              color="primary"
+              icon="edit">
+              <q-tooltip>Editar</q-tooltip>
+            </q-btn>
             <q-btn flat v-if="rowId===`m_${props.row.id}`"
               @click.stop="deleteRecord(props.row.id)"
               round
@@ -62,10 +71,10 @@
                 v-slot="scope"
                 @save="updateRecord(props.row)">
                 <!-- aqui definimos las ediciones especificas para cada columna -->
-                <q-input v-if="col.name !== 'status'" v-model="scope.value"/>
+                <q-input v-if="!['status', 'seleccionado'].includes(col.name)" v-model="scope.value"/>
                 <q-select v-if="col.name === 'status'"
                   class="col-xs-12 col-sm-6"
-                  label="Satus"
+                  label="Status"
                   stack-label
                   outlined
                   clearable
@@ -75,7 +84,18 @@
                   option-label="codElemento"
                   emit-value
               />
+              <q-select v-if="col.name === 'seleccionado'"
+                @update:model-value="v=> updateSelecc(v, props.row)"
+                v-model="scope.value"
+                :options="listaSINO"
+                option-value="id"
+                option-label="desc"
+                stack-label
+                emit-value
+                map-options
+              />
             </q-popup-edit>
+
           </q-td>
         </q-tr>
       </template>
@@ -122,6 +142,7 @@
             :key="col.name"
             :align="col.align"
           >
+          
             <div v-if="['fundName'].includes(col.name)">Media total</div>
             <div v-if="['grossMultiple'].includes(col.name)">{{ recordToSubmit.totGrossMultiple }}x</div>
             <div v-if="['grossIrr'].includes(col.name)">{{ recordToSubmit.totGrossIrr }}%</div>
@@ -151,6 +172,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import { headerFormData, axiosInstance } from 'boot/axios.js'
 import { date } from 'quasar'
 export default {
   props: ['modelValue'], // en 'value' tenemos la tabla de datos del grid
@@ -161,7 +183,10 @@ export default {
       mostrarDialog: false,
       registrosSeleccionados: [],
       registroEditado: {},
+      esteActivo: false,
       recordToSubmit: {
+        investingEmployees: 0,
+        operatingEmployees: 0,
         totGrossMultiple: 0,
         totGrossIrr: 0,
         totNetMultiple: 0,
@@ -173,6 +198,8 @@ export default {
         avgSoldAnnualCashYield: 0
       },
       columns: [
+       // { name: 'idActivo', align: 'left', label: 'idActivo', field: 'idActivo' },
+        { name: 'seleccionado', align: 'left', label: 'Activo actual', field: row =>(row.idActivo===this.value.id ? 'SI' : ''), sortable: true, style: 'width: 50px; whiteSpace: normal' },
         { name: 'fundName', align: 'left', label: 'Fund Name', field: 'fundName', sortable: true, style: 'width: 200px; whiteSpace: normal' },
         { name: 'vintage', align: 'left', label: 'Vintage', field: 'vintage', sortable: true },
         { name: 'size', align: 'left', label: 'Size', field: 'size', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
@@ -184,6 +211,8 @@ export default {
         { name: 'netIrr', align: 'left', label: 'Net IRR', field: 'netIrr', sortable: true },
         { name: 'annualCashYield', label: 'Annual Cash Yeld', align: 'left', field: 'annualCashYield', sortable: true },
         { name: 'dpi', label: 'DPI', align: 'left', field: 'dpi', sortable: true },
+        { name: 'investingEmployees', label: 'Investing Empl.', align: 'left', field: 'investingEmployees', sortable: true },
+        { name: 'operatingEmployees', label: 'Operating Empl.', align: 'left', field: 'operatingEmployees', sortable: true },
         { name: 'user', align: 'left', label: 'user', field: 'user', sortable: true },
         { name: 'ts', align: 'left', label: 'ts', field: 'ts', sortable: true }
       ],
@@ -193,10 +222,28 @@ export default {
   computed: {
     ...mapState('tablasAux', ['listaSINO', 'listaStatusAlt']),
     ...mapState('login', ['user']),
-    ...mapState('tabs', ['tabs'])
+    ...mapState('tabs', ['tabs']),
+    ...mapState('activos', ['listaEstrategias']),
+    listaEstrategiasComp () {
+      if (this.listaEstrategiasFilter.length <= 0) return this.listaEstrategias
+      else return this.listaEstrategiasFilter
+    }
   },
   methods: {
     ...mapActions('tabs', ['addTab']),
+    ...mapActions('activos', ['loadEstrategias']),
+    filterEstrategias (val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase()
+        this.listaEstrategiasFilter = this.listaEstrategias.filter(v => v.nombre.toLowerCase().indexOf(needle) > -1)
+      })
+    },
+    editRecord (rowChanges, id) { // no lo uso aqui pero lod ejo como demo
+      /*
+      id -> idAct_trackrecord
+      */
+      this.addTab(['portfolioFormMain1', 'Portfolio Companies - ' + rowChanges.idActivo, rowChanges, rowChanges.id])
+    },
     calcTotales (lineas) {
       var numl = 0
       var numlt = 0
@@ -243,7 +290,11 @@ export default {
     getRecords () {
       if (this.value.id === undefined) return // en el primer render no hay nada y es mejor no gastar tiempo
       // se reutiliza el grid de movimientos para el form de activos y de facturas
-      var objFilter = { idActivo: this.value.id }
+      var objFilter = { 
+        idActivo: this.value.id,
+        idEstrategia: this.value.idEstrategia
+      }
+     
       return this.$axios.get('activos/bd_act_altdatos.php/findAct_trackrecordFilter', { params: objFilter })
         .then(response => {
           this.registrosSeleccionados = response.data
@@ -256,7 +307,9 @@ export default {
     addRecord () {
       // se reutiliza el grid de movimientos para el form de activos y de facturas
       var record = {
-        idActivo: this.value.id,
+        //Quitar id Activo y solo poner cuando check = true
+        idActivo: 0,
+        idEstrategia: this.value.idEstrategia,
         fundName: this.value.nombre,
         user: this.user.user.email,
         ts: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
@@ -290,11 +343,67 @@ export default {
           })
       })
     },
+    //mejora para quitar metricas de la tabla activos
+    // Cuando el usuario marca "SI" en la columna "Activo actual",
+    // se copian los datos del track record seleccionado al activo (launch, size, status, etc.)
+    updateSelecc (v, row) {
+      if (v === '1') {
+        row.idActivo = this.value.id
+
+        // Construir objeto con los campos a copiar al activo
+        var tmp = {
+          id:          this.value.id,   // id del activo (no del track record)
+          annualyield: row.annualCashYield,
+          dpi:         row.dpi,
+          grossirr:    row.grossIrr,
+          grossmult:   row.grossMultiple,
+          netirr:      row.netIrr,
+          netmult:     row.netMultiple,
+          committed:   row.pCommitted,
+          targetSize:  row.size,
+          status:      row.status,
+          launch:      row.vintage       // ← aquí se copia el vintage como launch
+        }
+
+        // Persistir en tabla activos
+        return this.$axios.put(
+          `activos/bd_activos.php/guardarMetricas/${tmp.id}`,
+          JSON.stringify(tmp)
+        )
+          .then(() => {
+            this.$q.notify({ type: 'positive', message: 'Activo actual actualizado' })
+            this.$emit('refrescar')
+          })
+          .catch(error => {
+            this.$q.dialog({ title: 'Error', message: error.message || error })
+          })
+      } else {
+        row.idActivo = 0
+      }
+    },
     updateRecord (record) {
-      return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(record))
+      record.ts = date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss')
+      
+      var tmp = {}
+      var v = (record.idActivo == this.value.id ? "1" : "0")
+      Object.assign(tmp, record)
+      
+      delete tmp.seleccionado   
+      
+      return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(tmp))
         .then(response => {
-          return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(record))
-            .then()
+          Object.assign(tmp, record)
+          delete tmp.seleccionado
+          return this.$axios.put(`activos/bd_act_altdatos.php/act_trackrecord/${record.id}`, JSON.stringify(tmp))
+            .then(response =>{
+              
+              //mejora para quitar metricas de la tabla activos
+              this.updateSelecc (v, tmp)
+
+              this.$emit('refrescar')
+              
+            }    
+            )
         })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error.message })
@@ -302,6 +411,7 @@ export default {
     }
   },
   mounted () {
+    this.loadEstrategias(this.user.codEmpresa)
     Object.assign(this.value, this.modelValue)
     this.getRecords()
   }

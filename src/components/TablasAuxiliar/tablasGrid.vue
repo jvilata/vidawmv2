@@ -149,6 +149,8 @@ export default {
       this.actualizarTablaAux(record)
         .then((response) => {
           this.actualizarTablaAux(record)
+
+
         })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })

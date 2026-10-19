@@ -72,10 +72,21 @@
                   emit-value
                   map-options
                 />
-                <q-input v-if="!['userRol'].includes(col.name)" v-model="scope.value"
+                <q-input v-if="!['userRol', 'supervisadoPor'].includes(col.name)" v-model="scope.value"
                   autofocus counter
                   @keyup.enter.stop
                   style="width: 400px;"
+                />
+                <q-select v-if="['supervisadoPor'].includes(col.name)"
+                  :model-value="scope.value ? scope.value.split(',') : []"
+                  @update:model-value="(value) => scope.value = value.join()"
+                  multiple
+                  :options="listaUsers"
+                  option-value="email"
+                  option-label="email"
+                  emit-value
+                  use-chips
+                  stack-label
                 />
               </q-popup-edit>
           </q-td>
@@ -133,14 +144,15 @@ export default {
         { name: 'username', align: 'left', label: 'User name', field: 'username', sortable: true },
         { name: 'codEmpresa', align: 'left', label: 'Empresas', field: 'codEmpresa', sortable: true },
         { name: 'userRol', align: 'left', label: 'User Rol', field: 'userRol', sortable: true },
-        { name: 'idPersonal', align: 'left', label: 'idPersonal', field: 'idPersonal', sortable: true }
+        { name: 'idPersonal', align: 'left', label: 'idPersonal', field: 'idPersonal', sortable: true },
+        { name: 'supervisadoPor', align: 'left', label: 'Supervisado por', field: 'supervisadoPor', sortable: true, format: val => (val ? val.split(',') : null) }
       ],
       pagination: { rowsPerPage: 0 }
     }
   },
   computed: {
     ...mapState('login', ['user']),
-    ...mapState('tablasAux', ['listaRoles'])
+    ...mapState('tablasAux', ['listaRoles', 'listaUsers'])
   },
   methods: {
     ...mapActions('tabs', ['addTab']),

@@ -184,6 +184,7 @@ import { mapState, mapActions } from 'vuex'
 import { date } from 'quasar'
 import wgDate from 'components/General/wgDate.vue'
 import { newPostWindow } from 'components/General/libGeneral.js'
+import { headerFormData, axiosInstance } from 'boot/axios.js'
 export default {
   props: ['modelValue', 'idActivo', 'idEntidad'], // en 'value' tenemos el filtro, en idActivo en caso de que vengamos de ActivosFormMain
   data () {
@@ -194,7 +195,7 @@ export default {
         // { name: 'id', label: 'Id', align: 'left', field: 'id', sortable: true },
         { name: 'descripcion', align: 'left', label: 'Descripcion', field: 'descripcion', sortable: true, style: 'width: 300px; whiteSpace: normal' },
         { name: 'fechaProx', align: 'left', label: 'fechaProx', field: 'fechaProx', sortable: true, format: val => date.formatDate(date.extractDate(val, 'YYYY-MM-DD HH:mm:ss'), 'DD-MM-YYYY'), style: 'width: 70px; whiteSpace: normal'},
-        { name: 'idUserQuienProx', align: 'left', label: 'idUserQuienProx', field: 'idUserQuienProx', sortable: true, format: val => (val ? val.split(',') : null), style: 'width: 150px; whiteSpace: normal' },
+        { name: 'idUserQuienProx', align: 'left', label: 'idUserQuienProx', field: 'idUserQuienProx', sortable: true, format: val => (val ? val.split(',').join(', ') : null), style: 'width: 150px; whiteSpace: normal' },
         { name: 'tipoAccion', align: 'left', label: 'tipoAccion', field: 'tipoAccion', sortable: true },
         {
           name: 'realizada',
@@ -203,7 +204,7 @@ export default {
           field: 'realizada',
           sortable: true,
           format: val => {
-            var obj = this.listaSINO.find(x => x.id === val) // mapea el valor 0 , 1 en la listaSINO a string SI , NO
+            var obj = this.listaSINO.find(x => x.id == val) // mapea el valor 0 , 1 en la listaSINO a string SI , NO
             return (obj !== undefined ? obj.desc : val)
           }
         },
@@ -299,7 +300,9 @@ export default {
       })
     },
     generarAccion (record) {
-      if (record.tipoAccion === 'FACTURAR') this.generarFactura(record)
+      
+
+      if (record.tipoAccion === 'FACTURAR') this.generarFactura(record)     
       else if (record.tipoAccion === 'LIQUIDAR') this.generarLiquidacion(record)
       else if (record.tipoAccion === 'G.NOMINAS') this.generarNominas(record)
       else this.$q.dialog({ title: 'Aviso', message: record.tipoAccion })

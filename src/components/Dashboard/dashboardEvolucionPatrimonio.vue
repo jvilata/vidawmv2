@@ -89,7 +89,7 @@ export default {
     cargarDatosGraficos () {
       this.series = []
       this.registrosEvolucionPatrimonio = [...this.registrosEvolucionPatrimonioTmp]
-
+      
       this.registrosEvolucionPatrimonio.sort(function (a, b) { // ordeno el array por etiquetavalor
         return a.etiquetavalor.localeCompare(b.etiquetavalor)
       })
@@ -103,11 +103,12 @@ export default {
           etiqAnt = row.etiquetavalor
         }
       })
+      
       this.chartOptions = {
         ...this.chartOptions,
         labels: arr // es un array de strings
       }
-
+      
       //this.registrosEvolucionPatrimonio.sort(function (a, b) { // ordeno el array por serie
       //  return a.serie.localeCompare(b.serie)
       //})

@@ -102,7 +102,7 @@ export default {
       if (this.filterRecord.computa && this.filterRecord.computa.length > 0) str += ' and computa=' + this.filterRecord.computa
 
       var sql = 'select * from cvaloraciones where ' + str + ' order by fecha,tipoActivo,nombre'
-      console.log(sql)
+      
       var paramRecord = {
         SQL: sql,
         string_con: '',

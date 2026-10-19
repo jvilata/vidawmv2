@@ -353,10 +353,13 @@ export default {
       indice = indice + 1
       if (indice < rows.length) this.enviarMultiplesMails(0, this.callbackMail, indice, rows)
     },
-    enviarMails (record1) {
-      this.value.forEach(recordP => { // busco el nodo padre donde estan los marcados para generar
-        if (recordP.generar === '1') {
-          this.enviarMultiplesMails(0, this.callbackMail, 0, recordP.children)
+    enviarMails (recordP) {
+
+      this.value.forEach(record1 => { // busco el nodo padre donde estan los marcados para generar
+        
+        if (record1.generar == '1') {
+          
+          this.enviarMultiplesMails(0, this.callbackMail, 0, record1.children)
         }
       })
     },

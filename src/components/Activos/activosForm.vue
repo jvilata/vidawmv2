@@ -106,12 +106,26 @@
             type="textarea"
             counter
             @keyup.enter.stop />
+        <div class="row q-mb-sm" v-if="(recordToSubmit.tipoActivo ==='INMUEB.RENTA' || recordToSubmit.tipoActivo === 'INM.EN CONSTR')"  >
+          <q-input 
+          class="col-xs-12 col-sm-12" 
+            outlined 
+            v-model="recordToSubmit.direccion" 
+            label="Dirección"/>
+        </div>
         <div class="row q-mb-sm" v-if="recordToSubmit.tipoActivo ==='CAJA'"  >
           <q-input 
           class="col-xs-12 col-sm-12" 
             outlined 
             v-model="recordToSubmit.iban" 
             label="IBAN"/>
+        </div>
+        <div class="row q-mb-sm" v-if="recordToSubmit.tipoActivo ==='RENTA VBLE'"  >
+          <q-input 
+          class="col-xs-12 col-sm-12" 
+            outlined 
+            v-model="recordToSubmit.isin" 
+            label="ISIN"/>
         </div>
         <div class="row q-mb-sm">
           <q-select
@@ -151,7 +165,7 @@
             <q-input class="col-11" outlined v-model="recordToSubmit.urlinfo" label="URL Info"/>
             <q-btn @click="openWindow(recordToSubmit.urlinfo)" class="col-1 bg-primary text-white" dense icon="open_in_browser"/>
           </div>
-          <q-input class="row q-mb-sm" outlined v-model="recordToSubmit.comentarios" label="comentarios"
+          <q-input class="row q-mb-sm" outlined v-model="recordToSubmit.comentarios" label="Notas reuniones"
             type="textarea"
             counter
             @keyup.enter.stop/>
@@ -179,10 +193,12 @@ export default {
         nombre: '',
         carpetaDrive: '',
         descripcion: '',
+        direccion: '',
         tipoActivo: '',
         estadoActivo: '',
         tipoProducto: '',
         iban: '',
+        isin: '',
         moneda: '',
         idEntidad: 0,
         computa: '',

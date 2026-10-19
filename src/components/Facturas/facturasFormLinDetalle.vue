@@ -38,21 +38,32 @@
                   @keyup.enter.stop />
         </div>
         <div class="row">
-          <q-input class="col-xs-6 col-sm-3" outlined label="Unidades" stack-label v-model="recordToSubmit.unidades" debounce="1000" @update:model-value="calcularDatosLinea" />
-          <q-input class="col-xs-6 col-sm-3" outlined label="Precio" stack-label v-model="recordToSubmit.precio" debounce="1000" @update:model-value="calcularDatosLinea"/>
-          <q-input class="col-xs-6 col-sm-3" outlined label="%Dto" stack-label v-model="recordToSubmit.pdescuento" debounce="1000" @update:model-value="calcularDatosLinea" />
+          <q-input class="col-xs-6 col-sm-3" outlined label="Unidades" stack-label v-model="recordToSubmit.unidades" @update:model-value="calcularDatosLinea" />
+          <q-input class="col-xs-6 col-sm-3" outlined label="Precio" stack-label v-model="recordToSubmit.precio" @update:model-value="calcularDatosLinea"/>
+          <q-input class="col-xs-6 col-sm-3" outlined label="%Dto" stack-label v-model="recordToSubmit.pdescuento" @update:model-value="calcularDatosLinea" />
           <q-input class="col-xs-6 col-sm-3" outlined label="Descuento" stack-label v-model="recordToSubmit.descuento" readonly  />
         </div>
         <div class="row">
-          <q-input class="col-xs-6 col-sm-3" outlined stack-label v-model="recordToSubmit.neto" readonly label="Neto" debounce="1000"/>
-          <q-input class="col-xs-6 col-sm-3" outlined stack-label v-model="recordToSubmit.piva" label="%Iva" debounce="1000" @update:model-value="calcularDatosLinea"/>
-          <q-input class="col-xs-6 col-sm-3" outlined stack-label v-model="recordToSubmit.totalIva" readonly label="Total Iva" debounce="1000"/>
+          <q-input class="col-xs-6 col-sm-3" outlined stack-label v-model="recordToSubmit.neto" readonly label="Neto"/>
+          <q-input class="col-xs-6 col-sm-3" outlined stack-label v-model="recordToSubmit.piva" label="%Iva" @update:model-value="calcularDatosLinea"/>
+          <q-input class="col-xs-6 col-sm-3" outlined stack-label v-model="recordToSubmit.totalIva" readonly label="Total Iva"/>
           <q-input class="col-xs-6 col-sm-3" outlined stack-label v-model="recordToSubmit.totalLinea" readonly label="Total Linea"/>
         </div>
       </q-card-section>
-      <q-card-actions align=right>
-        <q-btn type="submit" label="Save" color="primary"/>
-        <q-btn @click="$emit('close')" label="Cancel" color="negative"/>
+      <q-card-actions class="row items-center justify-between">
+        <div class="row items-center q-gutter-sm">
+          <q-checkbox
+            v-model="isOperacionExenta"
+            label="Operación Exenta"
+            @update:model-value="onOperacionExentaChange" />
+          <div v-if="isOperacionExenta" class="text-caption text-grey-8">
+            E1 - Exención por el Art. 20.
+          </div>
+        </div>
+        <div>
+          <q-btn type="submit" label="Save" color="primary"/>
+          <q-btn @click="$emit('close')" label="Cancel" color="negative"/>
+        </div>
       </q-card-actions>
     </q-form>
   </q-card>
@@ -62,12 +73,13 @@
 import { mapState } from 'vuex'
 import { date } from 'quasar'
 export default {
-  props: ['modelValue'], // value es el objeto con los campos de filtro que le pasa accionesMain con v-model
+  props: ['modelValue', 'operacionExenta'], // value es el objeto con los campos de filtro que le pasa accionesMain con v-model
   data () {
     return {
       title: 'Detalle línea',
       recordToSubmit: {},
-      listaActivosFilter: []
+      listaActivosFilter: [],
+      isOperacionExenta: false
     }
   },
   computed: {
@@ -83,6 +95,7 @@ export default {
     saveForm () {
       delete this.recordToSubmit.descuento // campo calculado
       this.$emit('saveRecord', this.recordToSubmit) // lo captura accionesMain
+      this.$emit('updateOperacionExenta', this.isOperacionExenta ? 'SI' : 'NO') // se guarda en cabfacturas
     },
     formatDate (pdate) {
       return date.formatDate(pdate, 'DD-MM-YYYY')
@@ -99,10 +112,20 @@ export default {
       obj.totalIva = Math.round((obj.neto * obj.piva / 100.0) * 100.0) / 100
       obj.totalLinea = Math.round((obj.neto + obj.totalIva) * 100.0) / 100
       Object.assign(this.recordToSubmit, obj)
+      if (obj.piva === 0) { // %Iva a 0 => marcamos Operación Exenta automáticamente
+        this.isOperacionExenta = true
+      } else this.isOperacionExenta = false
+    },
+    onOperacionExentaChange (val) {
+      if (val) { // el usuario tica el checkbox a mano => ponemos %Iva a 0
+        this.recordToSubmit.piva = 0
+        this.calcularDatosLinea()
+      }
     }
   },
   mounted () {
     this.recordToSubmit = Object.assign({}, this.modelValue) // asignamos valor del parametro por si viene de otro tab
+    this.isOperacionExenta = this.operacionExenta === 'SI' // inicializamos desde cabecera (cabfacturas)
     this.calcularDatosLinea()
   }
 }

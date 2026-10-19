@@ -2,6 +2,7 @@ import { axiosInstance } from 'boot/axios.js'
 const state = {
   listaEntidades: [],
   listaEntidadesActivos: [],
+  listaNumFactEmitidas: [],
   entidadSelf: {},
   entidadAsesor: {}
 }
@@ -18,6 +19,9 @@ const mutations = {
   },
   loadEntidadAsesor (state, entidad) {
     state.entidadAsesor = entidad
+  },
+  loadNumFactEmitidas (state, factura) {
+    state.listaNumFactEmitidas = factura
   }
 }
 
@@ -29,6 +33,19 @@ const actions = {
           this.dispatch('mensajeLog/addMensaje', 'loadEntidades' + 'No existen datos', { root: true })
         } else {
           commit('loadEntidades', response.data)
+        }
+      })
+      .catch(error => {
+        this.dispatch('mensajeLog/addMensaje', 'loadEntidades' + error, { root: true })
+      })
+  },
+  loadNumFactEmitidas ({ commit }, codEmpresa) {
+    axiosInstance.get(`facturas/bd_facturas.php/findNumFactEmitidas?codEmpresa=${codEmpresa}`, {}, { withCredentials: true })
+      .then((response) => {
+        if (response.data.length === 0) {
+          this.dispatch('mensajeLog/addMensaje', 'loadNumFactEmitidas' + 'No existen datos', { root: true })
+        } else {
+          commit('loadNumFactEmitidas', response.data)
         }
       })
       .catch(error => {

@@ -60,7 +60,7 @@ export default {
       // objFilter.tipoProducto = (objFilter.tipoProducto && objFilter.tipoProducto !== null ? objFilter.tipoProducto.join() : null) // paso de array a concatenacion de strings (join)
       // desglosar TipoProducto
       objFilter.tipoProducto = objFilter.tipoProducto1.substring(0, objFilter.tipoProducto1.indexOf('.') + 1)
-
+    
       // donut resumen patrimonio
       this.$axios.get('activos/bd_activos.php/findAnalisisFondos3/', { params: objFilter })
         .then(response => {

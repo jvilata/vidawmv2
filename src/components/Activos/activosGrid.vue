@@ -118,6 +118,24 @@
         </div>
       </template>
 
+      <!-- SLOT CUANDO LA TABLA ESTÁ VACÍA -->
+    <template v-slot:no-data>
+      <div class="full-width row flex-center q-mb-sm text-grey-7">
+        
+        <span>No hay datos.</span>
+        
+        <q-btn
+            @click.stop="addRecord"
+            round
+            dense
+            color="primary"
+            size="20px"
+            icon="add">
+            <q-tooltip>Añadir</q-tooltip>
+          </q-btn>
+      </div>
+    </template>
+
     </q-table>
   </q-item>
 </template>
@@ -144,7 +162,7 @@ export default {
           field: 'computa',
           sortable: true,
           format: val => {
-            var obj = this.listaSINO.find(x => x.id === val) // mapea el valor 0 , 1 en la listaSINO a string SI , NO
+            var obj = this.listaSINO.find(x => x.id == val) // mapea el valor 0 , 1 en la listaSINO a string SI , NO
             return (obj !== undefined ? obj.desc : val)
           }
         },
@@ -190,6 +208,7 @@ export default {
       for (var key in record) {
         formData.append(key, record[key])
       }
+
       return this.$axios.post('activos/bd_activos.php/guardarBD', formData, headerFormData)
         .then(response => {
           record.id = response.data.id
@@ -260,6 +279,7 @@ export default {
       })
     },
     generarRentab () {
+      
       this.$q.dialog({
         title: 'Confirmar',
         message: '¿ Ejercicio a generar ?',

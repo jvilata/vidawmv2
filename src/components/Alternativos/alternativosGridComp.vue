@@ -72,6 +72,20 @@
             </q-item>
           </div>
         </div>
+        <div class="row" v-if="!trackRecord">
+          <div class="col-md" >
+            <q-item class="q-ma-md q-pa-xs bg-indigo-1 text-grey-8">
+              <q-item-section align="center">
+                <div class="text-h6">Gráficos Performance</div>
+              </q-item-section>
+            </q-item>
+            <q-item >
+              <q-item-section align="center">
+                <alternativosPerformance :value="copiaSeleccionados" :key="refreshPerf"/>
+              </q-item-section>
+            </q-item>
+          </div>
+        </div>
       </q-expansion-item>
       <q-expansion-item
         class="q-pt-md q-pl-sm q-pr-xs"
@@ -179,18 +193,21 @@ import { date } from 'quasar'
 import { mapState, mapActions } from 'vuex'
 import alternativosCompFilter from 'components/Alternativos/alternativosCompFilter.vue'
 import alternativosPieChartFiltros from 'components/Alternativos/alternativosPieChartFiltros.vue'
+import alternativosPerformance from 'src/components/Alternativos/alternativosPerformance.vue'
 import dashboardResumenPatrimonio from 'components/Dashboard/dashboardResumenPatrimonio.vue'
 export default {
   props: ['value'], // en 'value' tenemos la tabla de datos del grid
   data () {
     return {
       rowId: '',
-      trackRecord: false,
+      trackRecord: true,
       refreshRec: 0,
       refreshRec1: 0,
+      refreshPerf: 0,
       expanded: false,
       nomFormulario: 'Selección de Alternativos',
       filterRecord: {},
+      copiaSeleccionados: [],
       registrosSeleccionados: [],
       registrosAnalisisFondos1: [],
       registrosAnalisisFondos2: [],
@@ -204,21 +221,27 @@ export default {
         avgSoldNetMultiple: 0,
         avgSoldNetIrr: 0,
         avgSoldAnnualCashYield: 0,
-        avgDpi: 0
+        avgDpi: 0,
+        cartAnnualyield: 0,
+        cartDpi: 0,
+        cartGrossirr: 0,
+        cartGrossmult: 0,
+        cartNetirr: 0,
+        cartNetmult: 0
       },
       columns: [
         { name: 'seleccionado', align: 'left', label: 'Selec.', field: 'seleccionado', sortable: true, style: 'width: 50px; whiteSpace: normal' },
         { name: 'nombre', align: 'left', label: 'Fund Name', field: 'nombre', sortable: true, style: 'width: 300px; whiteSpace: normal' },
         { name: 'nombreEntidad', align: 'left', label: 'Entity', field: 'nombreEntidad', sortable: true, style: 'width: 200px; whiteSpace: normal' },
         { name: 'descEstadoActivo', align: 'left', label: 'State', field: 'descEstadoActivo', sortable: true, style: 'width: 100px;' },
-        { name: 'launch', align: 'left', label: 'Launch', field: 'launch', sortable: true },
+        { name: 'launch', align: 'left', label: 'Launch', field: 'cartLaunch', sortable: true },
         { name: 'grossMultiple', align: 'left', label: 'Gross Mult', field: 'avgGrossMultiple', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') + 'x' },
         { name: 'grossIrr', align: 'left', label: 'Gross IRR', field: 'avgGrossIrr', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.0') },
         { name: 'netMultiple', align: 'left', label: 'Net Multiple', field: 'avgNetMultiple', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') + 'x' },
         { name: 'netIrr', align: 'left', label: 'Net IRR', field: 'avgNetIrr', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
         { name: 'annualCashYield', label: 'Annual Cash Yield', align: 'left', field: 'avgAnnualCashYield', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
         { name: 'dpi', label: 'DPI', align: 'left', field: 'avgDpi', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0.00') },
-        { name: 'targetSize', align: 'left', label: 'Size', field: 'targetSize', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0') },
+        { name: 'targetSize', align: 'left', label: 'Size', field: 'cartTargetSize', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0') },
         { name: 'minimumTicket', align: 'left', label: 'Min.Tick', field: 'minimumTicket', sortable: true, format: val => this.$numeral(parseFloat(val)).format('0,0') },
         { name: 'duration', align: 'left', label: 'Duration', field: 'duration', sortable: true, style: 'width: 100px;' },
         { name: 'investmentPeriod', align: 'left', label: 'Inv.Per.', field: 'investmentPeriod', sortable: true },
@@ -249,6 +272,7 @@ export default {
     },
     clickColumn (colName, row) {
       if (colName === 'nombre') {
+        
         // row.id = row.idActivo
         this.addTab(['activosFormMain', 'Activo-' + row.id, row, row.id])
       }
@@ -261,7 +285,13 @@ export default {
         avgSoldNetMultiple: 0,
         avgSoldNetIrr: 0,
         avgSoldAnnualCashYield: 0,
-        avgDpi: 0
+        avgDpi: 0,
+        cartAnnualyield: 0,
+        cartDpi: 0,
+        cartGrossirr: 0,
+        cartGrossmult: 0,
+        cartNetirr: 0,
+        cartNetmult: 0
       }
       //en totSelecc iré acumulando el total asignado a cada fondo (commitment)
       var totSelecc = 0
@@ -273,6 +303,7 @@ export default {
         if (r.seleccionado > '0') {
           numl++
           if (this.filterRecord.trackRecord == 'Track Record') {
+            this.trackRecord=true
             this.recordToSubmit.avgSoldGrossMultiple += (r.avgGrossMultiple !== null ? parseFloat(r.avgGrossMultiple) : 0) * (parseFloat(r.seleccionado) / totSelecc)
             this.recordToSubmit.avgSoldGrossIrr += (r.avgGrossIrr !== null ? parseFloat(r.avgGrossIrr) : 0) * (parseFloat(r.seleccionado) / totSelecc)
             this.recordToSubmit.avgSoldNetMultiple += (r.avgNetMultiple !== null ? parseFloat(r.avgNetMultiple) : 0) * (parseFloat(r.seleccionado) / totSelecc)
@@ -280,12 +311,13 @@ export default {
             this.recordToSubmit.avgSoldAnnualCashYield += (r.avgAnnualCashYield !== null ? parseFloat(r.avgAnnualCashYield) : 0) * (parseFloat(r.seleccionado) / totSelecc)
             this.recordToSubmit.avgDpi += (r.avgDpi !== null ? parseFloat(r.avgDpi) : 0) * (parseFloat(r.seleccionado) / totSelecc)
           } else { //cartera actual
-            this.recordToSubmit.avgSoldGrossMultiple += (r.grossmult !== null ? parseFloat(r.grossmult) : 0) * (parseFloat(r.seleccionado) / totSelecc)
-            this.recordToSubmit.avgSoldGrossIrr += (r.grossirr !== null ? parseFloat(r.grossirr) : 0) * (parseFloat(r.seleccionado) / totSelecc)
-            this.recordToSubmit.avgSoldNetMultiple += (r.netmult !== null ? parseFloat(r.netmult) : 0) * (parseFloat(r.seleccionado) / totSelecc)
-            this.recordToSubmit.avgSoldNetIrr += (r.netirr !== null ? parseFloat(r.netirr) : 0) * (parseFloat(r.seleccionado) / totSelecc)
-            this.recordToSubmit.avgSoldAnnualCashYield += (r.annualyield !== null ? parseFloat(r.annualyield) : 0) * (parseFloat(r.seleccionado) / totSelecc)
-            this.recordToSubmit.avgDpi += (r.dpi !== null ? parseFloat(r.dpi) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.trackRecord=false
+            this.recordToSubmit.avgSoldGrossMultiple += (r.cartGrossmult !== null ? parseFloat(r.cartGrossmult) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgSoldGrossIrr += (r.cartGrossirr !== null ? parseFloat(r.cartGrossirr) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgSoldNetMultiple += (r.cartNetmult !== null ? parseFloat(r.cartNetmult) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgSoldNetIrr += (r.cartNetirr !== null ? parseFloat(r.cartNetirr) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgSoldAnnualCashYield += (r.cartAnnualyield !== null ? parseFloat(r.cartAnnualyield) : 0) * (parseFloat(r.seleccionado) / totSelecc)
+            this.recordToSubmit.avgDpi += (r.cartDpi !== null ? parseFloat(r.cartDpi) : 0) * (parseFloat(r.seleccionado) / totSelecc)
           }
         }
       })
@@ -301,21 +333,24 @@ export default {
     },
     getRecords (v) {
       //cuando cierro el filtro seleccion de alternativos, el emit hace que se ejecute este método.
-      if (v.trackRecord !== 'Track Record') { //cartera actual  
+     
+      if (v.trackRecord !== 'Track Record') { //cartera actual: ACTIVOS
         var obj;
+        this.trackRecord=false
         obj = this.columns.find(r => r.name=='grossMultiple')
-        obj.field = 'grossmult'
+        obj.field = 'cartGrossmult' //cogemos valores de tabla activo
         obj = this.columns.find(r => r.name=='grossIrr')
-        obj.field = 'grossirr'
+        obj.field = 'cartGrossirr'
         obj = this.columns.find(r => r.name=='netMultiple')
-        obj.field = 'netmult'
+        obj.field = 'cartNetmult'
         obj = this.columns.find(r => r.name=='netIrr')
-        obj.field = 'netirr'
+        obj.field = 'cartNetirr'
         obj = this.columns.find(r => r.name=='annualCashYield')
-        obj.field = 'annualyield'
+        obj.field = 'cartAnnualyield'
         obj = this.columns.find(r => r.name=='dpi')
-        obj.field = 'dpi'
-      } else {
+        obj.field = 'cartDpi'
+      } else { // se ha seleccionado Track Record (por defecto)
+        this.trackRecord=true
         obj = this.columns.find(r => r.name=='grossMultiple')
         obj.field = 'avgGrossMultiple'
         obj = this.columns.find(r => r.name=='grossIrr')
@@ -332,6 +367,7 @@ export default {
 
       this.expanded = false
       this.filterRecord = v
+      
       var objFilter = Object.assign({}, this.filterRecord)
       objFilter.codEmpresa = this.user.codEmpresa
       objFilter.idEntidad = (objFilter.idEntidad && objFilter.idEntidad !== null ? objFilter.idEntidad.join() : null) // paso de array a concatenacion de strings (join)
@@ -339,15 +375,17 @@ export default {
       objFilter.estadoActivo = (objFilter.estadoActivo && objFilter.estadoActivo !== null ? objFilter.estadoActivo.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.tipoProducto = (objFilter.tipoProducto && objFilter.tipoProducto !== null ? objFilter.tipoProducto.join() : null) // paso de array a concatenacion de strings (join)
       objFilter.codOtraEmpresa = (objFilter.codOtraEmpresa && objFilter.codOtraEmpresa !== null ? objFilter.codOtraEmpresa.join() : null) // paso de array a concatenacion de strings (join)
-
+    
       return this.$axios.get('activos/bd_activos.php/findActivosActFilter', { params: objFilter })
         .then(response => {
           // var i = 0
           //console.log('Error producido en llamada a findActivosActFilter')
-          response.data.forEach(row => {
-            // row.id = i++
-            row.seleccionado = '0'
-          })
+          if(response.data.length > 0) {
+            response.data.forEach(row => {
+              // row.id = i++
+              row.seleccionado = '0'
+            })
+          }
           //bucle para unicamente meter los de launch del objeto <= launchHasta
           /*console.log('response.data', response.data)
           
@@ -358,7 +396,6 @@ export default {
               this.registrosSeleccionados[k] = response.data[k]
             }
           }*/
-          
           this.registrosSeleccionados = response.data
           this.updateRecord()
         })
@@ -380,19 +417,23 @@ export default {
       var objFilter = {}
       objFilter.idActivo = ''
       objFilter.seleccionado = ''
+      this.copiaSeleccionados= []
       this.registrosSeleccionados.forEach(r => {
         if (r.seleccionado > '0') {
           if (objFilter.idActivo.length > 0) objFilter.idActivo += ','
           if (objFilter.seleccionado.length > 0) objFilter.seleccionado += ','
           objFilter.idActivo += r.id
           objFilter.seleccionado += r.seleccionado
+          //copia de array de objetos - seleccionados
+          this.copiaSeleccionados.push(r)
         }
-      }) //en objFilter ahora tengo un objeto con 2 atributos: idActivo y su commitment (en seleccionado)
-  
+      }) //en objFilter ahora tengo un objeto con 2 atributos: idActivo y su commitment (en seleccionado)      
+      this.refreshPerf++
       // donut analisis fondos moneda
       this.$axios.get('activos/bd_activos.php/findAnalisisFondos1/', { params: objFilter })
         .then(response => {
           this.registrosAnalisisFondos1 = response.data
+          
           this.refreshRec++ // para que refresque el componente
         })
         .catch(error => {
@@ -403,11 +444,13 @@ export default {
         .then(response => {
           this.registrosAnalisisFondos2 = response.data
           this.registrosAnalisisFondos2.forEach(r => r.serie === null ? r.serie = '.' : '')
+          
           this.refreshRec1++ // para que refresque el componente
         })
         .catch(error => {
           this.$q.dialog({ title: 'Error', message: error })
         })
+      //grafico performance por implementar
     }
   },
   mounted () {
@@ -420,18 +463,19 @@ export default {
         if(this.filterRecord.trackRecord=='Cartera Actual') {
           //estoy en cartera actual -  tengo que sustituir los valores del grid, por los de cartera actual (por defecto, se define con track record)
           var obj;
+          this.trackRecord=false
           obj = this.columns.find(r => r.name=='grossMultiple')
-          obj.field = 'grossmult'
+          obj.field = 'cartGrossmult'
           obj = this.columns.find(r => r.name=='grossIrr')
-          obj.field = 'grossirr'
+          obj.field = 'cartGrossirr'
           obj = this.columns.find(r => r.name=='netMultiple')
-          obj.field = 'netmult'
+          obj.field = 'cartNetmult'
           obj = this.columns.find(r => r.name=='netIrr')
-          obj.field = 'netirr'
+          obj.field = 'cartNetirr'
           obj = this.columns.find(r => r.name=='annualCashYield')
-          obj.field = 'annualyield'
+          obj.field = 'cartAnnualyield'
           obj = this.columns.find(r => r.name=='dpi')
-          obj.field = 'dpi'
+          obj.field = 'cartDpi'
         }
       }
       
@@ -440,6 +484,7 @@ export default {
     } else { // es la primera vez que entro, cargo valores por defecto
       this.filterRecord = {
         idActivo: [],
+        idEntidad: [],
         tipoActivo: ['CAP.RIESGO', 'ALTERN.R FIJA'],
         computa: '1',
         launch: (new Date()).getFullYear(),
@@ -462,6 +507,7 @@ export default {
   components: {
     alternativosCompFilter: alternativosCompFilter,
     alternativosPieChartFiltros: alternativosPieChartFiltros,
+    alternativosPerformance: alternativosPerformance,
     dashboardResumenPatrimonio: dashboardResumenPatrimonio
   }
 }

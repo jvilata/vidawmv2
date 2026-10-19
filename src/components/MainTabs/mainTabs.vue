@@ -44,8 +44,7 @@ export default {
     ...mapActions('tabs', ['addTab', 'updateTabData', 'removeTab', 'setltab']),
     ...mapActions('tablasAux', ['loadTablasAux']),
     updateTabData1 ([ptab, pvalue]) {
-      console.log(this.tabs, this.ltab)
-      console.log('maintasb ', ptab, pvalue)
+    
     }
   }
 }
