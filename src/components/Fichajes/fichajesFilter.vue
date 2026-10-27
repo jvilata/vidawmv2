@@ -7,7 +7,8 @@
 
     <q-form @submit="getRecords" class="q-gutter-y-xs">
       <q-select
-        :readonly="this.user.pers.userRol !== '1'"
+        
+        :readonly="this.user.pers.userRol != '1'"
         outlined
         clearable
         label="Persona"
@@ -19,6 +20,7 @@
         emit-value
         map-options
       />
+
       <q-select
         outlined
         clearable
@@ -42,24 +44,10 @@
         emit-value
         map-options
       />
-      <q-input outlined clearable label="Fecha Desde" stack-label :model-value="formatDate(filterR.fechaD)" @update:model-value="val =>filterR.fechaD=val" >
-        <template v-slot:append>
-            <q-icon name="event" class="cursos-pointer">
-              <q-popup-proxy ref="fechaD">
-                <wgDate v-model="filterR.fechaD" @update:model-value="filterR.ultimo=null;$refs.fechaD.hide()"/>
-              </q-popup-proxy>
-            </q-icon>
-        </template>
-      </q-input>
-      <q-input outlined clearable label="Fecha Hasta" stack-label :model-value="formatDate(filterR.fechaH)" @update:model-value="val =>filterR.fechaH=val" >
-        <template v-slot:append>
-            <q-icon name="event" class="cursos-pointer">
-              <q-popup-proxy ref="fechaH">
-                <wgDate v-model="filterR.fechaH" @update:model-value="filterR.ultimo=null;$refs.fechaH.hide()"/>
-              </q-popup-proxy>
-            </q-icon>
-        </template>
-      </q-input>
+      <q-input outlined clearable label="Fecha Desde" stack-label v-model="filterR.fechaD" type="date" />
+      <q-input outlined clearable label="Fecha Hasta" stack-label v-model="filterR.fechaH" type="date" />
+      
+      
        <q-select
         label="Estado"
         stack-label
@@ -83,7 +71,7 @@
 <script>
 import { mapState } from 'vuex'
 import { date } from 'quasar'
-import wgDate from 'components/General/wgDate.vue'
+
 export default {
   props: ['value'], // value es el objeto con los campos de filtro que le pasa accionesMain con v-model
   data () {
@@ -113,9 +101,6 @@ export default {
       this.filterR.fechaD = date.formatDate(new Date(), 'YYYY-MM-01')
       this.filterR.fechaH = date.formatDate(date.subtractFromDate(date.addToDate(date.adjustDate(new Date(), { date: 1 }), { month: 1 }), { days: 1 }), 'YYYY-MM-DD')
     }
-  },
-  components: {
-    wgDate: wgDate
   }
 }
 </script>

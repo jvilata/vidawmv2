@@ -1,5 +1,5 @@
-  <!-- componente que se llama desde accionesMain y que presenta el formulario de filtro y el boton de busqueda -->
-  <template>
+<!-- componente que se llama desde accionesMain y que presenta el formulario de registro de jornada -->
+<template>
   <q-card style="width: 400px;" class="q-pr-xs q-gutter-xs">
     <q-card-section class="bg-primary text-white">
       <div class="text-h6">Registro jornada</div>
@@ -7,7 +7,7 @@
 
     <q-form @submit="saveRecord" class="q-gutter-y-xs">
       <q-select
-        :readonly="this.user.pers.userRol !== '1'"
+        :readonly="this.user.pers.userRol != '1'"
         outlined
         clearable
         label="Persona"
@@ -23,7 +23,7 @@
         outlined
         clearable
         label="Tipo Jornada"
-        @blur="val=>{if (val!=='ORDINARIA') {filterR.estado='PENDIENTE'; filterR.fechaInicio=filterR.fechaInicio.substring(0,10)+' 00:00'; filterR.fechaFin=filterR.fechaFin.substring(0,10)+' 00:00'}} "
+        @update:model-value="onTipoJornadaChange"
         stack-label
         v-model="filterR.tipoJornada"
         :options="listaTiposJornada"
@@ -31,54 +31,63 @@
         option-label="codElemento"
         emit-value
       />
-      <q-input outlined clearable label="Fecha Inicio" stack-label :model-value="formatDate(filterR.fechaInicio)">
+
+      <!-- FECHA INICIO / HORA INICIO -->
+      <q-input outlined clearable label="Fecha Inicio" stack-label type="date"
+        :model-value="getFecha('fechaInicio')"
+        @update:model-value="val => setFecha('fechaInicio', val)" />
+
+      <q-input class="col-xs-6 col-sm-6" outlined label="Hora Inicio" stack-label mask="time"
+        :model-value="getHora('fechaInicio')"
+        @update:model-value="val => { if (val && val.length === 5) setHora('fechaInicio', val) }">
         <template v-slot:append>
-            <q-icon name="event" class="cursos-pointer">
-              <q-popup-proxy ref="fechaInicio">
-                <wgDate :model-value="filterR.fechaInicio" @update:model-value="val => {filterR.fechaInicio=val.substring(0, 10) + ' ' + filterR.fechaInicio.substring(11, 16); $refs.fechaInicio.hide()}"/>
-              </q-popup-proxy>
-            </q-icon>
+          <q-icon name="access_time" class="cursor-pointer">
+            <q-popup-proxy>
+              <q-time
+                :model-value="getHora('fechaInicio')"
+                @update:model-value="val => setHora('fechaInicio', val)"
+                :hour-options="hourOptions"
+                :minute-options="minuteOptions"
+                mask="HH:mm"
+                format24h
+              >
+                <div class="row items-center justify-end">
+                  <q-btn v-close-popup label="Aceptar" color="primary" flat />
+                </div>
+              </q-time>
+            </q-popup-proxy>
+          </q-icon>
         </template>
       </q-input>
-      <q-input class="col-xs-6 col-sm-6" outlined clearable label="Hora Inicio" stack-label :model-value="formatHour(filterR.fechaInicio)" @update:model-value="val => filterR.fechaInicio=val">
+
+      <!-- FECHA FIN / HORA FIN -->
+      <q-input outlined clearable label="Fecha Fin" stack-label type="date"
+        :model-value="getFecha('fechaFin')"
+        @update:model-value="val => setFecha('fechaFin', val)" />
+
+      <q-input class="col-xs-6 col-sm-6" outlined label="Hora Fin" stack-label mask="time"
+        :model-value="getHora('fechaFin')"
+        @update:model-value="val => { if (val && val.length === 5) setHora('fechaFin', val) }">
         <template v-slot:append>
-            <q-icon name="access_time" class="cursos-pointer">
-              <q-popup-proxy ref="horaInicio">
-                <q-time v-model="filterR.fechaInicio"
-                  @update:model-value="$refs.horaInicio.hide()"
-                  :hour-options="hourOptions"
-                  :minute-options="minuteOptions"
-                  mask="YYYY-MM-DD HH:mm:ss"
-                  format24h
-                />
-              </q-popup-proxy>
-            </q-icon>
+          <q-icon name="access_time" class="cursor-pointer">
+            <q-popup-proxy>
+              <q-time
+                :model-value="getHora('fechaFin')"
+                @update:model-value="val => setHora('fechaFin', val)"
+                :hour-options="hourOptions"
+                :minute-options="minuteOptions"
+                mask="HH:mm"
+                format24h
+              >
+                <div class="row items-center justify-end">
+                  <q-btn v-close-popup label="Aceptar" color="primary" flat />
+                </div>
+              </q-time>
+            </q-popup-proxy>
+          </q-icon>
         </template>
       </q-input>
-      <q-input outlined clearable label="Fecha Fin" stack-label :model-value="formatDate(filterR.fechaFin)" @update:model-value="val => filterR.fechaFin=val">
-        <template v-slot:append>
-            <q-icon name="event" class="cursos-pointer">
-              <q-popup-proxy ref="fechaFin">
-                <wgDate :model-value="filterR.fechaFin" @update:model-value="val => {filterR.fechaFin=val.substring(0, 10) + ' ' + filterR.fechaFin.substring(11, 16); $refs.fechaFin.hide()}"/>
-              </q-popup-proxy>
-            </q-icon>
-        </template>
-      </q-input>
-      <q-input class="col-xs-6 col-sm-6" outlined clearable label="Hora Fin" stack-label :model-value="formatHour(filterR.fechaFin)" @update:model-value="val => filterR.fechaFin=val">
-        <template v-slot:append>
-            <q-icon name="access_time" class="cursos-pointer">
-              <q-popup-proxy ref="horaFin">
-                <q-time v-model="filterR.fechaFin"
-                  @update:model-value="$refs.horaFin.hide()"
-                  :hour-options="hourOptions"
-                  :minute-options="minuteOptions"
-                  mask="YYYY-MM-DD HH:mm:ss"
-                  format24h
-                />
-              </q-popup-proxy>
-            </q-icon>
-        </template>
-      </q-input>
+
       <q-select
         :readonly="this.user.pers.userRol !== '1'"
         outlined
@@ -103,7 +112,6 @@
 <script>
 import { mapState } from 'vuex'
 import { date } from 'quasar'
-import wgDate from 'components/General/wgDate.vue'
 export default {
   props: ['value'], // value es el objeto con los campos de filtro que le pasa accionesMain con v-model
   data () {
@@ -123,6 +131,29 @@ export default {
     ...mapState('login', ['user'])
   },
   methods: {
+    // fechaInicio / fechaFin guardan 'YYYY-MM-DD HH:mm'. Estos helpers leen/escriben solo una parte conservando la otra.
+    getFecha (campo) {
+      const v = this.filterR[campo]
+      return v ? v.substring(0, 10) : ''
+    },
+    getHora (campo) {
+      const v = this.filterR[campo]
+      return v && v.length >= 16 ? v.substring(11, 16) : '00:00'
+    },
+    setFecha (campo, val) {
+      this.filterR[campo] = val ? val + ' ' + this.getHora(campo) : ''
+    },
+    setHora (campo, val) {
+      const f = this.getFecha(campo) || date.formatDate(new Date(), 'YYYY-MM-DD')
+      this.filterR[campo] = f + ' ' + val
+    },
+    onTipoJornadaChange (val) {
+      if (val && val !== 'ORDINARIA') {
+        this.filterR.estado = 'PENDIENTE'
+        this.setHora('fechaInicio', '00:00')
+        this.setHora('fechaFin', '00:00')
+      }
+    },
     crearRegistro () { // crear nuevo registro
       var horaInicio1 = this.user.pers.horaInicio1
       if (horaInicio1 === '' || horaInicio1 === null) horaInicio1 = '09:00'
@@ -147,7 +178,7 @@ export default {
         this.filterR.fechaInicio += ' ' + horaInicio2 // falta fichar la segunda parte
         this.filterR.fechaFin += ' ' + horaFin2
       } else {
-        this.filterR.fechaInicio += ' ' + horaInicio1 // falta fichar la segunda parte
+        this.filterR.fechaInicio += ' ' + horaInicio1
         this.filterR.fechaFin += ' ' + horaFin1
       }
     },
@@ -166,20 +197,11 @@ export default {
       if (this.filterR.fechaInicio.length < 18) this.filterR.fechaInicio += ':00' // añado segundos
       if (this.filterR.fechaFin.length < 18) this.filterR.fechaFin += ':00' // añado segundos
       this.$emit('saveRecord', this.filterR) // lo captura accionesMain
-    },
-    formatDate (pdate) {
-      return date.formatDate(pdate, 'DD-MM-YYYY')
-    },
-    formatHour (pdate) {
-      return date.formatDate(pdate, 'HH:mm')
     }
   },
   mounted () {
     this.filterR = Object.assign({}, this.value)
     if (this.value.registroNuevo === true) this.crearRegistro()
-  },
-  components: {
-    wgDate: wgDate
   }
 }
 </script>
